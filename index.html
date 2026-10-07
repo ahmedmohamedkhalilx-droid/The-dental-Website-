@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -318,7 +318,7 @@ em.accent { font-style: italic; color: var(--blush); }
 <header class="site-header">
   <div class="wrap">
     <a class="brand" href="#top" aria-label="The Dental Hauz home"><img src="assets/img/logo-dark.png" alt="The Dental Hauz" width="879" height="258"></a>
-    <button class="menu-toggle" id="menu-toggle" aria-controls="site-nav" aria-expanded="false" aria-label="Open menu"><span></span><span></span><span></span></button>
+    <button class="menu-toggle" id="menu-toggle" type="button" aria-controls="site-nav" aria-expanded="false" aria-label="Open menu"><span></span><span></span><span></span></button>
     <nav class="nav" id="site-nav" data-open="false" aria-label="Main">
       <a href="#about">About</a>
       <a href="#services">Services</a>
@@ -359,7 +359,7 @@ em.accent { font-style: italic; color: var(--blush); }
     </div>
   </section>
 
-  <div class="strip" aria-label="Treatments">
+  <div class="strip">
     <ul class="wrap">
       <li>Dental Implants</li>
       <li>Wisdom Teeth</li>
@@ -484,7 +484,7 @@ em.accent { font-style: italic; color: var(--blush); }
         <img src="assets/img/oral-health.jpg" alt="A clinician holding a dental model. Text reads: Oral health is more than just health." width="736" height="981">
       </div>
       <div class="manifesto-copy">
-        <div class="mantra" aria-label="Your smile, your experience, your Hauz">
+        <div class="mantra">
           <span>Your smile</span>
           <span>Your experience</span>
           <span>Your <b>Hauz</b></span>
@@ -544,7 +544,7 @@ em.accent { font-style: italic; color: var(--blush); }
       </div>
       <form class="form" id="booking-form" novalidate>
         <div class="row">
-          <div class="field"><label for="f-name">Full name</label><input id="f-name" name="name" autocomplete="name" required></div>
+          <div class="field"><label for="f-name">Full name</label><input id="f-name" type="text" name="name" autocomplete="name" required></div>
           <div class="field"><label for="f-phone">Phone</label><input id="f-phone" name="phone" type="tel" autocomplete="tel" required></div>
         </div>
         <div class="field"><label for="f-email">Email</label><input id="f-email" name="email" type="email" autocomplete="email"></div>

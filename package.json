@@ -1,0 +1,15 @@
+{
+  "name": "the-dental-hauz-website",
+  "private": true,
+  "description": "Static website for The Dental Hauz",
+  "scripts": {
+    "serve": "python3 -m http.server 4173",
+    "lint:html": "html-validate index.html",
+    "test:e2e": "playwright test",
+    "test": "npm run lint:html && npm run test:e2e"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.0",
+    "html-validate": "^9.0.0"
+  }
+}

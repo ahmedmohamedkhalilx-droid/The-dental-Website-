@@ -26,3 +26,11 @@ Open `index.html` in a browser, or run `python3 -m http.server` and visit http:/
 
 ## Publish with GitHub Pages
 Settings → Pages → Deploy from a branch → choose the branch and `/ (root)`.
+
+## Tests
+```
+npm install
+npx playwright install chromium   # first time only
+npm test                          # HTML validation + 20 browser tests (desktop + mobile)
+```
+The same checks run on GitHub Actions on every push (`.github/workflows/test.yml`).

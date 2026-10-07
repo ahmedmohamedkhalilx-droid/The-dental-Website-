@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Dental Hauz</title>
+<meta name="description" content="The Dental Hauz — implants, oral surgery, clear aligners and cosmetic dentistry in a calm, home-like clinic. Your smile. Your experience. Your Hauz.">
+<link rel="icon" type="image/png" href="assets/img/mark-dark.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500&display=swap">
+<style>
+/* Layout: split-screen editorial sections alternating cream / sage / umber bands, the way the brand sheet stacks its tiles. */
+:root {
+  /* Brand palette (The Dental Hauz brand sheet) */
+  --umber: #514A43;      /* deep brown: text, dark bands */
+  --sage-deep: #657568;  /* primary green */
+  --sage: #A8B6A5;       /* soft green */
+  --blush: #D8B8B2;      /* accent pink */
+  --cream: #F4F0E8;      /* ground */
+  --paper: #FBF9F5;      /* lifted surface */
+  --line: rgba(81, 74, 67, .16);
+  --umber-soft: rgba(81, 74, 67, .74);
+
+  /* Type: The Seasons (headings) and Garet (body) are the brand faces;
+     Cormorant Garamond and Jost stand in until the licensed files are added. */
+  --font-display: "The Seasons", "Cormorant Garamond", "Cormorant", Georgia, "Times New Roman", serif;
+  --font-body: "Garet", "Jost", "Futura", "Century Gothic", "Helvetica Neue", Arial, sans-serif;
+
+  --step--1: .8125rem;
+  --step-0: 1.0625rem;
+  --step-1: 1.375rem;
+  --step-2: clamp(1.75rem, 1.4rem + 1.4vw, 2.5rem);
+  --step-3: clamp(2.25rem, 1.6rem + 2.8vw, 3.75rem);
+  --step-4: clamp(2.75rem, 1.8rem + 4.2vw, 5.25rem);
+
+  --gutter: clamp(16px, 4vw, 56px);
+  --max: 1240px;
+  --radius: 2px;
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { transition: none !important; animation: none !important; } }
+body {
+  margin: 0;
+  background: var(--cream);
+  color: var(--umber);
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  font-weight: 300;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+img { max-width: 100%; display: block; }
+a { color: inherit; }
+h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 400; line-height: 1.08; margin: 0; text-wrap: balance; letter-spacing: -.005em; }
+p { margin: 0; }
+:focus-visible { outline: 2px solid var(--sage-deep); outline-offset: 3px; }
+
+.wrap { width: 100%; max-width: var(--max); margin-inline: auto; padding-inline: var(--gutter); }
+.eyebrow {
+  font-family: var(--font-body);
+  font-size: var(--step--1);
+  font-weight: 400;
+  letter-spacing: .32em;
+  text-transform: uppercase;
+  color: var(--sage-deep);
+}
+.eyebrow--light { color: var(--blush); }
+em.accent { font-style: italic; color: var(--blush); }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .6em;
+  padding: .95em 1.8em;
+  border: 1px solid var(--umber);
+  background: var(--umber); color: var(--cream);
+  font: 400 var(--step--1)/1 var(--font-body);
+  letter-spacing: .22em; text-transform: uppercase; text-decoration: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background .25s ease, color .25s ease, border-color .25s ease;
+}
+.btn:hover { background: var(--sage-deep); border-color: var(--sage-deep); }
+.btn--ghost { background: transparent; color: var(--umber); }
+.btn--ghost:hover { background: var(--umber); color: var(--cream); border-color: var(--umber); }
+.btn--light { background: var(--cream); color: var(--umber); border-color: var(--cream); }
+.btn--light:hover { background: var(--blush); border-color: var(--blush); color: var(--umber); }
+.btn--outline-light { background: transparent; color: var(--cream); border-color: rgba(244, 240, 232, .6); }
+.btn--outline-light:hover { background: var(--cream); color: var(--umber); }
+
+/* ---------- Top bar + header ---------- */
+.topbar { background: var(--umber); color: var(--cream); font-size: var(--step--1); letter-spacing: .06em; }
+.topbar .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .25rem 1.5rem; padding-block: .55rem; }
+.topbar span { opacity: .86; }
+
+.site-header {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 50;
+  background: rgba(244, 240, 232, .94);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.site-header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; padding-block: .9rem; }
+.brand img { height: 46px; width: auto; }
+.nav { display: flex; align-items: center; gap: clamp(1rem, 2.2vw, 2.2rem); }
+.nav a { text-decoration: none; font-size: .78rem; letter-spacing: .2em; text-transform: uppercase; font-weight: 400; position: relative; padding-block: .3rem; }
+.nav a:not(.btn)::after { content: ""; position: absolute; left: 0; right: 100%; bottom: 0; height: 1px; background: var(--blush); transition: right .3s ease; }
+.nav a:not(.btn):hover::after { right: 0; }
+.nav .btn { padding: .85em 1.4em; }
+.menu-toggle { display: none; background: none; border: 1px solid var(--line); border-radius: var(--radius); padding: .55rem .7rem; cursor: pointer; color: var(--umber); }
+.menu-toggle span { display: block; width: 22px; height: 1px; background: currentColor; margin: 5px 0; }
+
+@media (max-width: 960px) {
+  .menu-toggle { display: block; }
+  .nav {
+    position: absolute; left: 0; right: 0; top: 100%;
+    flex-direction: column; align-items: stretch; gap: 0;
+    background: var(--cream); border-bottom: 1px solid var(--line);
+    padding: .5rem var(--gutter) 1.25rem;
+  }
+  .nav[data-open="false"] { display: none; }
+  .nav a:not(.btn) { padding-block: .9rem; border-bottom: 1px solid var(--line); }
+  .nav .btn { margin-top: 1rem; }
+  .brand img { height: 38px; }
+}
+
+/* ---------- Hero ---------- */
+.hero { position: relative; overflow: hidden; }
+.hero .wrap { display: grid; grid-template-columns: 1.05fr .95fr; gap: clamp(2rem, 5vw, 5rem); align-items: center; padding-block: clamp(3rem, 7vw, 6.5rem); }
+.hero-copy { display: grid; gap: 1.6rem; min-width: 0; }
+.hero h1 { font-size: var(--step-4); }
+.hero h1 .line { display: block; }
+.hero h1 .hauz { color: var(--sage-deep); font-style: italic; }
+.hero-lead { max-width: 34rem; color: var(--umber-soft); font-size: 1.125rem; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: .9rem; }
+.hero-media { position: relative; min-width: 0; }
+.hero-media .frame { aspect-ratio: 4 / 5; max-width: 100%; overflow: hidden; border-radius: 220px 220px var(--radius) var(--radius); background: var(--sage); }
+.hero-media .frame img { width: 100%; height: 100%; object-fit: cover; filter: saturate(.85); }
+.hero-badge {
+  position: absolute; left: -1.5rem; bottom: 2.5rem;
+  background: var(--paper); padding: 1.1rem 1.4rem; max-width: 15.5rem;
+  border: 1px solid var(--line); box-shadow: 0 18px 40px -24px rgba(81, 74, 67, .45);
+  display: grid; gap: .35rem;
+}
+.hero-badge strong { font-family: var(--font-display); font-weight: 500; font-size: 1.35rem; line-height: 1.15; }
+.hero-badge span { font-size: .85rem; color: var(--umber-soft); line-height: 1.5; }
+.hero-mark { position: absolute; right: -60px; top: -40px; width: 340px; opacity: .06; pointer-events: none; }
+@media (max-width: 860px) {
+  .hero .wrap { grid-template-columns: 1fr; }
+  .hero-media { max-width: 460px; }
+  .hero-badge { left: 1rem; bottom: 1rem; }
+}
+
+/* ---------- Services strip ---------- */
+.strip { background: var(--sage-deep); color: var(--cream); }
+.strip ul { list-style: none; margin: 0; padding-block: 1.15rem; display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem 1.4rem; }
+.strip li { font-size: .78rem; letter-spacing: .28em; text-transform: uppercase; display: flex; align-items: center; gap: 1.4rem; }
+.strip li + li::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--blush); }
+
+/* ---------- Generic section ---------- */
+.section { padding-block: clamp(4rem, 9vw, 8rem); }
+.section-head { display: grid; gap: 1rem; max-width: 46rem; margin-bottom: clamp(2.5rem, 5vw, 4rem); }
+.section-head h2 { font-size: var(--step-3); }
+.section-head p { color: var(--umber-soft); max-width: 38rem; }
+.section-head--center { margin-inline: auto; text-align: center; justify-items: center; }
+
+/* ---------- About ---------- */
+.about .wrap { display: grid; grid-template-columns: .9fr 1.1fr; gap: clamp(2rem, 6vw, 6rem); align-items: center; }
+.about-media { position: relative; }
+.about-media img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: var(--radius); }
+.about-media::before { content: ""; position: absolute; inset: 1.5rem -1.5rem -1.5rem 1.5rem; background: var(--blush); z-index: -1; border-radius: var(--radius); }
+.about-copy { display: grid; gap: 1.4rem; min-width: 0; }
+.about-copy h2 { font-size: var(--step-3); }
+.about-copy p { color: var(--umber-soft); max-width: 36rem; }
+.pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 1rem; padding-top: 1.75rem; border-top: 1px solid var(--line); }
+.pillars h3 { font-size: 1.45rem; margin-bottom: .35rem; }
+.pillars p { font-size: .92rem; line-height: 1.6; }
+@media (max-width: 860px) {
+  .about .wrap { grid-template-columns: 1fr; }
+  .about-media { max-width: 440px; margin-right: 1.5rem; }
+  .pillars { grid-template-columns: 1fr; }
+}
+
+/* ---------- Services ---------- */
+.services { background: var(--paper); border-block: 1px solid var(--line); }
+.service-grid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+.service {
+  display: grid; grid-template-rows: auto auto 1fr auto; gap: .9rem;
+  padding: clamp(1.75rem, 3vw, 2.6rem);
+  border-right: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  text-decoration: none; min-width: 0;
+  transition: background .3s ease;
+}
+.service:hover { background: var(--cream); }
+.service svg { width: 44px; height: 44px; stroke: var(--sage-deep); fill: none; stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; }
+.service h3 { font-size: 1.7rem; }
+.service p { color: var(--umber-soft); font-size: .95rem; line-height: 1.65; }
+.service .more { font-size: .72rem; letter-spacing: .24em; text-transform: uppercase; color: var(--sage-deep); display: inline-flex; gap: .6rem; align-items: center; }
+.service .more::after { content: ""; width: 26px; height: 1px; background: currentColor; transition: width .3s ease; }
+.service:hover .more::after { width: 44px; }
+@media (max-width: 960px) { .service-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .service-grid { grid-template-columns: 1fr; } }
+
+/* ---------- Feature (implants) ---------- */
+.feature { background: var(--umber); color: var(--cream); }
+.feature .wrap { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem, 6vw, 6rem); align-items: center; }
+.feature-copy { display: grid; gap: 1.4rem; min-width: 0; }
+.feature-copy h2 { font-size: var(--step-3); }
+.feature-copy p { color: rgba(244, 240, 232, .8); max-width: 34rem; }
+.checklist { list-style: none; padding: 0; margin: .4rem 0 .6rem; display: grid; gap: .8rem; }
+.checklist li { display: grid; grid-template-columns: 22px 1fr; gap: .9rem; align-items: start; color: rgba(244, 240, 232, .9); }
+.checklist li::before { content: ""; width: 14px; height: 14px; margin-top: .45em; border: 1px solid var(--blush); border-radius: 50%; background: radial-gradient(circle, var(--blush) 0 3px, transparent 3.5px); }
+.feature-media { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: end; }
+.feature-media img { width: 100%; object-fit: cover; border-radius: var(--radius); }
+.feature-media img:first-child { aspect-ratio: 3 / 4.4; }
+.feature-media img:last-child { aspect-ratio: 3 / 4; margin-bottom: 3rem; }
+@media (max-width: 860px) { .feature .wrap { grid-template-columns: 1fr; } }
+
+/* ---------- Journey (a real sequence, so it is numbered) ---------- */
+.steps { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(1.25rem, 2.5vw, 2rem); counter-reset: step; }
+.step { counter-increment: step; display: grid; gap: .75rem; align-content: start; padding-top: 1.4rem; border-top: 1px solid var(--umber); min-width: 0; }
+.step::before { content: "0" counter(step); font-family: var(--font-display); font-size: 2.75rem; line-height: 1; color: var(--blush); font-style: italic; }
+.step h3 { font-size: 1.55rem; }
+.step p { color: var(--umber-soft); font-size: .95rem; line-height: 1.65; }
+@media (max-width: 960px) { .steps { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .steps { grid-template-columns: 1fr; } }
+
+/* ---------- Manifesto ---------- */
+.manifesto { background: var(--sage-deep); color: var(--cream); overflow: hidden; }
+.manifesto .wrap { display: grid; grid-template-columns: .85fr 1.15fr; gap: clamp(2rem, 6vw, 6rem); align-items: center; }
+.manifesto-media img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: var(--radius); }
+.manifesto-copy { display: grid; gap: 1.6rem; min-width: 0; }
+.mantra { display: grid; gap: .4rem; }
+.mantra span { font-family: var(--font-body); font-size: clamp(1rem, .8rem + 1vw, 1.5rem); letter-spacing: .42em; text-transform: uppercase; font-weight: 300; }
+.mantra span:last-child b { font-weight: 300; color: var(--blush); }
+.manifesto blockquote { margin: 0; font-family: var(--font-display); font-size: var(--step-2); line-height: 1.25; font-style: italic; max-width: 34rem; }
+.manifesto p { color: rgba(244, 240, 232, .84); max-width: 34rem; }
+@media (max-width: 860px) { .manifesto .wrap { grid-template-columns: 1fr; } .manifesto-media { max-width: 420px; } }
+
+/* ---------- FAQ ---------- */
+.faq .wrap { display: grid; grid-template-columns: .8fr 1.2fr; gap: clamp(2rem, 6vw, 6rem); align-items: start; }
+.faq .section-head { margin-bottom: 0; }
+.faq-list { border-top: 1px solid var(--line); min-width: 0; }
+.faq details { border-bottom: 1px solid var(--line); }
+.faq summary {
+  list-style: none; cursor: pointer;
+  display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+  padding-block: 1.35rem;
+  font-family: var(--font-display); font-size: 1.45rem; line-height: 1.25;
+}
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; font-family: var(--font-body); font-weight: 300; font-size: 1.6rem; color: var(--sage-deep); transition: transform .3s ease; flex: none; }
+.faq details[open] summary::after { transform: rotate(45deg); }
+.faq details p { padding-bottom: 1.4rem; color: var(--umber-soft); max-width: 40rem; }
+@media (max-width: 860px) { .faq .wrap { grid-template-columns: 1fr; } }
+
+/* ---------- Book ---------- */
+.book { background: var(--blush); }
+.book .wrap { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem, 6vw, 6rem); align-items: start; }
+.book-copy { display: grid; gap: 1.4rem; min-width: 0; }
+.book-copy h2 { font-size: var(--step-3); }
+.book-copy .eyebrow { color: var(--umber); }
+.book-copy p { max-width: 32rem; }
+.contact-lines { display: grid; gap: 1.1rem; margin-top: .5rem; }
+.contact-lines div { display: grid; gap: .1rem; }
+.contact-lines dt { font-size: .72rem; letter-spacing: .26em; text-transform: uppercase; }
+.contact-lines dd { margin: 0; font-family: var(--font-display); font-size: 1.4rem; }
+.form { background: var(--paper); padding: clamp(1.5rem, 4vw, 2.75rem); display: grid; gap: 1.1rem; border-radius: var(--radius); min-width: 0; }
+.form .row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; }
+.field { display: grid; gap: .4rem; min-width: 0; }
+.field label { font-size: .72rem; letter-spacing: .24em; text-transform: uppercase; color: var(--umber-soft); }
+.field input, .field select, .field textarea {
+  width: 100%; font: inherit; font-size: 1rem; color: var(--umber);
+  background: transparent; border: 0; border-bottom: 1px solid var(--line);
+  padding: .55rem 0; border-radius: 0;
+}
+.field textarea { resize: vertical; min-height: 5.5rem; }
+.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-bottom-color: var(--sage-deep); }
+.form .btn { justify-self: start; margin-top: .4rem; }
+.form-note { font-size: .88rem; color: var(--sage-deep); }
+@media (max-width: 860px) { .book .wrap { grid-template-columns: 1fr; } }
+@media (max-width: 520px) { .form .row { grid-template-columns: 1fr; } }
+
+/* ---------- Footer ---------- */
+.footer { background: var(--umber); color: var(--cream); padding-block: clamp(3.5rem, 7vw, 5.5rem) 2rem; }
+.footer-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 2.5rem; }
+.footer-brand { display: grid; gap: 1.2rem; align-content: start; }
+.footer-brand img { width: 240px; max-width: 100%; }
+.footer-brand p { color: rgba(244, 240, 232, .72); font-size: .95rem; max-width: 22rem; }
+.footer h4 { font-family: var(--font-body); font-size: .72rem; letter-spacing: .28em; text-transform: uppercase; font-weight: 400; color: var(--blush); margin-bottom: 1rem; }
+.footer ul { list-style: none; padding: 0; margin: 0; display: grid; gap: .55rem; font-size: .95rem; }
+.footer ul a { text-decoration: none; color: rgba(244, 240, 232, .82); }
+.footer ul a:hover { color: var(--cream); }
+.hours li { display: flex; justify-content: space-between; gap: 1rem; color: rgba(244, 240, 232, .82); font-variant-numeric: tabular-nums; }
+.footer-base { margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(244, 240, 232, .16); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; font-size: .8rem; color: rgba(244, 240, 232, .6); letter-spacing: .04em; }
+.footer-base .tag { letter-spacing: .32em; text-transform: uppercase; }
+@media (max-width: 960px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 520px) { .footer-grid { grid-template-columns: 1fr; } }
+
+/* Gentle entrance: content rests visible; only a short lift on load */
+@keyframes rise { from { transform: translateY(14px); opacity: .001; } to { transform: none; opacity: 1; } }
+.hero-copy > * { animation: rise .8s cubic-bezier(.2, .7, .2, 1) both; }
+.hero-copy > *:nth-child(2) { animation-delay: .08s; }
+.hero-copy > *:nth-child(3) { animation-delay: .16s; }
+.hero-copy > *:nth-child(4) { animation-delay: .24s; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <span>Implants · Oral Surgery · Aligners · Cosmetic Dentistry</span>
+    <span>Sat – Thu · 10:00 – 21:00</span>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="The Dental Hauz home"><img src="assets/img/logo-dark.png" alt="The Dental Hauz" width="879" height="258"></a>
+    <button class="menu-toggle" id="menu-toggle" aria-controls="site-nav" aria-expanded="false" aria-label="Open menu"><span></span><span></span><span></span></button>
+    <nav class="nav" id="site-nav" data-open="false" aria-label="Main">
+      <a href="#about">About</a>
+      <a href="#services">Services</a>
+      <a href="#implants">Implants</a>
+      <a href="#visit">Your Visit</a>
+      <a href="#faq">FAQ</a>
+      <a class="btn" href="#book">Book a Consultation</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- Hero -->
+  <section class="hero">
+    <img class="hero-mark" src="assets/img/mark-dark.png" alt="" aria-hidden="true">
+    <div class="wrap">
+      <div class="hero-copy">
+        <p class="eyebrow">Oral surgery &amp; modern dentistry</p>
+        <h1>
+          <span class="line">Your smile.</span>
+          <span class="line">Your experience.</span>
+          <span class="line hauz">Your Hauz.</span>
+        </h1>
+        <p class="hero-lead">Expert implant, surgical and cosmetic care in a clinic designed to feel like home. Calm rooms, clear plans and a team that takes the time to explain every step.</p>
+        <div class="hero-actions">
+          <a class="btn" href="#book">Book a Consultation</a>
+          <a class="btn btn--ghost" href="#services">Explore Treatments</a>
+        </div>
+      </div>
+      <div class="hero-media">
+        <div class="frame"><img src="assets/img/craft.jpg" alt="A dentist working carefully with a fine instrument" width="736" height="1308"></div>
+        <div class="hero-badge">
+          <strong>Comfort-first care</strong>
+          <span>Local anaesthesia and sedation options for every surgical visit.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="strip" aria-label="Treatments">
+    <ul class="wrap">
+      <li>Dental Implants</li>
+      <li>Wisdom Teeth</li>
+      <li>Clear Aligners</li>
+      <li>Veneers</li>
+      <li>Whitening</li>
+    </ul>
+  </div>
+
+  <!-- About -->
+  <section class="section about" id="about">
+    <div class="wrap">
+      <div class="about-media">
+        <img src="assets/img/scrubs.jpg" alt="A Dental Hauz clinician in green scrubs with the embroidered logo" width="730" height="917">
+      </div>
+      <div class="about-copy">
+        <p class="eyebrow">Welcome to the Hauz</p>
+        <h2>Dentistry that feels like coming home</h2>
+        <p>The Dental Hauz brings surgical precision and everyday dentistry under one roof. From a single implant to a full smile makeover, your treatment is planned, performed and followed up by the same team, so you never have to start your story again.</p>
+        <p>We built the clinic around how a visit should feel: unhurried, quiet and honest about options and costs before anything begins.</p>
+        <div class="pillars">
+          <div><h3>Precise</h3><p>Digital scans and 3D imaging guide every surgical plan.</p></div>
+          <div><h3>Gentle</h3><p>Pain control and sedation tailored to you.</p></div>
+          <div><h3>Personal</h3><p>One team from first consultation to final check-up.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services -->
+  <section class="section services" id="services">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Treatments</p>
+        <h2>Complete care, from surgery to the finishing touches</h2>
+        <p>Every treatment starts with a consultation and a written plan, so you know what will happen, how long it takes and what it costs.</p>
+      </div>
+      <div class="service-grid">
+        <a class="service" href="#implants">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M14 8c3-2 7-2 10 0 3-2 7-2 10 0 3 3 3 8 1 12H13c-2-4-2-9 1-12Z"/><path d="M18 24h12M19 29h10M20 34h8M21 39h6M24 20v23"/></svg>
+          <h3>Dental Implants</h3>
+          <p>Permanent, natural-looking replacements for one tooth, several teeth or a full arch, placed with guided surgery.</p>
+          <span class="more">Learn more</span>
+        </a>
+        <a class="service" href="#book">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M15 10c3-2 6-2 9 0 3-2 6-2 9 0 4 4 2 12 0 17-1 4-1 13-4 13-2 0-2-8-5-8s-3 8-5 8c-3 0-3-9-4-13-2-5-4-13 0-17Z"/><path d="M8 18l5 2M40 18l-5 2"/></svg>
+          <h3>Wisdom Teeth</h3>
+          <p>Safe removal of impacted or troublesome wisdom teeth, with sedation available and clear aftercare.</p>
+          <span class="more">Learn more</span>
+        </a>
+        <a class="service" href="#book">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M6 22c4 8 11 13 18 13s14-5 18-13"/><path d="M10 21c3 6 8 9 14 9s11-3 14-9"/><path d="M14 25.5v4M19 28v4.5M24 29v5M29 28v4.5M34 25.5v4"/></svg>
+          <h3>Clear Aligners</h3>
+          <p>Discreet, removable aligners that straighten teeth gradually, planned from a 3D scan of your smile.</p>
+          <span class="more">Learn more</span>
+        </a>
+        <a class="service" href="#book">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="12" y="10" width="10" height="18" rx="5"/><rect x="26" y="10" width="10" height="18" rx="5"/><path d="M17 28v10M31 28v10M12 38h24"/></svg>
+          <h3>Veneers &amp; Crowns</h3>
+          <p>Hand-finished porcelain matched shade by shade to restore shape, strength and colour.</p>
+          <span class="more">Learn more</span>
+        </a>
+        <a class="service" href="#book">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M16 12c3-2 5-2 8 0 3-2 5-2 8 0 4 4 2 11 0 16-1 4-1 12-4 12-2 0-2-7-4-7s-2 7-4 7c-3 0-3-8-4-12-2-5-4-12 0-16Z"/><path d="M38 6v6M35 9h6M9 30v4M7 32h4"/></svg>
+          <h3>Teeth Whitening</h3>
+          <p>In-clinic and take-home whitening that lifts stains safely while protecting sensitive teeth.</p>
+          <span class="more">Learn more</span>
+        </a>
+        <a class="service" href="#book">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 6 8 18v4h32v-4L24 6Z"/><path d="M12 22v18h24V22"/><path d="M20 40V30h8v10"/></svg>
+          <h3>General &amp; Preventive</h3>
+          <p>Check-ups, hygiene, fillings and root canal treatment that keep your smile healthy for the long run.</p>
+          <span class="more">Learn more</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Feature: implants -->
+  <section class="section feature" id="implants">
+    <div class="wrap">
+      <div class="feature-copy">
+        <p class="eyebrow eyebrow--light">Signature treatment</p>
+        <h2>Dental implants, planned to the millimetre</h2>
+        <p>Implants are the closest thing to a natural tooth. We map your bone and nerves in 3D, plan the position digitally and place each implant through a surgical guide for a faster, more comfortable recovery.</p>
+        <ul class="checklist">
+          <li>3D cone-beam imaging and digital treatment planning</li>
+          <li>Single tooth, multiple teeth and full-arch solutions</li>
+          <li>Bone grafting and sinus lift when extra support is needed</li>
+          <li>Crowns shade-matched to your natural teeth</li>
+        </ul>
+        <div><a class="btn btn--light" href="#book">Plan Your Implant</a></div>
+      </div>
+      <div class="feature-media">
+        <img src="assets/img/shades.jpg" alt="A porcelain shade guide used to match crowns to natural teeth" width="933" height="1400">
+        <img src="assets/img/aligners.jpg" alt="Gloved hands holding a clear aligner" width="736" height="1104">
+      </div>
+    </div>
+  </section>
+
+  <!-- Journey -->
+  <section class="section journey" id="visit">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Your visit</p>
+        <h2>What to expect at the Hauz</h2>
+        <p>Whether you are coming in for a check-up or surgery, every patient follows the same clear path.</p>
+      </div>
+      <ol class="steps">
+        <li class="step"><h3>Consultation</h3><p>Meet your dentist, talk through your goals and have a full examination with digital X-rays.</p></li>
+        <li class="step"><h3>Scan &amp; plan</h3><p>We take a 3D scan and give you a written plan with timings, options and costs.</p></li>
+        <li class="step"><h3>Treatment</h3><p>Your care is carried out in a calm private suite, with comfort and sedation options explained.</p></li>
+        <li class="step"><h3>Aftercare</h3><p>Follow-up visits and a direct line to the team while you heal and settle in.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- Manifesto -->
+  <section class="section manifesto">
+    <div class="wrap">
+      <div class="manifesto-media">
+        <img src="assets/img/oral-health.jpg" alt="A clinician holding a dental model. Text reads: Oral health is more than just health." width="736" height="981">
+      </div>
+      <div class="manifesto-copy">
+        <div class="mantra" aria-label="Your smile, your experience, your Hauz">
+          <span>Your smile</span>
+          <span>Your experience</span>
+          <span>Your <b>Hauz</b></span>
+        </div>
+        <blockquote>Oral health is more than just health. It is how you eat, speak, smile and feel.</blockquote>
+        <p>That is why we treat the whole person, not only the tooth. We take time to listen, explain the options in plain language and design care that fits your life.</p>
+        <div><a class="btn btn--outline-light" href="#book">Meet the Team</a></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section faq" id="faq">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Questions</p>
+        <h2>Good to know before you visit</h2>
+        <p>Can't find your answer? Send us a message and the team will get back to you.</p>
+      </div>
+      <div class="faq-list">
+        <details open>
+          <summary>Do implants hurt?</summary>
+          <p>Implant surgery is done under local anaesthesia, and sedation is available if you feel anxious. Most patients describe the recovery as easier than a tooth extraction, and we give you a clear aftercare plan.</p>
+        </details>
+        <details>
+          <summary>How long does implant treatment take?</summary>
+          <p>The implant usually needs a few months to bond with the bone before the final crown is fitted. In suitable cases we can place a temporary tooth on the same day. Your plan will show your exact timeline.</p>
+        </details>
+        <details>
+          <summary>Should my wisdom teeth come out?</summary>
+          <p>Not always. We recommend removal when wisdom teeth are impacted, causing pain or infection, or putting neighbouring teeth at risk. A consultation and X-ray will tell us which applies to you.</p>
+        </details>
+        <details>
+          <summary>Are clear aligners right for me?</summary>
+          <p>Aligners suit most adults and teens with crowding, gaps or bite issues. After a 3D scan we can show you a preview of how your teeth will move before you commit.</p>
+        </details>
+        <details>
+          <summary>Do you offer payment plans?</summary>
+          <p>Yes. Every plan includes a written cost breakdown, and we can spread the cost of larger treatments into monthly instalments.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- Book -->
+  <section class="section book" id="book">
+    <div class="wrap">
+      <div class="book-copy">
+        <p class="eyebrow">Book a consultation</p>
+        <h2>Start your smile at the Hauz</h2>
+        <p>Tell us a little about what you need and our team will call you to arrange a time that suits you.</p>
+        <dl class="contact-lines">
+          <div><dt>Phone</dt><dd>Phone number to be added</dd></div>
+          <div><dt>Email</dt><dd>Email to be added</dd></div>
+          <div><dt>Visit</dt><dd>Clinic address to be added</dd></div>
+        </dl>
+      </div>
+      <form class="form" id="booking-form" novalidate>
+        <div class="row">
+          <div class="field"><label for="f-name">Full name</label><input id="f-name" name="name" autocomplete="name" required></div>
+          <div class="field"><label for="f-phone">Phone</label><input id="f-phone" name="phone" type="tel" autocomplete="tel" required></div>
+        </div>
+        <div class="field"><label for="f-email">Email</label><input id="f-email" name="email" type="email" autocomplete="email"></div>
+        <div class="field">
+          <label for="f-treatment">Treatment</label>
+          <select id="f-treatment" name="treatment">
+            <option>Not sure yet</option>
+            <option>Dental implants</option>
+            <option>Wisdom teeth</option>
+            <option>Clear aligners</option>
+            <option>Veneers &amp; crowns</option>
+            <option>Teeth whitening</option>
+            <option>General check-up</option>
+          </select>
+        </div>
+        <div class="field"><label for="f-message">Message</label><textarea id="f-message" name="message" rows="3"></textarea></div>
+        <button class="btn" type="submit">Request Appointment</button>
+        <p class="form-note" id="form-note" role="status" hidden></p>
+      </form>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <img src="assets/img/logo-light.png" alt="The Dental Hauz" width="900" height="264">
+        <p>Implants, oral surgery and modern dentistry in a clinic that feels like home.</p>
+      </div>
+      <div>
+        <h4>Treatments</h4>
+        <ul>
+          <li><a href="#implants">Dental Implants</a></li>
+          <li><a href="#services">Wisdom Teeth</a></li>
+          <li><a href="#services">Clear Aligners</a></li>
+          <li><a href="#services">Veneers &amp; Crowns</a></li>
+          <li><a href="#services">Whitening</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Patients</h4>
+        <ul>
+          <li><a href="#visit">Your Visit</a></li>
+          <li><a href="#faq">FAQ</a></li>
+          <li><a href="#book">Book a Consultation</a></li>
+          <li><a href="#about">About the Hauz</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Hours</h4>
+        <ul class="hours">
+          <li><span>Sat – Thu</span><span>10:00 – 21:00</span></li>
+          <li><span>Friday</span><span>Closed</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-base">
+      <span>© <span id="year">2026</span> The Dental Hauz. All rights reserved.</span>
+      <span class="tag">Your smile · Your experience · Your Hauz</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var toggle = document.getElementById('menu-toggle');
+  var nav = document.getElementById('site-nav');
+  function setOpen(open) {
+    nav.setAttribute('data-open', open ? 'true' : 'false');
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+  }
+  toggle.addEventListener('click', function () { setOpen(nav.getAttribute('data-open') !== 'true'); });
+  nav.addEventListener('click', function (e) { if (e.target.closest('a')) setOpen(false); });
+
+  var form = document.getElementById('booking-form');
+  var note = document.getElementById('form-note');
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var name = form.elements.name.value.trim();
+    var phone = form.elements.phone.value.trim();
+    note.hidden = false;
+    if (!name || !phone) {
+      note.textContent = 'Please add your name and phone number so we can call you back.';
+      return;
+    }
+    // TODO: connect to the clinic's booking system or email service.
+    note.textContent = 'Thanks, ' + name + '. Online booking is not connected yet, so please call the clinic to confirm your appointment.';
+  });
+
+  document.getElementById('year').textContent = new Date().getFullYear();
+})();
+</script>
+</body>
+</html>

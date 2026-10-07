@@ -33,6 +33,27 @@ test.describe('The Dental Hauz site', () => {
     }
   });
 
+  test('no image is stretched or squashed', async ({ page }) => {
+    const shapes = await page.$$eval('img', (imgs) => imgs.map((i) => {
+      const r = i.getBoundingClientRect();
+      return {
+        src: i.getAttribute('src'),
+        fit: getComputedStyle(i).objectFit,
+        rendered: r.height / r.width,
+        natural: i.naturalHeight / i.naturalWidth,
+      };
+    }));
+    for (const s of shapes) {
+      if (s.fit === 'cover') {
+        // Cropped photos: the frame may differ from the file, but never become a tall sliver.
+        expect(s.rendered, `photo frame too tall: ${s.src}`).toBeLessThanOrEqual(1.6);
+      } else {
+        // Logos and uncropped images must keep their exact proportions.
+        expect(Math.abs(s.rendered / s.natural - 1), `distorted image: ${s.src}`).toBeLessThan(0.02);
+      }
+    }
+  });
+
   test('favicon and Google Fonts stylesheet respond 200', async ({ page, request }) => {
     const icon = await page.getAttribute('link[rel="icon"]', 'href');
     expect((await request.get(`/${icon}`)).status()).toBe(200);

@@ -6,7 +6,11 @@
     "serve": "python3 -m http.server 4173",
     "lint:html": "html-validate index.html",
     "test:e2e": "playwright test",
-    "test": "npm run lint:html && npm run test:e2e"
+    "test": "npm run lint:html && npm run test:e2e && npm run theme:php && npm run theme:render && npm run theme:e2e",
+    "theme:render": "rm -rf tests/theme/out && mkdir -p tests/theme/out && cp -r wordpress-theme/the-dental-hauz/style.css wordpress-theme/the-dental-hauz/assets tests/theme/out/ && DH_THEME_DIR=$PWD/wordpress-theme/the-dental-hauz php tests/theme/render.php tests/theme/out",
+    "theme:php": "for f in $(find wordpress-theme -name '*.php'); do php -l $f >/dev/null || exit 1; done && DH_THEME_DIR=$PWD/wordpress-theme/the-dental-hauz php tests/theme/booking-test.php",
+    "theme:e2e": "playwright test -c playwright.theme.config.js",
+    "theme:zip": "cd wordpress-theme && rm -f ../the-dental-hauz-theme.zip && zip -qr ../the-dental-hauz-theme.zip the-dental-hauz -x '*.DS_Store'"
   },
   "devDependencies": {
     "@playwright/test": "^1.56.0",

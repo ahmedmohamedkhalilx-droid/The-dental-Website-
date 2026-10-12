@@ -57,13 +57,13 @@ function language_attributes() { echo 'lang="en-US"'; }
 function wp_head() {
 	foreach ( $GLOBALS['dh_styles'] as $h => $src ) { echo '<link rel="stylesheet" id="' . esc_attr( $h ) . '" href="' . esc_attr( $src ) . '">' . "\n"; }
 	foreach ( $GLOBALS['dh_hooks']['wp_head'] ?? array() as $cb ) { call_user_func( $cb ); }
-	if ( dh_preview() ) { echo '<meta name="robots" content="noindex, nofollow"><style>.preview-bar{background:#D8B8B2;color:#514A43;text-align:center;font:400 13px/1.4 Jost,Arial,sans-serif;padding:.5rem 1rem;letter-spacing:.03em}</style>' . "\n"; }
+	if ( dh_preview() ) { echo '<meta name="robots" content="noindex, nofollow">' . "\n"; }
 }
 function wp_footer() {
 	foreach ( $GLOBALS['dh_scripts'] as $src ) { echo '<script src="' . esc_attr( $src ) . '" defer></script>' . "\n"; }
 	if ( dh_preview() ) { echo '<script>document.querySelectorAll("form.form").forEach(function(f){f.addEventListener("submit",function(e){e.preventDefault();var n=f.querySelector(".form-note");if(!n){n=document.createElement("p");n.className="form-note";n.setAttribute("role","status");f.insertBefore(n,f.querySelector(".fields"));}n.textContent="This is a preview. The form sends an email to the clinic once the theme is installed on thedentalhauz.com.";n.scrollIntoView({block:"center"});});});</script>' . "\n"; }
 }
-function wp_body_open() { if ( dh_preview() ) { echo '<div class="preview-bar">Preview of the new thedentalhauz.com design. Forms and Google reviews work once the theme is installed.</div>' . "\n"; } }
+function wp_body_open() {}
 function body_class() { echo 'class="page"'; }
 function post_class( $c = '' ) { echo 'class="' . esc_attr( $c ) . '"'; }
 function wp_date( $f ) { return gmdate( $f ); }

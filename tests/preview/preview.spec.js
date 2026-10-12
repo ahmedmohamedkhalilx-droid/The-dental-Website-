@@ -13,7 +13,7 @@ test.beforeEach(async ({ page }) => {
   await page.route('https://www.google.com/**', (route) => route.fulfill({ status: 200, contentType: 'text/html', body: '<p>map</p>' }));
 });
 
-test('home loads under the GitHub Pages path with styles, scripts and the preview banner', async ({ page }) => {
+test('home loads under the GitHub Pages path with styles and scripts, and no banner above the site', async ({ page }) => {
   const bad = [];
   const errors = [];
   page.on('response', (r) => { if (r.status() >= 400) bad.push(`${r.status()} ${r.url()}`); });
@@ -21,7 +21,8 @@ test('home loads under the GitHub Pages path with styles, scripts and the previe
   await page.goto(`${BASE}/`, { waitUntil: 'networkidle' });
   expect(bad).toEqual([]);
   expect(errors).toEqual([]);
-  await expect(page.locator('.preview-bar')).toContainText('Preview of the new thedentalhauz.com design');
+  await expect(page.locator('.preview-bar')).toHaveCount(0);
+  await expect(page.locator('body > :first-child')).toHaveClass(/skip-link/);
   await expect(page.locator('h1')).toHaveText('Healthy. Everyday.');
   expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe('rgb(244, 240, 232)');
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, nofollow');

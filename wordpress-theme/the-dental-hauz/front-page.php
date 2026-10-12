@@ -15,14 +15,15 @@ get_header();
 ?>
 
 <section class="hero">
-  <img class="hero-mark" src="<?php echo esc_url( get_theme_file_uri( 'assets/img/mark-dark.png' ) ); ?>" alt="" aria-hidden="true">
-  <div class="wrap">
+  <img class="hero-mark" src="<?php echo esc_url( get_theme_file_uri( 'assets/img/mark-light.png' ) ); ?>" alt="" aria-hidden="true">
+  <div class="wrap hero__grid">
     <div class="hero-copy">
       <p class="eyebrow"><?php echo esc_html( $dh_h['hero']['subtitle'] ); ?></p>
       <h1><?php echo esc_html( $dh_h['hero']['title'] ); ?></h1>
       <p class="hero-lead"><?php echo esc_html( $dh_h['hero']['body'] ); ?></p>
       <div class="hero-actions">
         <a class="btn" href="<?php echo esc_url( dh_page_url( $dh_h['hero']['button_link'] ) ); ?>"><?php echo esc_html( $dh_h['hero']['button'] ); ?></a>
+        <a class="btn btn--outline-light" href="<?php echo esc_url( $dh_h['cta']['call_link'] ); ?>"><?php echo esc_html( $dh_h['cta']['call'] ); ?></a>
       </div>
     </div>
     <div class="hero-media">
@@ -30,6 +31,39 @@ get_header();
     </div>
   </div>
 </section>
+
+<?php
+$dh_q_tel   = dh_tel_href();
+$dh_q_addr  = dh_address_lines();
+$dh_q_hours = dh_hours();
+if ( $dh_q_tel || $dh_q_addr || $dh_q_hours ) :
+	?>
+<div class="wrap quick-wrap">
+  <div class="quick">
+    <?php if ( $dh_q_tel ) : ?>
+      <div class="quick__item">
+        <span class="quick__label"><?php esc_html_e( 'Call Us', 'the-dental-hauz' ); ?></span>
+        <span class="quick__value"><a href="<?php echo esc_url( $dh_q_tel ); ?>"><?php echo esc_html( dh_clinic( 'phone' ) ); ?></a></span>
+      </div>
+    <?php endif; ?>
+    <?php if ( $dh_q_addr ) : ?>
+      <div class="quick__item">
+        <span class="quick__label"><?php esc_html_e( 'Location', 'the-dental-hauz' ); ?></span>
+        <span class="quick__value"><a href="<?php echo esc_url( dh_clinic( 'maps_url' ) ); ?>"><?php echo esc_html( implode( ', ', $dh_q_addr ) ); ?></a></span>
+      </div>
+    <?php endif; ?>
+    <?php if ( $dh_q_hours ) : ?>
+      <div class="quick__item">
+        <span class="quick__label"><?php esc_html_e( 'Working Hours', 'the-dental-hauz' ); ?></span>
+        <span class="quick__value"><?php echo esc_html( $dh_q_hours[0][0] . ( $dh_q_hours[0][1] ? ': ' . $dh_q_hours[0][1] : '' ) ); ?></span>
+        <?php foreach ( array_slice( $dh_q_hours, 1 ) as $dh_q_row ) : ?>
+          <span class="quick__sub"><?php echo esc_html( $dh_q_row[0] . ( $dh_q_row[1] ? ': ' . $dh_q_row[1] : '' ) ); ?></span>
+        <?php endforeach; ?>
+      </div>
+    <?php endif; ?>
+  </div>
+</div>
+<?php endif; ?>
 
 <section class="section intro" id="about">
   <div class="wrap intro__grid">

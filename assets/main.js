@@ -28,6 +28,22 @@
 
   nav.addEventListener('click', function (e) { if (e.target.closest('a')) { setOpen(false); } });
 
+  // Touch screens: the first tap on a treatment card shows its details, a second tap opens the page.
+  var allCards = Array.prototype.slice.call(document.querySelectorAll('.svc'));
+  if (allCards.length && window.matchMedia && window.matchMedia('(hover: none)').matches) {
+    allCards.forEach(function (c) {
+      c.addEventListener('click', function (e) {
+        if (!c.classList.contains('is-open')) {
+          e.preventDefault();
+          allCards.forEach(function (o) { o.classList.remove('is-open'); });
+          c.classList.add('is-open');
+        } else if (!e.target.closest('a')) {
+          c.classList.remove('is-open');
+        }
+      });
+    });
+  }
+
   // Treatment cards slide in as they scroll into view (only cards still below the fold; never hides anything for good).
   var cards = Array.prototype.slice.call(document.querySelectorAll('.svc'));
   var calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;

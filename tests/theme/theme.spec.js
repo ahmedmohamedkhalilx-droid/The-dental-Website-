@@ -278,29 +278,76 @@ test.describe('forms', () => {
 });
 
 test.describe('treatment card motion', () => {
-  test('hover lifts the card, zooms the photo and shows the arrow', async ({ page }, info) => {
+  const heights = (c) => c.evaluate((el) => ({
+    inner: el.querySelector('.svc__details-inner').getBoundingClientRect().height,
+    desc: getComputedStyle(el.querySelector('.svc__details')).opacity,
+    title: el.querySelector('h3').getBoundingClientRect().height,
+    lift: getComputedStyle(el).transform,
+  }));
+
+  test('at rest only the number and name show; hover reveals the description and Learn More', async ({ page }, info) => {
     test.skip(info.project.name === 'mobile', 'hover is a desktop gesture');
     await page.goto('/our-services.html', { waitUntil: 'networkidle' });
     const card = page.locator('.svc').first();
     await card.scrollIntoViewIfNeeded();
     await expect(card).not.toHaveClass(/will-reveal/, { timeout: 6000 });
-    await page.waitForTimeout(500);
-    const rest = await card.evaluate((c) => ({ t: getComputedStyle(c).transform, a: getComputedStyle(c.querySelector('.svc__media'), '::after').opacity }));
-    expect(rest.t).toBe('none');
-    expect(rest.a).toBe('0');
+    await page.mouse.move(2, 2);
+    await page.waitForTimeout(700);
+    const rest = await heights(card);
+    expect(rest.inner).toBeLessThan(2);
+    expect(rest.desc).toBe('0');
+    expect(rest.title).toBeGreaterThan(20);
+    expect(rest.lift).toBe('none');
     await card.hover();
-    await page.waitForTimeout(600);
-    const up = await card.evaluate((c) => ({ t: getComputedStyle(c).transform, a: getComputedStyle(c.querySelector('.svc__media'), '::after').opacity, i: getComputedStyle(c.querySelector('.svc__media img')).transform }));
-    expect(up.t).not.toBe('none');
-    expect(up.a).toBe('1');
-    expect(up.i).not.toBe('none');
+    await page.waitForTimeout(900);
+    const up = await heights(card);
+    expect(up.inner).toBeGreaterThan(40);
+    expect(up.desc).toBe('1');
+    expect(up.lift).not.toBe('none');
+    await expect(card.locator('.more')).toBeVisible();
+    await expect(card.locator('p')).toContainText('Detect dental concerns early');
   });
 
-  test('on touch screens the arrow is always shown and a press gives feedback', async ({ page }, info) => {
+  test('keyboard focus reveals the details too', async ({ page }, info) => {
+    test.skip(info.project.name === 'mobile', 'keyboard');
+    await page.goto('/our-services.html', { waitUntil: 'networkidle' });
+    const card = page.locator('.svc').nth(1);
+    await card.scrollIntoViewIfNeeded();
+    await expect(card).not.toHaveClass(/will-reveal/, { timeout: 6000 });
+    await card.locator('h3 a').focus();
+    await page.waitForTimeout(900);
+    expect((await heights(card)).inner).toBeGreaterThan(40);
+  });
+
+  test('the whole card is one link to its treatment page', async ({ page }, info) => {
+    test.skip(info.project.name === 'mobile', 'desktop click');
+    await page.goto('/our-services.html', { waitUntil: 'networkidle' });
+    const card = page.locator('.svc').first();
+    await card.scrollIntoViewIfNeeded();
+    await expect(card).not.toHaveClass(/will-reveal/, { timeout: 6000 });
+    const box = await card.boundingBox();
+    const hit = await page.evaluate(([x, y]) => document.elementFromPoint(x, y).closest('a')?.getAttribute('href'), [box.x + box.width / 2, box.y + box.height / 3]);
+    expect(hit).toBe('https://clinic.test/comprehensive-oral-examination/');
+  });
+
+  test('on touch: first tap shows the details, second tap follows the link', async ({ page }, info) => {
     test.skip(info.project.name !== 'mobile', 'touch only');
     await page.goto('/our-services.html', { waitUntil: 'networkidle' });
-    const a = await page.locator('.svc').first().evaluate((c) => getComputedStyle(c.querySelector('.svc__media'), '::after').opacity);
-    expect(a).toBe('1');
+    const card = page.locator('.svc').first();
+    await card.scrollIntoViewIfNeeded();
+    await expect(card).not.toHaveClass(/will-reveal/, { timeout: 6000 });
+    expect((await heights(card)).inner).toBeLessThan(2);
+    await card.locator('h3').tap();
+    await expect(card).toHaveClass(/is-open/);
+    await page.waitForTimeout(900);
+    expect((await heights(card)).inner).toBeGreaterThan(40);
+    expect(page.url()).toContain('/our-services.html');
+    const other = page.locator('.svc').nth(1);
+    await other.scrollIntoViewIfNeeded();
+    await expect(other).not.toHaveClass(/will-reveal/, { timeout: 6000 });
+    await other.locator('h3').tap();
+    await expect(other).toHaveClass(/is-open/);
+    await expect(card).not.toHaveClass(/is-open/);
   });
 
   test('cards below the fold slide in as you scroll and all end up visible', async ({ page }) => {

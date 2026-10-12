@@ -220,43 +220,40 @@ p { margin: 0; }
 .video figcaption { font-size: var(--step--1); letter-spacing: .24em; text-transform: uppercase; color: var(--sage-deep); }
 @media (max-width: 860px) { .intro__grid { grid-template-columns: 1fr; } .intro__media { max-width: 460px; } }
 
-/* Treatment cards */
+/* Treatment cards: photo cards. Name at rest; description and "Learn More" appear on hover, focus or tap. */
 .services { background: var(--paper); border-block: 1px solid var(--line); }
 .svc-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: clamp(.9rem, 1.6vw, 1.4rem); }
-.svc { display: grid; grid-template-rows: auto 1fr; background: var(--cream); border: 1px solid var(--line); border-radius: var(--radius-lg); overflow: hidden; min-width: 0; transition: transform .3s ease, box-shadow .3s ease; }
-.svc:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
-.svc__media { display: block; aspect-ratio: 4 / 3; overflow: hidden; background: var(--sage); }
-.svc__media img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
-.svc:hover .svc__media img { transform: scale(1.05); }
-.svc__body { display: grid; gap: .6rem; padding: clamp(1rem, 1.6vw, 1.4rem); align-content: start; }
-.svc__num { font-family: var(--font-display); font-style: italic; font-size: 1.4rem; line-height: 1; color: var(--blush); }
-.svc h3 { font-size: 1.4rem; line-height: 1.15; }
-.svc h3 a { text-decoration: none; }
-.svc p { color: var(--umber-soft); font-size: .9rem; line-height: 1.6; }
-.svc .more { font-size: .7rem; letter-spacing: .22em; text-transform: uppercase; color: var(--sage-deep); text-decoration: none; display: inline-flex; gap: .6rem; align-items: center; margin-top: .2rem; }
+.svc { position: relative; isolation: isolate; overflow: hidden; aspect-ratio: 3 / 4.3; border-radius: var(--radius-lg); background: var(--umber); color: var(--cream); min-width: 0; transition: transform .35s ease, box-shadow .35s ease; }
+.svc:hover, .svc:focus-within, .svc.is-open { transform: translateY(-4px); box-shadow: var(--shadow); }
+.svc:active { transform: translateY(-1px) scale(.99); transition-duration: .12s; }
+.svc__media { position: absolute; inset: 0; z-index: -2; background: var(--sage); }
+.svc__media img { width: 100%; height: 100%; object-fit: cover; transition: transform .8s cubic-bezier(.2, .8, .2, 1); }
+.svc:hover .svc__media img, .svc:focus-within .svc__media img, .svc.is-open .svc__media img { transform: scale(1.08); }
+.svc__media::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(81, 74, 67, .18) 0%, rgba(81, 74, 67, 0) 35%, rgba(81, 74, 67, .88) 100%); }
+.svc__media::after { content: "+"; position: absolute; top: .9rem; right: .9rem; width: 2.4rem; height: 2.4rem; display: grid; place-items: center; border-radius: 50%; background: rgba(244, 240, 232, .92); color: var(--umber); font-size: 1.4rem; line-height: 1; transition: transform .4s ease, background .3s ease; }
+.svc:hover .svc__media::after, .svc:focus-within .svc__media::after, .svc.is-open .svc__media::after { transform: rotate(45deg); background: var(--blush); }
+.svc__body { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; gap: .5rem; padding: clamp(1rem, 1.6vw, 1.4rem); }
+.svc__body::before { content: ""; position: absolute; inset: 0; z-index: -1; background: rgba(81, 74, 67, .9); opacity: 0; transition: opacity .45s ease; }
+.svc:hover .svc__body::before, .svc:focus-within .svc__body::before, .svc.is-open .svc__body::before { opacity: 1; }
+.svc__num { position: absolute; top: 1rem; left: clamp(1rem, 1.6vw, 1.4rem); font-family: var(--font-display); font-style: italic; font-size: 1.5rem; line-height: 1; color: var(--blush); }
+.svc h3 { font-size: 1.45rem; line-height: 1.12; color: var(--cream); }
+.svc h3 a { text-decoration: none; background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat; transition: background-size .35s ease; }
+.svc h3 a::after { content: ""; position: absolute; inset: 0; z-index: 2; }
+.svc:hover h3 a, .svc:focus-within h3 a, .svc.is-open h3 a { background-size: 100% 1px; }
+.svc__details { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .5s cubic-bezier(.2, .8, .2, 1), opacity .4s ease; }
+.svc:hover .svc__details, .svc:focus-within .svc__details, .svc.is-open .svc__details { grid-template-rows: 1fr; opacity: 1; }
+.svc__details-inner { overflow: hidden; display: grid; gap: .8rem; min-height: 0; }
+.svc p { color: rgba(244, 240, 232, .9); font-size: .9rem; line-height: 1.6; padding-top: .3rem; }
+.svc .more { position: relative; z-index: 3; justify-self: start; font-size: .7rem; letter-spacing: .22em; text-transform: uppercase; color: var(--cream); text-decoration: none; display: inline-flex; gap: .6rem; align-items: center; padding-bottom: .2rem; }
 .svc .more::after { content: ""; width: 22px; height: 1px; background: currentColor; transition: width .3s ease; }
-.svc:hover .more::after, .svc:focus-within .more::after { width: 40px; }
-
-/* Hover, focus and tap motion on the treatment cards */
-.svc { will-change: transform; }
-.svc:hover, .svc:focus-within { transform: translateY(-6px); box-shadow: var(--shadow); border-color: rgba(101, 117, 104, .45); }
-.svc:active { transform: translateY(-2px) scale(.985); transition-duration: .12s; }
-.svc__media { position: relative; }
-.svc__media::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 45%, rgba(81, 74, 67, .45)); opacity: 0; transition: opacity .35s ease; }
-.svc__media::after { content: "\2192"; position: absolute; right: .9rem; bottom: .9rem; width: 2.6rem; height: 2.6rem; display: grid; place-items: center; border-radius: 50%; background: var(--cream); color: var(--umber); font-size: 1.2rem; line-height: 1; opacity: 0; transform: translate(10px, 10px) scale(.8); transition: opacity .3s ease, transform .35s cubic-bezier(.2, .8, .2, 1); }
-.svc:hover .svc__media::before, .svc:focus-within .svc__media::before { opacity: 1; }
-.svc:hover .svc__media::after, .svc:focus-within .svc__media::after { opacity: 1; transform: none; }
-.svc:hover .svc__media img, .svc:focus-within .svc__media img { transform: scale(1.07); }
-.svc h3 a { background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat; transition: background-size .35s ease; }
-.svc:hover h3 a, .svc:focus-within h3 a { background-size: 100% 1px; }
-@media (hover: none) { .svc__media::after { opacity: 1; transform: none; } }
+.svc .more:hover::after { width: 40px; }
+@media (max-width: 1199px) { .svc-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .svc { aspect-ratio: 4 / 3; } }
+@media (max-width: 600px) { .svc-grid { grid-template-columns: 1fr; } .svc { aspect-ratio: 4 / 4.3; } }
 
 /* Cards below the fold slide in as they come into view. Applied by script, so without it every card is simply visible. */
 .svc.will-reveal { opacity: 0; transform: translateY(26px); }
-.svc.will-reveal.is-in { opacity: 1; transform: none; transition: opacity .7s ease var(--reveal-delay, 0ms), transform .7s cubic-bezier(.2, .8, .2, 1) var(--reveal-delay, 0ms), box-shadow .3s ease, border-color .3s ease; }
-@media (prefers-reduced-motion: reduce) { .svc.will-reveal { opacity: 1; transform: none; } .svc, .svc:hover, .svc:active { transition: none; } }
-@media (max-width: 1199px) { .svc-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 600px) { .svc-grid { grid-template-columns: 1fr; } }
+.svc.will-reveal.is-in { opacity: 1; transform: none; transition: opacity .7s ease var(--reveal-delay, 0ms), transform .7s cubic-bezier(.2, .8, .2, 1) var(--reveal-delay, 0ms), box-shadow .3s ease; }
+@media (prefers-reduced-motion: reduce) { .svc.will-reveal { opacity: 1; transform: none; } .svc, .svc:hover, .svc:active, .svc__details, .svc__media img, .svc__body::before { transition: none; } }
 
 /* Call to action band */
 .cta-band { background: var(--sage-deep); }

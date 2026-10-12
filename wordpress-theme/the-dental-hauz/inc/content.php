@@ -17,7 +17,7 @@ return array(
 			'subtitle' => 'Trusted Dentist in Markham, Ontario',
 			'body' => 'The Dental Hauz provides personalized family dental care in Markham, ON, offering preventive, cosmetic, restorative, and emergency dentistry for healthy smiles.',
 			'button' => 'Make Appointment',
-			'button_link' => 'contact-us',
+			'button_link' => '#book',
 			'image' => 114,
 		),
 		'intro' => array(

@@ -318,7 +318,7 @@ p { margin: 0; }
 @media (max-width: 640px) { .form-cards { grid-template-columns: 1fr; } }
 
 /* Booking */
-.book { background: var(--blush); }
+.book { background: var(--blush); scroll-margin-top: 4.5rem; }
 .book__grid { display: grid; grid-template-columns: .85fr 1.15fr; gap: clamp(2rem, 6vw, 6rem); align-items: start; }
 .book__copy { display: grid; gap: 1.2rem; min-width: 0; }
 .book__copy h2 { font-size: var(--step-3); }

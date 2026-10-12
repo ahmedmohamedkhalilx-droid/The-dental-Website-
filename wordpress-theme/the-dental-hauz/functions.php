@@ -126,7 +126,7 @@ function dh_page_url( $slug ) {
 	if ( '' === $slug || null === $slug ) {
 		return home_url( '/' );
 	}
-	if ( preg_match( '#^(tel|sms|mailto|https?):#', $slug ) ) {
+	if ( preg_match( '#^(tel|sms|mailto|https?):#', $slug ) || '#' === $slug[0] ) {
 		return $slug;
 	}
 	static $cache = array();

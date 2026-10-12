@@ -101,6 +101,7 @@ test.describe('home page', () => {
     await expect(page.locator('h1')).toHaveText('Healthy. Everyday.');
     await expect(page.locator('.hero')).toContainText('Trusted Dentist in Markham, Ontario');
     await expect(page.locator('.hero-actions a.btn').first()).toHaveText('Make Appointment');
+    await expect(page.locator('.hero-actions a.btn').first()).toHaveAttribute('href', '#book');
     await expect(page.locator('.hero-actions a.btn').nth(1)).toHaveAttribute('href', 'tel:9054704289');
     await expect(page.locator('.quick__item')).toHaveCount(3);
     await expect(page.locator('.quick')).toContainText('(905) 470-4289');

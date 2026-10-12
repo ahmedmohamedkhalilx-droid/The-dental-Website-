@@ -168,6 +168,7 @@ def build(items):
                     items=[[text(a['acc_title']), text(a['acc_content'])] for a in acc])
     i = h.heading('Book An Appointment')
     book = dict(eyebrow=text(ws[i]['settings']['title']), title=text(ws[i + 1]['settings']['title']))
+    hero['button_link'] = '#book'  # jump to the booking form on the page instead of the Contact Us page
     C['home'] = dict(hero=hero, intro=intro, services_head=services_head, cta=cta, programs=programs, reviews=reviews,
                      smile=smile, devices=devices, faq=faq_home, book=book)
     C['services'] = services

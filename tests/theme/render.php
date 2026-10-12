@@ -7,6 +7,7 @@ require __DIR__ . '/wp-stubs.php';
 $theme = getenv( 'DH_THEME_DIR' );
 $out   = $argv[1];
 require $theme . '/functions.php';
+foreach ( $GLOBALS['dh_hooks']['wp_enqueue_scripts'] ?? array() as $cb ) { call_user_func( $cb ); }
 
 function dh_render( $theme, $file ) {
 	$GLOBALS['dh_loop'] = 0;

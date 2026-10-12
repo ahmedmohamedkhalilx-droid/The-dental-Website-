@@ -3,3 +3,4 @@ test-results/
 playwright-report/
 tests/theme/out/
 __pycache__/
+tests/preview/mount/

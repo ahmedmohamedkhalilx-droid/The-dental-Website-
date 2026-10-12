@@ -4,14 +4,17 @@
   "description": "Static website for The Dental Hauz",
   "scripts": {
     "serve": "python3 -m http.server 4173",
-    "lint:html": "html-validate index.html",
+    "lint:html": "html-validate single-page/index.html",
     "test:e2e": "playwright test",
-    "test": "npm run lint:html && npm run test:e2e && npm run theme:php && npm run theme:render && npm run theme:complete && npm run theme:e2e",
+    "test": "npm run lint:html && npm run test:e2e && npm run theme:php && npm run theme:render && npm run theme:complete && npm run theme:e2e && npm run preview:check && npm run preview:e2e",
     "theme:render": "rm -rf tests/theme/out && mkdir -p tests/theme/out && cp -r wordpress-theme/the-dental-hauz/style.css wordpress-theme/the-dental-hauz/assets tests/theme/out/ && echo placeholder > tests/theme/out/assets/video.mp4 && DH_THEME_DIR=$PWD/wordpress-theme/the-dental-hauz php tests/theme/render.php tests/theme/out",
     "theme:php": "for f in $(find wordpress-theme -name '*.php'); do php -l $f >/dev/null || exit 1; done && DH_THEME_DIR=$PWD/wordpress-theme/the-dental-hauz php tests/theme/forms-test.php",
     "theme:e2e": "playwright test -c playwright.theme.config.js",
     "theme:zip": "cd wordpress-theme && rm -f ../the-dental-hauz-theme.zip && zip -qr ../the-dental-hauz-theme.zip the-dental-hauz -x '*.DS_Store'",
-    "theme:complete": "python3 tests/theme/completeness.py tests/theme/out"
+    "theme:complete": "python3 tests/theme/completeness.py tests/theme/out",
+    "preview:build": "DH_PREVIEW=1 DH_BASE=/The-dental-Website- DH_ATTACHMENTS=$PWD/tools/preview/attachments.json DH_THEME_DIR=$PWD/wordpress-theme/the-dental-hauz php tools/build-preview.php . && cp wordpress-theme/the-dental-hauz/style.css . && cp -r wordpress-theme/the-dental-hauz/assets/. assets/ && touch .nojekyll",
+    "preview:check": "python3 tools/check-preview.py . /The-dental-Website-",
+    "preview:e2e": "playwright test -c playwright.preview.config.js"
   },
   "devDependencies": {
     "@playwright/test": "^1.56.0",

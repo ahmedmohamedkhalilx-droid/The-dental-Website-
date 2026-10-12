@@ -2,7 +2,8 @@
 
 Static marketing site for **The Dental Hauz** (implants, oral surgery, aligners and cosmetic dentistry), built from the brand sheet.
 
-- `index.html` — the full single-page site (HTML + CSS + a little JS, no build step)
+- `index.html`, `about-us/`, `our-services/`, `dental-implants/` and the other page folders: a **static preview of the WordPress theme**, published on GitHub Pages so it can be reviewed before the theme is installed (generated, see below)
+- `single-page/index.html` — the earlier single-page design (HTML + CSS + a little JS, no build step)
 - `wordpress-theme/the-dental-hauz/` — the same design as a WordPress theme (source)
 - `the-dental-hauz-theme.zip` — ready-to-upload WordPress theme (rebuild with `npm run theme:zip`)
 - `assets/img/` — logos and photography extracted from the brand sheet
@@ -22,6 +23,9 @@ Fonts: the brand faces are **The Seasons** (headings) and **Garet** (body). They
 - Phone, email and clinic address (Book section)
 - Opening hours (top bar and footer use sample hours)
 - Booking form: connect to a booking system or form service (see the `TODO` in the script)
+
+## Preview (GitHub Pages)
+The site at https://ahmedmohamedkhalilx-droid.github.io/The-dental-Website-/ is the WordPress theme rendered to static pages by `npm run preview:build` (run it after changing the theme, then commit). Photos load from the old site's media library; forms are inert; Google reviews are hidden. Pages carry `noindex`. `npm run preview:check` verifies every internal link.
 
 ## Preview locally
 Open `index.html` in a browser, or run `python3 -m http.server` and visit http://localhost:8000.

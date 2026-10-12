@@ -13,7 +13,7 @@ test.describe('The Dental Hauz site', () => {
     page.on('console', (m) => { if (m.type() === 'error') consoleErrors.push(m.text()); });
     page.on('pageerror', (e) => consoleErrors.push(String(e)));
     page.on('response', (r) => { if (r.status() >= 400) badResponses.push({ url: r.url(), status: r.status() }); });
-    const res = await page.goto('/index.html', { waitUntil: 'networkidle' });
+    const res = await page.goto('/single-page/index.html', { waitUntil: 'networkidle' });
     expect(res?.status()).toBe(200);
   });
 
@@ -56,7 +56,7 @@ test.describe('The Dental Hauz site', () => {
 
   test('favicon and Google Fonts stylesheet respond 200', async ({ page, request }) => {
     const icon = await page.getAttribute('link[rel="icon"]', 'href');
-    expect((await request.get(`/${icon}`)).status()).toBe(200);
+    expect((await request.get(new URL(icon, page.url()).href)).status()).toBe(200);
     const fontsHref = await page.getAttribute('link[rel="stylesheet"]', 'href');
     expect(fontsHref).toContain('fonts.googleapis.com');
   });

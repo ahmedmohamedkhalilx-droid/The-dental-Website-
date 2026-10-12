@@ -7,7 +7,7 @@ const executablePath = process.env.PW_CHROMIUM_PATH || undefined;
 
 module.exports = defineConfig({
   testDir: './tests',
-  testIgnore: '**/theme/**',
+  testIgnore: ['**/theme/**', '**/preview/**'],
   reporter: [['list']],
   use: {
     baseURL: 'http://127.0.0.1:4173',
@@ -19,7 +19,7 @@ module.exports = defineConfig({
   ],
   webServer: {
     command: 'python3 -m http.server 4173 --bind 127.0.0.1',
-    url: 'http://127.0.0.1:4173/index.html',
+    url: 'http://127.0.0.1:4173/single-page/index.html',
     reuseExistingServer: !process.env.CI,
   },
 });

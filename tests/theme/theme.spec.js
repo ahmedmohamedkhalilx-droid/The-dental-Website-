@@ -276,3 +276,64 @@ test.describe('forms', () => {
     await expect(page.locator('#form-booking .form-note')).toHaveCount(0);
   });
 });
+
+test.describe('treatment card motion', () => {
+  test('hover lifts the card, zooms the photo and shows the arrow', async ({ page }, info) => {
+    test.skip(info.project.name === 'mobile', 'hover is a desktop gesture');
+    await page.goto('/our-services.html', { waitUntil: 'networkidle' });
+    const card = page.locator('.svc').first();
+    await card.scrollIntoViewIfNeeded();
+    await expect(card).not.toHaveClass(/will-reveal/, { timeout: 6000 });
+    await page.waitForTimeout(500);
+    const rest = await card.evaluate((c) => ({ t: getComputedStyle(c).transform, a: getComputedStyle(c.querySelector('.svc__media'), '::after').opacity }));
+    expect(rest.t).toBe('none');
+    expect(rest.a).toBe('0');
+    await card.hover();
+    await page.waitForTimeout(600);
+    const up = await card.evaluate((c) => ({ t: getComputedStyle(c).transform, a: getComputedStyle(c.querySelector('.svc__media'), '::after').opacity, i: getComputedStyle(c.querySelector('.svc__media img')).transform }));
+    expect(up.t).not.toBe('none');
+    expect(up.a).toBe('1');
+    expect(up.i).not.toBe('none');
+  });
+
+  test('on touch screens the arrow is always shown and a press gives feedback', async ({ page }, info) => {
+    test.skip(info.project.name !== 'mobile', 'touch only');
+    await page.goto('/our-services.html', { waitUntil: 'networkidle' });
+    const a = await page.locator('.svc').first().evaluate((c) => getComputedStyle(c.querySelector('.svc__media'), '::after').opacity);
+    expect(a).toBe('1');
+  });
+
+  test('cards below the fold slide in as you scroll and all end up visible', async ({ page }) => {
+    await page.goto('/our-services.html', { waitUntil: 'networkidle' });
+    const last = page.locator('.svc').last();
+    await expect(last).toHaveClass(/will-reveal/);
+    await last.scrollIntoViewIfNeeded();
+    await expect.poll(() => last.evaluate((c) => getComputedStyle(c).opacity)).toBe('1');
+    // after arriving, the card goes back to normal styles so hover motion works
+    await expect(last).not.toHaveClass(/will-reveal/, { timeout: 5000 });
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await expect.poll(async () => page.$$eval('.svc', (cs) => cs.filter((c) => getComputedStyle(c).opacity !== '1').length), { timeout: 6000 }).toBe(0);
+  });
+
+  test('a safety timer shows every card even if the visitor never scrolls', async ({ page }) => {
+    await page.goto('/our-services.html', { waitUntil: 'networkidle' });
+    await expect.poll(async () => page.$$eval('.svc', (cs) => cs.filter((c) => getComputedStyle(c).opacity !== '1').length), { timeout: 8000 }).toBe(0);
+  });
+});
+
+test.describe('treatment cards without script or with reduced motion', () => {
+  test.describe('script off', () => {
+    test.use({ javaScriptEnabled: false });
+    test('every card is visible', async ({ page }) => {
+      await page.goto('/our-services.html');
+      expect(await page.$$eval('.svc', (cs) => cs.filter((c) => getComputedStyle(c).opacity !== '1' || c.classList.contains('will-reveal')).length)).toBe(0);
+    });
+  });
+  test.describe('reduced motion', () => {
+    test.use({ reducedMotion: 'reduce' });
+    test('no card is hidden or animated in', async ({ page }) => {
+      await page.goto('/our-services.html', { waitUntil: 'networkidle' });
+      expect(await page.$$eval('.svc', (cs) => cs.filter((c) => c.classList.contains('will-reveal')).length)).toBe(0);
+    });
+  });
+});

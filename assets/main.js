@@ -27,4 +27,29 @@
   });
 
   nav.addEventListener('click', function (e) { if (e.target.closest('a')) { setOpen(false); } });
+
+  // Treatment cards slide in as they scroll into view (only cards still below the fold; never hides anything for good).
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.svc'));
+  var calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (cards.length && 'IntersectionObserver' in window && !calm) {
+    var below = cards.filter(function (c) { return c.getBoundingClientRect().top > window.innerHeight * 0.95; });
+    var show = function (c) {
+      if (c.classList.contains('is-in')) { return; }
+      c.classList.add('is-in');
+      // Once it has arrived, hand the card back to its normal styles so hover and tap motion work.
+      window.setTimeout(function () { c.classList.remove('will-reveal', 'is-in'); c.style.removeProperty('--reveal-delay'); }, 1500);
+    };
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { show(e.target); io.unobserve(e.target); }
+      });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
+    below.forEach(function (c, i) {
+      c.style.setProperty('--reveal-delay', ((i % 5) * 70) + 'ms');
+      c.classList.add('will-reveal');
+      io.observe(c);
+    });
+    // Safety net: whatever has not appeared after a few seconds is shown anyway.
+    window.setTimeout(function () { below.forEach(show); }, 4000);
+  }
 })();

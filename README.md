@@ -33,15 +33,8 @@ Settings → Pages → Deploy from a branch → choose the branch and `/ (root)`
 ```
 npm install
 npx playwright install chromium   # first time only
-npm test                          # HTML validation + 20 browser tests (desktop + mobile)
+npm test
 ```
-The same checks run on GitHub Actions on every push (`.github/workflows/test.yml`).
+`npm test` runs, in order: HTML validation of the static site; its 22 browser tests; PHP lint and the form/routing checks for the theme; the theme's pages rendered to HTML with stubbed WordPress; the **completeness check** against the old site's text (`tests/theme/completeness.py`); and 84 browser tests on the rendered theme (desktop and phone sizes). The same checks run on GitHub Actions on every push.
 
-## WordPress theme
-Upload `the-dental-hauz-theme.zip` at **Appearance → Themes → Add New → Upload Theme**, then activate it.
-
-- **Clinic details:** Appearance → Customize → Clinic details (phone, email, address, opening hours, where booking requests are emailed). Empty fields are hidden.
-- **Menu:** Appearance → Menus → assign to "Primary menu". Until you do, a default menu linking to the home-page sections is shown.
-- **Booking form:** submits to WordPress and emails the clinic via `wp_mail` (site admin email by default). On hosts that don't deliver PHP mail reliably, install an SMTP plugin such as WP Mail SMTP.
-- **Home page:** the theme's `front-page.php` is used for the home page whatever is chosen under Settings → Reading. Other pages and posts use `page.php` / `single.php`.
-- Tests: `npm run theme:php` (PHP lint + booking handler checks), `npm run theme:render && npm run theme:e2e` (templates rendered to HTML and tested in a browser, desktop + mobile).
+Rebuild the theme zip with `npm run theme:zip`. To regenerate `inc/content.php` from a fresh WordPress export: `python3 tools/build-content.py <export.xml> wordpress-theme/the-dental-hauz/inc`. Never commit the export itself: it contains patient form submissions.

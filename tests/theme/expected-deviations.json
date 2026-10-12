@@ -1,0 +1,152 @@
+{
+ "*": [
+  {
+   "string": "Divider",
+   "reason": "Page-builder widget label, not visible text on the old site"
+  }
+ ],
+ "home": [
+  {
+   "string": "Modern Anesthesic",
+   "reason": "Spelling fixed to \"Modern Anesthetic\""
+  }
+ ],
+ "contact-us": [
+  {
+   "string": "DENTISTS",
+   "reason": "Banner breadcrumb carried the wrong page name; the new page shows a correct \"Home / Contact Us\" breadcrumb"
+  },
+  {
+   "string": "01",
+   "reason": "Decorative card numbers not carried over"
+  },
+  {
+   "string": "03",
+   "reason": "Decorative card numbers not carried over"
+  },
+  {
+   "string": "04",
+   "reason": "Decorative card numbers not carried over"
+  },
+  {
+   "string": "8321 Kennedy Rd#22 , Markham, ON L3N 5N4",
+   "reason": "Postal code corrected to L3R 5N4 (the old site used L3R 5N4 on its forms and map, L3N 5N4 here and in its header); address now comes from Customizer > Clinic details"
+  },
+  {
+   "string": "Monday - Friday: 10AM - 6PM",
+   "reason": "Same hours, reformatted; now come from Customizer > Clinic details"
+  },
+  {
+   "string": "Saturday: 9:00AM – 6:00PM",
+   "reason": "Same hours, reformatted; now come from Customizer > Clinic details"
+  },
+  {
+   "string": "The Dental Hauz 8321 Kennedy Rd #22, Markham, ON L3R 5N4, Canada",
+   "reason": "Used as the address of the embedded Google Map (checked separately)"
+  }
+ ],
+ "testimonial": [
+  {
+   "string": "Testimonials",
+   "reason": "Banner title; the new page uses the page title \"Testimonial\""
+  },
+  {
+   "string": "TESTIMONIALS",
+   "reason": "Banner breadcrumb; replaced by a real breadcrumb"
+  }
+ ],
+ "our-services": [
+  {
+   "string": "DENTISTS",
+   "reason": "Banner breadcrumb carried the wrong page name; replaced by a real breadcrumb"
+  }
+ ],
+ "medical-history-form": [
+  {
+   "string": "8321 KENNEDY RD. UNIT # 22. MARKHAM, L3R 5N4",
+   "reason": "Same address, now from Customizer > Clinic details"
+  },
+  {
+   "string": "905.470.4289",
+   "reason": "Same phone number, now from Customizer > Clinic details"
+  },
+  {
+   "string": "MEDICAL ALERT:",
+   "reason": "Heading with no content under it on the old page; left out"
+  },
+  {
+   "string": "IN CASE OF EMERGENCY, WE SHOULD NOTIFY:",
+   "reason": "Same heading without the trailing colon"
+  },
+  {
+   "string": "NAMERELATIONSHIP",
+   "reason": "Label typo; now \"Relationship\""
+  },
+  {
+   "string": "Not Sure/Maybe",
+   "reason": "Answer option spelled \"Not sure / Maybe\""
+  },
+  {
+   "string": "Do you have any allergies? If you answered yes, please list using the categories below: a) medications b) latex/rubber products c) other (e.g., hayfever, foods)4. Are you taking any medications, non-prescription drugs or herbal supplements of any kind?",
+   "reason": "Two questions had been merged into one label; split into the allergies question and the medications question, each with its own \"if yes, please list\" box"
+  },
+  {
+   "string": "I Have you ever been hospitalized for any illnesses or operations?",
+   "reason": "Typo; now \"Have you ever been hospitalized...\""
+  },
+  {
+   "string": "chesr pain,angaina",
+   "reason": "Typo; now \"chest pain, angina\""
+  },
+  {
+   "string": "eheumatic fever",
+   "reason": "Typo; now \"rheumatic fever\""
+  },
+  {
+   "string": "thyroid dusease",
+   "reason": "Typo; now \"thyroid disease\""
+  },
+  {
+   "string": "steroid theraypy",
+   "reason": "Typo; now \"steroid therapy\""
+  }
+ ],
+ "request-for-records": [
+  {
+   "string": "8321 KENNEDY RD. UNIT # 22. MARKHAM, L3R 5N4",
+   "reason": "Same address, now from Customizer > Clinic details"
+  },
+  {
+   "string": "905.470.4289",
+   "reason": "Same phone number, now from Customizer > Clinic details"
+  },
+  {
+   "string": "Pataint Name, has/have recently become a patient/patients in my practice",
+   "reason": "Typo; now \"Patient Name\" with the \"has/have recently become a patient/patients in my practice\" note under it"
+  }
+ ],
+ "dental-treatment-payment-agreement": [
+  {
+   "string": "I, acknowledge that I have read and understand the above payment agreement. I agree to the terms stated and accept financial responsibility for the services provided.",
+   "reason": "Stray comma removed; a \"Full name of patient\" box added so the patient can state who is acknowledging"
+  },
+  {
+   "string": "Dental Office Representative Signature",
+   "reason": "Image-upload signature replaced by a typed \"Dental Office Representative\" name"
+  },
+  {
+   "string": "8321 KENNEDY RD. UNIT # 22. MARKHAM, L3R 5N4 905.470.4289",
+   "reason": "Was a mistaken radio button holding the address; shown as a plain address line from Customizer > Clinic details"
+  }
+ ],
+ "payment-agreement": [
+  {
+   "string": "I, _ acknowledge that I have read and understand the above payment agreement. I agree to the terms stated and accept financial responsibility for the services provided.",
+   "reason": "Blank in the sentence removed; the patient's \"Full Name\" box sits above it"
+  },
+  {
+   "string": "8321 KENNEDY RD. UNIT # 22. MARKHAM, L3R 5N4 905.470.4289",
+   "reason": "Was a mistaken radio button holding the address; shown as a plain address line from Customizer > Clinic details"
+  }
+ ]
+}

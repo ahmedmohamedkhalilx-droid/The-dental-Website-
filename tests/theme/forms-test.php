@@ -1,0 +1,142 @@
+<?php
+/**
+ * Exercises every form handler. Usage: DH_THEME_DIR=<theme> php forms-test.php
+ */
+require __DIR__ . '/wp-stubs.php';
+require getenv( 'DH_THEME_DIR' ) . '/functions.php';
+
+$fails = 0;
+function check( $label, $cond ) {
+	global $fails;
+	echo ( $cond ? '  ok   ' : '  FAIL ' ) . $label . "\n";
+	if ( ! $cond ) { $fails++; }
+}
+function submit( $post, $ip = '1.1.1.1' ) {
+	$_POST = $post;
+	$_SERVER['REMOTE_ADDR'] = $ip;
+	$GLOBALS['dh_mail'] = array();
+	$GLOBALS['dh_posts'] = array();
+	try { dh_handle_form(); } catch ( DH_Redirect $r ) { return $r->getMessage(); }
+	return null;
+}
+/** A complete, valid submission for a form, built from its definition. */
+function valid_post( $id ) {
+	$post = array( 'dh_form' => $id, 'dh_return' => 'https://clinic.test/some-page/' );
+	foreach ( dh_forms()[ $id ]['fields'] as $f ) {
+		$k = 'dh_' . $f['name'];
+		switch ( $f['type'] ) {
+			case 'heading': case 'note': break;
+			case 'email': $post[ $k ] = 'patient@example.test'; break;
+			case 'tel': $post[ $k ] = '905-555-0100'; break;
+			case 'date': $post[ $k ] = '2026-10-12'; break;
+			case 'select': case 'radio': $post[ $k ] = $f['options'][0]; break;
+			case 'checkboxes': $post[ $k ] = array( $f['options'][0], $f['options'][1] ); break;
+			case 'checkbox': $post[ $k ] = '1'; break;
+			default: $post[ $k ] = 'Sample ' . $f['name'];
+		}
+	}
+	return $post;
+}
+
+$ids = array_keys( dh_forms() );
+echo "forms defined: " . implode( ', ', $ids ) . "\n";
+check( 'all five forms exist', $ids === array( 'booking', 'request-for-records', 'dental-treatment-payment-agreement', 'payment-agreement', 'medical-history-form' ) );
+
+$n = 0;
+foreach ( $ids as $id ) {
+	$n++;
+	$ip = "10.0.0.$n";
+	echo "\n[$id]\n";
+	$form = dh_forms()[ $id ];
+
+	$r = submit( valid_post( $id ), $ip );
+	check( 'valid submission redirects back to the form with status=sent', $r === "https://clinic.test/some-page/?dh_form=$id&dh_status=sent#form-$id" );
+	check( 'one email is sent to the clinic address', count( $GLOBALS['dh_mail'] ) === 1 && $GLOBALS['dh_mail'][0]['to'] === 'thedentalhauz@gmail.com' );
+	$body = $GLOBALS['dh_mail'][0]['body'] ?? '';
+	$allin = true;
+	foreach ( $form['fields'] as $f ) {
+		if ( in_array( $f['type'], array( 'note' ), true ) ) { continue; }
+		if ( false === strpos( $body, $f['label'] ) && false === strpos( $body, strtoupper( $f['label'] ) ) ) { $allin = false; echo "      missing in email: {$f['label']}\n"; }
+	}
+	check( 'email lists every field of the form', $allin );
+	check( 'a private copy is kept in the dashboard', count( $GLOBALS['dh_posts'] ) === 1 && 'dh_submission' === $GLOBALS['dh_posts'][0]['post_type'] && 'private' === $GLOBALS['dh_posts'][0]['post_status'] );
+
+	// Each required field, left empty, stops the submission.
+	$allreq = true;
+	foreach ( $form['fields'] as $f ) {
+		if ( empty( $f['required'] ) ) { continue; }
+		$p = valid_post( $id );
+		unset( $p[ 'dh_' . $f['name'] ] );
+		$r = submit( $p, $ip );
+		if ( $r !== "https://clinic.test/some-page/?dh_form=$id&dh_status=invalid#form-$id" || count( $GLOBALS['dh_mail'] ) !== 0 ) { $allreq = false; echo "      not enforced: {$f['label']}\n"; }
+	}
+	check( 'every required field is enforced (no email when one is missing)', $allreq );
+
+	$r = submit( valid_post( $id ) + array( 'dh_website' => 'http://spam.test' ), $ip );
+	check( 'honeypot filled: looks successful but sends nothing', strpos( (string) $r, 'dh_status=sent' ) !== false && count( $GLOBALS['dh_mail'] ) === 0 );
+
+	$p = valid_post( $id );
+	foreach ( $form['fields'] as $f ) { if ( 'text' === $f['type'] ) { $p[ 'dh_' . $f['name'] ] = '<script>alert(1)</script>Bob'; break; } }
+	submit( $p, $ip );
+	check( 'HTML is stripped from text fields', strpos( $GLOBALS['dh_mail'][0]['body'] ?? '', '<script>' ) === false && count( $GLOBALS['dh_mail'] ) === 1 );
+}
+
+echo "\n[shared behaviour]\n";
+$r = submit( array( 'dh_form' => 'nope', 'dh_return' => 'https://clinic.test/x/' ), '9.9.9.9' );
+check( 'unknown form id goes home and sends nothing', $r === 'https://clinic.test/' && count( $GLOBALS['dh_mail'] ) === 0 );
+
+$r = submit( array_merge( valid_post( 'booking' ), array( 'dh_return' => 'https://evil.test/phish' ) ), '9.9.9.8' );
+check( 'return address on another site is ignored', strpos( (string) $r, 'https://clinic.test/' ) === 0 && strpos( (string) $r, 'evil.test' ) === false );
+
+$b = valid_post( 'booking' ); $b['dh_service'] = 'Free iPhone';
+check( 'booking: a service that is not on the list is rejected', strpos( (string) submit( $b, '9.9.9.7' ), 'invalid' ) !== false );
+$b = valid_post( 'booking' ); $b['dh_email'] = 'not-an-email';
+check( 'booking: an invalid email address is rejected', strpos( (string) submit( $b, '9.9.9.6' ), 'invalid' ) !== false );
+$b = valid_post( 'booking' ); $b['dh_time'] = 'Midnight';
+check( 'booking: a time that is not on the list is rejected', strpos( (string) submit( $b, '9.9.9.5' ), 'invalid' ) !== false );
+
+submit( valid_post( 'booking' ), '9.9.9.4' );
+$m = $GLOBALS['dh_mail'][0];
+check( 'booking: Reply-To is the patient', in_array( 'Reply-To: Sample first_name Sample last_name <patient@example.test>', $m['headers'], true ) );
+check( 'booking: subject names the form and the patient', $m['subject'] === '[The Dental Hauz] Appointment request from Sample first_name Sample last_name' );
+
+$GLOBALS['dh_mods']['dh_form_email'] = 'frontdesk@example.test';
+submit( valid_post( 'booking' ), '9.9.9.3' );
+check( 'Customizer "send form submissions to" overrides the default', $GLOBALS['dh_mail'][0]['to'] === 'frontdesk@example.test' );
+$GLOBALS['dh_mods']['dh_form_email'] = '';
+submit( valid_post( 'booking' ), '9.9.9.2' );
+check( 'empty recipient falls back to the site admin email', $GLOBALS['dh_mail'][0]['to'] === 'admin@example.test' );
+$GLOBALS['dh_mods'] = array( 'dh_store_submissions' => false );
+submit( valid_post( 'booking' ), '9.9.9.1' );
+check( 'dashboard copies can be switched off', count( $GLOBALS['dh_posts'] ) === 0 && count( $GLOBALS['dh_mail'] ) === 1 );
+$GLOBALS['dh_mods'] = array();
+
+$last = null;
+for ( $i = 0; $i < 35; $i++ ) { $last = submit( valid_post( 'booking' ), '7.7.7.7' ); }
+check( 'more than 30 submissions an hour from one address are refused', strpos( (string) $last, 'dh_status=error' ) !== false && count( $GLOBALS['dh_mail'] ) === 0 );
+
+check( 'handler is wired to admin-post for visitors and logged-in users', isset( $GLOBALS['dh_hooks']['admin_post_nopriv_dh_form'] ) && isset( $GLOBALS['dh_hooks']['admin_post_dh_form'] ) );
+
+echo "\n[medical history specifics]\n";
+$med = dh_forms()['medical-history-form']['fields'];
+$labels = array_column( $med, 'label' );
+foreach ( array( 'chest pain, angina', 'rheumatic fever', 'thyroid disease', 'steroid therapy' ) as $opt ) {
+	$f = array_values( array_filter( $med, function ( $x ) { return 'conditions' === $x['name']; } ) )[0];
+	check( "condition list includes \"$opt\"", in_array( $opt, $f['options'], true ) );
+}
+check( 'follow-up boxes are optional so a "No" answer can be submitted', ! array_filter( $med, function ( $x ) { return substr( $x['name'], -5 ) === '_more' && $x['required']; } ) );
+check( 'the consent statement names the dentist as on the old form', (bool) array_filter( $labels, function ( $l ) { return false !== strpos( $l, 'Dr. Summer Al Maqdassy' ); } ) );
+
+echo "\n[template override]\n";
+$GLOBALS['dh_page'] = array( 'slug' => 'about-us', 'title' => 'About Us' );
+check( 'a carried-over page is forced onto the theme page template', substr( dh_force_templates( '/elementor/canvas.php' ), -8 ) === 'page.php' );
+$GLOBALS['dh_page'] = array( 'slug' => 'home', 'title' => 'Home' );
+check( 'the home page is forced onto front-page.php', substr( dh_force_templates( '/elementor/canvas.php' ), -14 ) === 'front-page.php' );
+$GLOBALS['dh_page'] = array( 'slug' => 'privacy-policy', 'title' => 'Privacy' );
+check( 'any other page keeps whatever template WordPress chose', dh_force_templates( '/x/custom.php' ) === '/x/custom.php' );
+$all = array_keys( dh_page_map() );
+sort( $all );
+check( 'all 20 inner pages of the old site are mapped (10 treatments + 10 others)', count( $all ) === 20 );
+
+echo $fails ? "\n$fails FAILED\n" : "\nall form and routing checks passed\n";
+exit( $fails ? 1 : 0 );

@@ -1,19 +1,24 @@
 <?php
 /**
- * Minimal stand-ins for the WordPress functions the theme calls, so templates
- * can be rendered and the booking handler exercised without a WordPress install.
- * Test-only: never shipped in the theme zip.
+ * Minimal stand-ins for the WordPress functions the theme calls, so templates can be rendered and
+ * the form handler exercised without a WordPress install. Test-only: never shipped in the theme zip.
  */
 define( 'ABSPATH', __DIR__ . '/' );
 define( 'HOUR_IN_SECONDS', 3600 );
 define( 'ENT_QUOTES_', ENT_QUOTES );
 
-$GLOBALS['dh_mods']      = array();
-$GLOBALS['dh_options']   = array( 'admin_email' => 'admin@example.test' );
-$GLOBALS['dh_mail']      = array();
+$GLOBALS['dh_mods']       = array();
+$GLOBALS['dh_options']    = array( 'admin_email' => 'admin@example.test' );
+$GLOBALS['dh_mail']       = array();
+$GLOBALS['dh_posts']      = array();
 $GLOBALS['dh_transients'] = array();
-$GLOBALS['dh_hooks']     = array();
-$GLOBALS['dh_is_admin']  = false;
+$GLOBALS['dh_hooks']      = array();
+$GLOBALS['dh_is_admin']   = false;
+$GLOBALS['dh_page']       = array( 'slug' => '', 'title' => '' );
+$GLOBALS['dh_shortcode']  = true;
+$GLOBALS['dh_video']      = true;
+$GLOBALS['dh_loop']       = 0;
+$GLOBALS['wp']            = (object) array( 'request' => '' );
 
 class DH_Redirect extends Exception {}
 
@@ -23,25 +28,28 @@ function get_theme_file_uri( $p = '' ) { return $p; }
 function get_stylesheet_uri() { return 'style.css'; }
 function add_action( $h, $cb ) { $GLOBALS['dh_hooks'][ $h ][] = $cb; }
 function add_filter( $h, $cb ) { $GLOBALS['dh_hooks'][ $h ][] = $cb; }
+function apply_filters( $h, $v ) { return $v; }
 function add_theme_support() {}
 function register_nav_menus() {}
+function register_post_type() {}
 function load_theme_textdomain() {}
 function wp_enqueue_style() {}
 function wp_enqueue_script() {}
 function has_site_icon() { return false; }
 function has_custom_logo() { return false; }
-function wp_get_attachment_image() { return ''; }
-function get_theme_mod( $k, $d = '' ) { return isset( $GLOBALS['dh_mods'][ $k ] ) ? $GLOBALS['dh_mods'][ $k ] : $d; }
+function get_theme_mod( $k, $d = '' ) { return array_key_exists( $k, $GLOBALS['dh_mods'] ) ? $GLOBALS['dh_mods'][ $k ] : $d; }
 function get_option( $k ) { return $GLOBALS['dh_options'][ $k ] ?? ''; }
 function home_url( $p = '' ) { return 'https://clinic.test' . $p; }
 function admin_url( $p = '' ) { return 'https://clinic.test/wp-admin/' . $p; }
+function user_trailingslashit( $s ) { return rtrim( $s, '/' ) . '/'; }
 function get_bloginfo( $k = '' ) { return 'charset' === $k ? 'UTF-8' : 'The Dental Hauz'; }
 function bloginfo( $k = '' ) { echo get_bloginfo( $k ); }
 function language_attributes() { echo 'lang="en-US"'; }
 function wp_head() { echo '<link rel="stylesheet" href="style.css">'; }
 function wp_footer() { echo '<script src="assets/main.js" defer></script>'; }
 function wp_body_open() {}
-function body_class() { echo 'class="home dh-home"'; }
+function body_class() { echo 'class="page"'; }
+function post_class( $c = '' ) { echo 'class="' . esc_attr( $c ) . '"'; }
 function wp_date( $f ) { return gmdate( $f ); }
 function antispambot( $e ) { return $e; }
 function current_user_can() { return $GLOBALS['dh_is_admin']; }
@@ -53,20 +61,62 @@ function esc_attr_e( $s ) { echo htmlspecialchars( $s, ENT_QUOTES, 'UTF-8' ); }
 function esc_html( $s ) { return htmlspecialchars( (string) $s, ENT_QUOTES, 'UTF-8' ); }
 function esc_attr( $s ) { return htmlspecialchars( (string) $s, ENT_QUOTES, 'UTF-8' ); }
 function esc_url( $s ) { return htmlspecialchars( (string) $s, ENT_QUOTES, 'UTF-8' ); }
+function esc_url_raw( $s ) { return (string) $s; }
+function wp_validate_redirect( $url, $fallback ) { return 0 === strpos( $url, 'https://clinic.test' ) ? $url : $fallback; }
 function wp_unslash( $s ) { return $s; }
 function sanitize_text_field( $s ) { return trim( strip_tags( (string) $s ) ); }
 function sanitize_textarea_field( $s ) { return trim( strip_tags( (string) $s ) ); }
 function sanitize_email( $s ) { return filter_var( trim( (string) $s ), FILTER_VALIDATE_EMAIL ) ? trim( $s ) : ''; }
 function sanitize_key( $s ) { return preg_replace( '/[^a-z0-9_\-]/', '', strtolower( (string) $s ) ); }
 function is_email( $s ) { return (bool) filter_var( $s, FILTER_VALIDATE_EMAIL ); }
+function rest_sanitize_boolean( $v ) { return (bool) $v; }
+function number_format_i18n( $n ) { return number_format( $n ); }
 function wp_specialchars_decode( $s ) { return $s; }
-function add_query_arg( $k, $v, $url ) { return $url . ( false === strpos( $url, '?' ) ? '?' : '&' ) . $k . '=' . $v; }
+function add_query_arg( $k, $v = null, $url = null ) {
+	if ( is_array( $k ) ) { $url = $v; $pairs = $k; } else { $pairs = array( $k => $v ); }
+	return $url . ( false === strpos( $url, '?' ) ? '?' : '&' ) . http_build_query( $pairs );
+}
+function remove_query_arg( $keys, $url ) { return preg_replace( '/\?.*$/', '', $url ); }
 function wp_safe_redirect( $url ) { throw new DH_Redirect( $url ); }
 function get_transient( $k ) { return $GLOBALS['dh_transients'][ $k ] ?? false; }
 function set_transient( $k, $v ) { $GLOBALS['dh_transients'][ $k ] = $v; }
+function wp_insert_post( $a ) { $GLOBALS['dh_posts'][] = $a; return count( $GLOBALS['dh_posts'] ); }
 function wp_mail( $to, $subject, $body, $headers = array() ) {
 	$GLOBALS['dh_mail'][] = compact( 'to', 'subject', 'body', 'headers' );
 	return true;
 }
+
+// Media library: any attachment ID counts as an image and renders as a stand-in photo.
+function wp_attachment_is_image( $id ) { return true; }
+function get_post_meta() { return ''; }
+function wp_get_attachment_image( $id, $size = 'large', $icon = false, $attr = array() ) {
+	$attrs = '';
+	foreach ( $attr as $k => $v ) { $attrs .= ' ' . $k . '="' . esc_attr( $v ) . '"'; }
+	return '<img src="assets/img/aligners.jpg" width="736" height="1104" data-attachment="' . (int) $id . '"' . $attrs . '>';
+}
+function wp_get_attachment_image_url( $id ) { return 'assets/img/aligners.jpg'; }
+function wp_get_attachment_url( $id ) { return $GLOBALS['dh_video'] ? 'assets/video.mp4' : false; }
+
+// Pages, loop and templates.
+function dh_known_titles() { static $t = null; if ( null === $t ) { $t = ( require dh_theme_dir() . '/inc/content.php' )['titles']; } return $t; }
+function get_page_by_path( $slug ) { return isset( dh_known_titles()[ $slug ] ) ? (object) array( 'slug' => $slug ) : null; }
+function get_permalink( $p ) { return 'https://clinic.test/' . $p->slug . '/'; }
+function get_the_title() { return $GLOBALS['dh_page']['title']; }
+function the_title() { echo esc_html( get_the_title() ); }
+function the_content() { echo '<p>Editor content</p>'; }
+function get_the_ID() { return 1; }
+function get_queried_object_id() { return 1; }
+function get_post_field( $f, $id ) { return $GLOBALS['dh_page']['slug']; }
+function is_page() { return '' !== $GLOBALS['dh_page']['slug'] && 'home' !== $GLOBALS['dh_page']['slug']; }
+function is_front_page() { return 'home' === $GLOBALS['dh_page']['slug']; }
+function locate_template( $f ) { return dh_theme_dir() . '/' . $f; }
+function have_posts() { return 0 === $GLOBALS['dh_loop']; }
+function the_post() { $GLOBALS['dh_loop']++; }
+function shortcode_exists() { return $GLOBALS['dh_shortcode']; }
+function do_shortcode() { return '<div class="ti-widget">Google reviews widget</div>'; }
 function get_header() { include dh_theme_dir() . '/header.php'; }
 function get_footer() { include dh_theme_dir() . '/footer.php'; }
+function get_template_part( $slug, $name = null, $args = array() ) {
+	$file = dh_theme_dir() . '/' . $slug . ( $name ? '-' . $name : '' ) . '.php';
+	( function () use ( $file, $args ) { include $file; } )();
+}

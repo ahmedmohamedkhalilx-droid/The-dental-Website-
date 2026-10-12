@@ -9,10 +9,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'DH_VERSION', '1.0.0' );
+define( 'DH_VERSION', '2.0.0' );
 
 require_once get_template_directory() . '/inc/customizer.php';
-require_once get_template_directory() . '/inc/booking.php';
+require_once get_template_directory() . '/inc/forms.php';
 
 /**
  * Theme setup.
@@ -45,9 +45,6 @@ function dh_assets() {
 }
 add_action( 'wp_enqueue_scripts', 'dh_assets' );
 
-/**
- * Font preconnect hints.
- */
 function dh_resource_hints( $urls, $relation_type ) {
 	if ( 'preconnect' === $relation_type ) {
 		$urls[] = 'https://fonts.googleapis.com';
@@ -68,18 +65,101 @@ function dh_favicon() {
 add_action( 'wp_head', 'dh_favicon' );
 
 /**
- * Add a skip link target class and a body class for the home page.
+ * Page copy carried over from the previous site (see inc/content.php).
  */
-function dh_body_class( $classes ) {
-	if ( is_front_page() ) {
-		$classes[] = 'dh-home';
+function dh_content( $key = null ) {
+	static $c = null;
+	if ( null === $c ) {
+		$c = require get_template_directory() . '/inc/content.php';
 	}
-	return $classes;
+	return null === $key ? $c : ( isset( $c[ $key ] ) ? $c[ $key ] : null );
 }
-add_filter( 'body_class', 'dh_body_class' );
 
 /**
- * Header logo: the Site Logo from Customizer if set, otherwise the brand logo.
+ * Which template part renders which page, by page slug.
+ *
+ * @return array<string,string>
+ */
+function dh_page_map() {
+	$map = array(
+		'about-us'                           => 'about',
+		'our-services'                       => 'services',
+		'contact-us'                         => 'contact',
+		'testimonial'                        => 'testimonial',
+		'faqs'                               => 'faqs',
+		'forms'                              => 'forms',
+		'medical-history-form'               => 'form',
+		'request-for-records'                => 'form',
+		'dental-treatment-payment-agreement' => 'form',
+		'payment-agreement'                  => 'form',
+	);
+	foreach ( array_keys( dh_content( 'service_pages' ) ) as $slug ) {
+		$map[ $slug ] = 'service';
+	}
+	return $map;
+}
+
+/**
+ * Make sure the theme's own templates are used for these pages, even if a page builder
+ * plugin that built them before is still active.
+ */
+function dh_force_templates( $template ) {
+	if ( is_front_page() ) {
+		$t = locate_template( 'front-page.php' );
+		return $t ? $t : $template;
+	}
+	if ( is_page() ) {
+		$slug = get_post_field( 'post_name', get_queried_object_id() );
+		if ( isset( dh_page_map()[ $slug ] ) ) {
+			$t = locate_template( 'page.php' );
+			return $t ? $t : $template;
+		}
+	}
+	return $template;
+}
+add_filter( 'template_include', 'dh_force_templates', 99 );
+
+/**
+ * URL of a page by slug (falls back to /slug/ if the page does not exist yet).
+ */
+function dh_page_url( $slug ) {
+	if ( '' === $slug || null === $slug ) {
+		return home_url( '/' );
+	}
+	if ( preg_match( '#^(tel|sms|mailto|https?):#', $slug ) ) {
+		return $slug;
+	}
+	static $cache = array();
+	if ( ! isset( $cache[ $slug ] ) ) {
+		$p              = get_page_by_path( $slug );
+		$cache[ $slug ] = $p ? get_permalink( $p ) : home_url( '/' . $slug . '/' );
+	}
+	return $cache[ $slug ];
+}
+
+/**
+ * An image from the media library by attachment ID, with an optional brand-photo fallback.
+ */
+function dh_img( $id, $size = 'large', $attr = array(), $fallback = '' ) {
+	$id = (int) $id;
+	if ( $id && wp_attachment_is_image( $id ) ) {
+		if ( isset( $attr['alt'] ) && '' !== (string) get_post_meta( $id, '_wp_attachment_image_alt', true ) ) {
+			unset( $attr['alt'] );
+		}
+		return wp_get_attachment_image( $id, $size, false, $attr );
+	}
+	if ( $fallback ) {
+		return sprintf(
+			'<img src="%s" alt="%s" loading="lazy" decoding="async">',
+			esc_url( get_theme_file_uri( 'assets/img/' . $fallback ) ),
+			esc_attr( isset( $attr['alt'] ) ? $attr['alt'] : '' )
+		);
+	}
+	return '';
+}
+
+/**
+ * Header and footer logo.
  */
 function dh_logo( $variant = 'dark' ) {
 	$home  = esc_url( home_url( '/' ) );
@@ -103,33 +183,33 @@ function dh_logo( $variant = 'dark' ) {
 }
 
 /**
- * Menu shown until an admin builds one under Appearance > Menus.
+ * Menu shown until an admin builds one under Appearance > Menus. Same structure as the old site.
  */
 function dh_fallback_menu() {
-	$items = array(
-		'#about'    => __( 'About', 'the-dental-hauz' ),
-		'#services' => __( 'Services', 'the-dental-hauz' ),
-		'#implants' => __( 'Implants', 'the-dental-hauz' ),
-		'#visit'    => __( 'Your Visit', 'the-dental-hauz' ),
-		'#faq'      => __( 'FAQ', 'the-dental-hauz' ),
-	);
+	$c = dh_content();
 	echo '<ul>';
-	foreach ( $items as $hash => $label ) {
-		printf( '<li><a href="%s">%s</a></li>', esc_url( home_url( '/' . $hash ) ), esc_html( $label ) );
+	printf( '<li><a href="%s">%s</a></li>', esc_url( home_url( '/' ) ), esc_html__( 'Home', 'the-dental-hauz' ) );
+	printf( '<li><a href="%s">%s</a></li>', esc_url( dh_page_url( 'about-us' ) ), esc_html__( 'About Us', 'the-dental-hauz' ) );
+	printf( '<li class="menu-item-has-children"><a href="%s">%s</a><ul class="sub-menu">', esc_url( dh_page_url( 'our-services' ) ), esc_html__( 'Services', 'the-dental-hauz' ) );
+	foreach ( $c['services'] as $s ) {
+		printf( '<li><a href="%s">%s</a></li>', esc_url( dh_page_url( $s['slug'] ) ), esc_html( $c['service_pages'][ $s['slug'] ]['title'] ) );
 	}
+	echo '</ul></li>';
+	printf( '<li><a href="%s">%s</a></li>', esc_url( dh_page_url( 'testimonial' ) ), esc_html__( 'Testimonial', 'the-dental-hauz' ) );
+	printf( '<li><a href="%s">%s</a></li>', esc_url( dh_page_url( 'faqs' ) ), esc_html__( "FAQ's", 'the-dental-hauz' ) );
+	printf( '<li><a href="%s">%s</a></li>', esc_url( dh_page_url( 'forms' ) ), esc_html__( 'Forms', 'the-dental-hauz' ) );
+	printf( '<li><a href="%s">%s</a></li>', esc_url( dh_page_url( 'contact-us' ) ), esc_html__( 'Contact Us', 'the-dental-hauz' ) );
 	echo '</ul>';
 }
 
 /**
- * Plain-text list of "Label | Value" opening-hours lines from the Customizer.
+ * Opening hours as [label, time] rows.
  *
  * @return array<int, array{0:string,1:string}>
  */
 function dh_hours() {
-	$raw   = (string) get_theme_mod( 'dh_hours', '' );
-	$lines = preg_split( '/\r\n|\r|\n/', $raw );
-	$out   = array();
-	foreach ( $lines as $line ) {
+	$out = array();
+	foreach ( preg_split( '/\r\n|\r|\n/', dh_clinic( 'hours' ) ) as $line ) {
 		$line = trim( $line );
 		if ( '' === $line ) {
 			continue;
@@ -138,4 +218,36 @@ function dh_hours() {
 		$out[] = array( $parts[0], isset( $parts[1] ) ? $parts[1] : '' );
 	}
 	return $out;
+}
+
+/**
+ * Address as lines.
+ *
+ * @return string[]
+ */
+function dh_address_lines() {
+	return array_values( array_filter( array_map( 'trim', preg_split( '/\r\n|\r|\n/', dh_clinic( 'address' ) ) ) ) );
+}
+
+/**
+ * tel: link for the clinic phone.
+ */
+function dh_tel_href() {
+	$digits = preg_replace( '/[^0-9+]/', '', dh_clinic( 'phone' ) );
+	return $digits ? 'tel:' . $digits : '';
+}
+
+/**
+ * Embedded Google Map URL.
+ */
+function dh_map_src() {
+	$q = dh_clinic( 'map_query' );
+	return $q ? 'https://www.google.com/maps?q=' . rawurlencode( $q ) . '&output=embed' : '';
+}
+
+/**
+ * Reviews block: the Google reviews widget from the Trustindex plugin, if it is active.
+ */
+function dh_reviews_html() {
+	return shortcode_exists( 'trustindex' ) ? do_shortcode( '[trustindex no-registration=google]' ) : '';
 }

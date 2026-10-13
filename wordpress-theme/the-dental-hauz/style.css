@@ -476,3 +476,21 @@ body .elementor-location-header, body .elementor-location-footer { display: none
 .footer-base .tag { letter-spacing: .32em; text-transform: uppercase; }
 @media (max-width: 960px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 520px) { .footer-grid { grid-template-columns: 1fr; } }
+
+/* Phones: keep everything in proportion (shorter tiles and photo frames, tighter spacing, larger logo) */
+@media (max-width: 600px) {
+  .brand img, .brand .custom-logo { height: 46px; }
+  .section { padding-block: 2.75rem; }
+  .section.reviews--compact, .reviews--compact { padding-block: 2rem; }
+  .hero { padding-bottom: 4.5rem; }
+  .hero__grid { padding-block: 2rem 0; gap: 1.6rem; }
+  .hero-media { max-width: 100%; }
+  .hero-media .frame { aspect-ratio: 5 / 4; }
+  .intro__media { max-width: 100%; }
+  .intro__media > img { aspect-ratio: 4 / 3; }
+  .page-hero__media { aspect-ratio: 16 / 10; }
+  .faq__media, .split__media { max-width: 100%; }
+  .svc-grid { gap: .85rem; }
+  .svc { aspect-ratio: 16 / 10; }
+  .quick-wrap { margin-top: -3rem; }
+}

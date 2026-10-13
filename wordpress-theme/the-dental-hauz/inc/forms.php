@@ -26,6 +26,22 @@ function dh_f( $name, $label, $type = 'text', $extra = array() ) {
 }
 
 /**
+ * Everything a patient can book: the visit types from the old form plus every treatment the clinic lists.
+ *
+ * @return string[]
+ */
+function dh_booking_services() {
+	$c        = dh_content();
+	$services = array( 'New Patient Exam' );
+	foreach ( $c['services'] as $s ) {
+		$services[] = $c['service_pages'][ $s['slug'] ]['title'];
+	}
+	$services[] = 'Emergency Exam';
+	$services[] = 'Other';
+	return $services;
+}
+
+/**
  * Form definitions.
  *
  * Types: text, tel, email, date, textarea, select, radio, checkbox (single), checkboxes (several),
@@ -51,7 +67,7 @@ function dh_forms() {
 			dh_f( 'email', 'Your Email', 'email', array( 'required' => true, 'half' => true, 'autocomplete' => 'email' ) ),
 			dh_f( 'service', 'Service You Would Like to Book', 'select', array(
 				'required' => true,
-				'options'  => array( 'New Patient Exam', 'Cleaning', 'Emergency Exam', 'Fillings', 'Extraction', 'Invisalign / Orthodontics', 'Teeth Whitening', 'Other' ),
+				'options'  => dh_booking_services(),
 			) ),
 			dh_f( 'day', 'Preferred Day', 'select', array( 'required' => true, 'half' => true, 'options' => array( 'Monday', 'Wednesday', 'Friday', 'Saturday' ) ) ),
 			dh_f( 'time', 'Preferred Time', 'select', array( 'required' => true, 'half' => true, 'options' => array( 'Morning', 'Afternoon', 'Evening', 'No Preference' ) ) ),

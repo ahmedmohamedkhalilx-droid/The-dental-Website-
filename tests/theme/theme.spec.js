@@ -169,12 +169,12 @@ test.describe('home page', () => {
     await expect(page.locator('#book .form')).toBeVisible();
   });
 
-  test('without the video file a photo takes its place; without the reviews plugin a link to the Google reviews is shown', async ({ page }) => {
+  test('without the video file a photo takes its place; without the reviews plugin the built-in Google reviews are shown', async ({ page }) => {
     await page.goto('/home-novideo.html');
     await expect(page.locator('.video')).toHaveCount(0);
     await expect(page.locator('.reviews--compact .ti-widget')).toHaveCount(0);
-    await expect(page.locator('.reviews--compact .reviews-fallback a.btn')).toHaveAttribute('href', 'https://maps.app.goo.gl/tq5NC39rXTekr9da9');
-    await expect(page.locator('.reviews--compact .reviews-fallback')).toContainText('Read what our patients say about us on Google.');
+    await expect(page.locator('.reviews--compact .rv__card')).toHaveCount(3);
+    await expect(page.locator('.reviews--compact .rv__count')).toHaveText('66 Google reviews');
   });
 
   test('home uses its own (smaller) widget shortcode; only Trustindex shortcodes are accepted', async ({ page }) => {
@@ -273,7 +273,7 @@ test.describe('inner pages', () => {
     await expect(page.locator('.reviews h2')).toContainText('Patient Experiences That Inspire Confidence');
     await page.goto('/testimonial-noplugin-admin.html');
     await expect(page.locator('.admin-note')).toContainText('Trustindex');
-    await expect(page.locator('.reviews-fallback a.btn')).toHaveAttribute('href', 'https://maps.app.goo.gl/tq5NC39rXTekr9da9');
+    await expect(page.locator('.rv__card')).toHaveCount(3);
   });
 
   test('a page that is not from the old site shows its editor content', async ({ page }) => {
@@ -297,7 +297,7 @@ test.describe('forms', () => {
     await expect(form.locator('input[name="action"]')).toHaveValue('dh_form');
     await expect(form.locator('input[name="dh_form"]')).toHaveValue('booking');
     const opts = async (n) => form.locator(`select[name="${n}"] option`).allTextContents();
-    expect(await opts('dh_service')).toEqual(['Select', 'New Patient Exam', 'Cleaning', 'Emergency Exam', 'Fillings', 'Extraction', 'Invisalign / Orthodontics', 'Teeth Whitening', 'Other']);
+    expect(await opts('dh_service')).toEqual(['Select', 'New Patient Exam', 'Comprehensive Oral Examination', 'Dental Cleaning', 'Tooth-Colored Restorations', 'Crowns & Bridges', 'Dental Implants', 'Orthodontics & Clear Aligners', 'Simple & Wisdom Tooth Extractions', 'Root Canal Therapy', 'Kids Dentistry', 'Teeth whitening', 'Emergency Exam', 'Other']);
     expect(await opts('dh_day')).toEqual(['Select', 'Monday', 'Wednesday', 'Friday', 'Saturday']);
     expect(await opts('dh_time')).toEqual(['Select', 'Morning', 'Afternoon', 'Evening', 'No Preference']);
     for (const n of ['dh_first_name', 'dh_phone', 'dh_email', 'dh_service', 'dh_day', 'dh_time']) await expect(form.locator(`[name="${n}"]`)).toHaveAttribute('required', '');
@@ -517,9 +517,66 @@ test.describe('google reviews by widget ID', () => {
   test('without the plugin, a Trustindex ID embeds the widget; a bad ID is ignored', async ({ page }) => {
     await page.goto('/testimonial-custom-noplugin.html');
     await expect(page.locator('script[src="https://cdn.trustindex.io/loader.js?abc123abc123abc123"]')).toHaveCount(1);
-    await expect(page.locator('.reviews-fallback')).toHaveCount(0);
+    await expect(page.locator('.rv')).toHaveCount(0);
     await page.goto('/testimonial-badid.html');
     await expect(page.locator('script[src*="cdn.trustindex.io"]')).toHaveCount(0);
-    await expect(page.locator('.reviews-fallback')).toHaveCount(1);
+    await expect(page.locator('.rv')).toHaveCount(1);
+  });
+});
+
+test.describe('built-in Google reviews', () => {
+  test('summary and review cards match the clinic\'s Google listing', async ({ page }) => {
+    await page.goto('/testimonial-noplugin-admin.html');
+    const sum = page.locator('.rv__summary');
+    await expect(sum.locator('.rv__name')).toHaveText('The Dental Hauz');
+    await expect(sum.locator('.rv__count')).toHaveText('66 Google reviews');
+    await expect(sum.locator('.rv__star.is-on')).toHaveCount(5);
+    await expect(sum.locator('a.btn')).toHaveText('Write a review');
+    await expect(sum.locator('a.btn')).toHaveAttribute('href', 'https://maps.app.goo.gl/tq5NC39rXTekr9da9');
+    const cards = page.locator('.rv__card');
+    await expect(cards).toHaveCount(3);
+    await expect(cards.nth(0)).toContainText('Kitty Tse');
+    await expect(cards.nth(0)).toContainText('Staff are always friendly and helpful.');
+    await expect(cards.nth(0).locator('.rv__more')).toHaveCount(0);
+    await expect(cards.nth(1)).toContainText('B M');
+    await expect(cards.nth(1)).toContainText('Dr. Sherief explained the pros and cons of veneers, crowns…');
+    await expect(cards.nth(1).locator('.rv__more')).toHaveAttribute('href', 'https://maps.app.goo.gl/tq5NC39rXTekr9da9');
+    await expect(cards.nth(2)).toContainText('Kelly F');
+    await expect(cards.nth(2)).toContainText('Dr.Sherief is outstanding!');
+    await expect(cards.locator('.rv__star.is-on')).toHaveCount(15);
+    await expect(cards.locator('.rv__avatar').allTextContents()).resolves.toEqual(['K', 'B', 'K']);
+  });
+
+  test('cards are laid out in a row and fit the page', async ({ page }, info) => {
+    await page.goto('/testimonial-noplugin-admin.html', { waitUntil: 'networkidle' });
+    const tops = await page.locator('.rv__card').evaluateAll((cs) => cs.map((c) => Math.round(c.getBoundingClientRect().top)));
+    expect(new Set(tops).size, 'one row').toBe(1);
+    const w = await page.evaluate(() => [document.documentElement.scrollWidth, document.documentElement.clientWidth]);
+    expect(w[0]).toBeLessThanOrEqual(w[1]);
+    if (info.project.name !== 'mobile') {
+      // all three fit side by side on a wide screen, so no arrows are needed
+      await expect(page.locator('.rv__nav')).toBeHidden({ timeout: 2000 }).catch(() => {});
+      const vis = await page.locator('.rv__card').evaluateAll((cs) => cs.filter((c) => { const r = c.getBoundingClientRect(); return r.left >= 0 && r.right <= innerWidth; }).length);
+      expect(vis).toBe(3);
+    }
+  });
+
+  test('on a phone the row scrolls sideways and the arrow appears', async ({ page }, info) => {
+    test.skip(info.project.name !== 'mobile', 'phone only');
+    await page.goto('/testimonial-noplugin-admin.html', { waitUntil: 'networkidle' });
+    const next = page.locator('.rv__nav--next');
+    await expect(next).toBeVisible();
+    const before = await page.locator('.rv__track').evaluate((t) => t.scrollLeft);
+    await next.click();
+    await expect.poll(() => page.locator('.rv__track').evaluate((t) => t.scrollLeft)).toBeGreaterThan(before + 100);
+    await expect(page.locator('.rv__nav--prev')).toBeVisible();
+  });
+
+  test('the compact home block uses the same reviews at a smaller size', async ({ page }) => {
+    await page.goto('/home-novideo.html');
+    const fs = await page.locator('.reviews--compact .rv__card p').first().evaluate((p) => parseFloat(getComputedStyle(p).fontSize));
+    await page.goto('/testimonial-noplugin-admin.html');
+    const full = await page.locator('.rv__card p').first().evaluate((p) => parseFloat(getComputedStyle(p).fontSize));
+    expect(fs).toBeLessThan(full);
   });
 });

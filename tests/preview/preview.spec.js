@@ -74,7 +74,7 @@ test('forms are inert in the preview and say so', async ({ page }) => {
   await page.fill('#f-booking-first_name', 'Test');
   await page.fill('#f-booking-phone', '905 555 0100');
   await page.fill('#f-booking-email', 'a@b.test');
-  await page.selectOption('#f-booking-service', 'Cleaning');
+  await page.selectOption('#f-booking-service', 'Dental Cleaning');
   await page.selectOption('#f-booking-day', 'Monday');
   await page.selectOption('#f-booking-time', 'Morning');
   await page.getByRole('button', { name: 'Book Appointment' }).click();

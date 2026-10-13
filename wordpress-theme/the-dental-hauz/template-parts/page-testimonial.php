@@ -10,9 +10,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 $dh_t    = dh_content( 'testimonial' );
 $dh_html = dh_reviews_html();
-if ( '' === $dh_html ) {
-	$dh_html = dh_reviews_fallback();
-}
 get_template_part( 'template-parts/hero', null, array( 'title' => get_the_title(), 'image' => 528, 'alt' => '' ) );
 ?>
 <section class="section reviews">
@@ -25,7 +22,7 @@ get_template_part( 'template-parts/hero', null, array( 'title' => get_the_title(
       <div class="reviews__widget"><?php echo $dh_html; // phpcs:ignore WordPress.Security.EscapeOutput ?></div>
     <?php endif; ?>
     <?php if ( ! shortcode_exists( 'trustindex' ) && current_user_can( 'edit_theme_options' ) ) : ?>
-      <p class="admin-note"><?php esc_html_e( 'Admins: the Google reviews appear here once the Trustindex plugin is active.', 'the-dental-hauz' ); ?></p>
+      <p class="admin-note"><?php esc_html_e( 'Admins: these are the reviews saved in the theme. Activate the Trustindex plugin (or add a Trustindex widget ID in the Customizer) to show your live Google reviews here.', 'the-dental-hauz' ); ?></p>
     <?php endif; ?>
   </div>
 </section>

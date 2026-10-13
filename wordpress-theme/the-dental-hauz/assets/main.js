@@ -28,6 +28,30 @@
 
   nav.addEventListener('click', function (e) { if (e.target.closest('a')) { setOpen(false); } });
 
+  // Google reviews: arrows that scroll the row of review cards (swiping and the keyboard work without them).
+  document.querySelectorAll('[data-rv]').forEach(function (rv) {
+    var track = rv.querySelector('.rv__track');
+    var prev = rv.querySelector('.rv__nav--prev');
+    var next = rv.querySelector('.rv__nav--next');
+    if (!track || !prev || !next) { return; }
+    function update() {
+      var max = track.scrollWidth - track.clientWidth;
+      var scrolls = max > 4;
+      prev.hidden = !scrolls || track.scrollLeft <= 4;
+      next.hidden = !scrolls || track.scrollLeft >= max - 4;
+    }
+    function step(dir) {
+      var card = track.querySelector('.rv__card');
+      var by = card ? card.getBoundingClientRect().width + 20 : track.clientWidth * 0.8;
+      track.scrollBy({ left: dir * by, behavior: 'smooth' });
+    }
+    prev.addEventListener('click', function () { step(-1); });
+    next.addEventListener('click', function () { step(1); });
+    track.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  });
+
   // Touch screens: the first tap on a treatment card shows its details, a second tap opens the page.
   var allCards = Array.prototype.slice.call(document.querySelectorAll('.svc'));
   if (allCards.length && window.matchMedia && window.matchMedia('(hover: none)').matches) {

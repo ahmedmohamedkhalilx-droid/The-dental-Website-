@@ -13,9 +13,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 $dh_compact = ! empty( $args['compact'] );
 $dh_html    = dh_reviews_html( $dh_compact ? 'home' : 'full' );
 if ( '' === $dh_html ) {
-	$dh_html = dh_reviews_fallback();
-}
-if ( '' === $dh_html ) {
 	return;
 }
 ?>

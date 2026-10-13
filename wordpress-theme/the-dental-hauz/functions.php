@@ -325,18 +325,74 @@ function dh_reviews_html( $where = 'full' ) {
 	if ( $id ) {
 		return '<script defer async src="' . esc_url( 'https://cdn.trustindex.io/loader.js?' . $id ) . '"></script>';
 	}
-	return '';
+	return dh_reviews_static();
 }
 
 /**
- * Shown where the reviews widget would be when the plugin is not active: a link to the Google listing.
+ * The clinic's Google reviews (inc/reviews.php).
  */
-function dh_reviews_fallback() {
-	$url = dh_clinic( 'maps_url' );
-	if ( ! $url ) {
+function dh_reviews_data() {
+	static $d = null;
+	if ( null === $d ) {
+		$d = require get_template_directory() . '/inc/reviews.php';
+	}
+	return $d;
+}
+
+/**
+ * Five stars, filled up to $rating.
+ */
+function dh_stars( $rating ) {
+	$out = '';
+	for ( $i = 1; $i <= 5; $i++ ) {
+		$out .= '<svg class="rv__star' . ( $i <= $rating ? ' is-on' : '' ) . '" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.5l2.95 6.2 6.8.85-5 4.7 1.3 6.75L12 17.6l-6.05 3.4 1.3-6.75-5-4.7 6.8-.85L12 2.5z"/></svg>';
+	}
+	return $out;
+}
+
+/**
+ * Built-in version of the Google reviews block: rating summary and a swipeable row of review cards.
+ * Used when the Trustindex plugin and widget ID are not set up.
+ */
+function dh_reviews_static() {
+	$d = dh_reviews_data();
+	if ( empty( $d['items'] ) ) {
 		return '';
 	}
-	return '<div class="reviews-fallback"><p>' . esc_html__( 'Read what our patients say about us on Google.', 'the-dental-hauz' ) . '</p><a class="btn" href="' . esc_url( $url ) . '" target="_blank" rel="noopener">' . esc_html__( 'See our Google reviews', 'the-dental-hauz' ) . '</a></div>';
+	$url = dh_clinic( 'maps_url' );
+	ob_start();
+	?>
+	<div class="rv" data-rv>
+	  <div class="rv__summary">
+	    <strong class="rv__name"><?php echo esc_html( $d['name'] ); ?></strong>
+	    <span class="rv__stars" role="img" aria-label="<?php echo esc_attr( sprintf( /* translators: %d: rating out of 5 */ __( 'Rated %d out of 5', 'the-dental-hauz' ), $d['rating'] ) ); ?>"><?php echo dh_stars( $d['rating'] ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+	    <span class="rv__count"><?php echo esc_html( sprintf( /* translators: %d: number of reviews */ __( '%d Google reviews', 'the-dental-hauz' ), $d['count'] ) ); ?></span>
+	    <?php if ( $url ) : ?>
+	      <a class="btn btn--ghost" href="<?php echo esc_url( $url ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'Write a review', 'the-dental-hauz' ); ?></a>
+	    <?php endif; ?>
+	  </div>
+	  <div class="rv__carousel">
+	    <button class="rv__nav rv__nav--prev" type="button" aria-label="<?php esc_attr_e( 'Previous reviews', 'the-dental-hauz' ); ?>" hidden>&#8249;</button>
+	    <div class="rv__track" tabindex="0" role="group" aria-label="<?php esc_attr_e( 'Google reviews', 'the-dental-hauz' ); ?>">
+	      <?php foreach ( $d['items'] as $n => $r ) : ?>
+	        <article class="rv__card">
+	          <header>
+	            <span class="rv__avatar rv__avatar--<?php echo (int) ( $n % 3 ); ?>" aria-hidden="true"><?php echo esc_html( strtoupper( mb_substr( $r['name'], 0, 1 ) ) ); ?></span>
+	            <span class="rv__who"><strong><?php echo esc_html( $r['name'] ); ?></strong><span class="rv__src"><?php esc_html_e( 'Google review', 'the-dental-hauz' ); ?></span></span>
+	          </header>
+	          <span class="rv__stars" role="img" aria-label="<?php echo esc_attr( sprintf( __( 'Rated %d out of 5', 'the-dental-hauz' ), $r['rating'] ) ); ?>"><?php echo dh_stars( $r['rating'] ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+	          <p><?php echo esc_html( $r['text'] ); ?></p>
+	          <?php if ( ! empty( $r['more'] ) && $url ) : ?>
+	            <a class="rv__more" href="<?php echo esc_url( $url ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'Read more', 'the-dental-hauz' ); ?><span class="screen-reader-text"> <?php echo esc_html( $r['name'] ); ?></span></a>
+	          <?php endif; ?>
+	        </article>
+	      <?php endforeach; ?>
+	    </div>
+	    <button class="rv__nav rv__nav--next" type="button" aria-label="<?php esc_attr_e( 'Next reviews', 'the-dental-hauz' ); ?>" hidden>&#8250;</button>
+	  </div>
+	</div>
+	<?php
+	return ob_get_clean();
 }
 
 /**

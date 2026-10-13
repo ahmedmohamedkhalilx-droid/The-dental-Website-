@@ -629,3 +629,14 @@ test('the stylesheet uses only the five brand colours', async () => {
   const rgb = [...css.matchAll(/rgba?\(\s*(\d+,\s*\d+,\s*\d+)/g)].map((m) => m[1].replace(/\s+/g, ' '));
   expect(rgb.filter((c) => !brandRgb.has(c))).toEqual([]);
 });
+
+test('form text stays readable even if a page builder styles labels and inputs', async ({ page }) => {
+  await page.goto('/index.html');
+  await page.addStyleTag({ content: 'label{color:#fff !important} input,select{background:#fff !important}' });
+  const labelColor = await page.locator('#book .field label').first().evaluate((e) => getComputedStyle(e).color);
+  const fieldBg = await page.locator('#book .field input').first().evaluate((e) => getComputedStyle(e).backgroundColor);
+  const btn = await page.locator('#book .form .btn').evaluate((e) => [getComputedStyle(e).backgroundColor, getComputedStyle(e).color]);
+  expect(labelColor).not.toBe('rgb(255, 255, 255)');
+  expect(fieldBg).toBe('rgb(244, 240, 232)');
+  expect(btn).toEqual(['rgb(81, 74, 67)', 'rgb(244, 240, 232)']);
+});

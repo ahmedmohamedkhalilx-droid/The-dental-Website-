@@ -494,3 +494,13 @@ body .elementor-location-header, body .elementor-location-footer { display: none
   .svc { aspect-ratio: 16 / 10; }
   .quick-wrap { margin-top: -3rem; }
 }
+
+/* Brand colours win over leftover page-builder styles (Elementor, MetForm, kit colours) */
+body .form { color: var(--umber) !important; }
+body .form .field label, body .form .field legend { color: var(--umber-soft) !important; opacity: 1 !important; }
+body .form .field label.choice { color: var(--umber) !important; }
+body .form .field input:not([type=checkbox]):not([type=radio]), body .form .field select, body .form .field textarea { background: var(--cream) !important; color: var(--umber) !important; border: 1px solid var(--line) !important; box-shadow: none !important; }
+body .form .field input:focus, body .form .field select:focus, body .form .field textarea:focus { border-color: var(--sage-deep) !important; box-shadow: 0 0 0 3px rgba(101, 117, 104, .18) !important; }
+body .form .btn { background: var(--umber) !important; color: var(--cream) !important; border: 1px solid var(--umber) !important; }
+body .form .btn:hover { background: var(--sage-deep) !important; border-color: var(--sage-deep) !important; color: var(--cream) !important; }
+body .site-header { background: rgba(244, 240, 232, .95) !important; }

@@ -547,18 +547,57 @@ test.describe('built-in Google reviews', () => {
     await expect(cards.locator('.rv__avatar').allTextContents()).resolves.toEqual(['K', 'B', 'K']);
   });
 
-  test('cards are laid out in a row and fit the page', async ({ page }, info) => {
+  test('cards are in one row, fit the page, and the row scrolls with arrows', async ({ page }) => {
     await page.goto('/testimonial-noplugin-admin.html', { waitUntil: 'networkidle' });
     const tops = await page.locator('.rv__card').evaluateAll((cs) => cs.map((c) => Math.round(c.getBoundingClientRect().top)));
     expect(new Set(tops).size, 'one row').toBe(1);
     const w = await page.evaluate(() => [document.documentElement.scrollWidth, document.documentElement.clientWidth]);
     expect(w[0]).toBeLessThanOrEqual(w[1]);
-    if (info.project.name !== 'mobile') {
-      // all three fit side by side on a wide screen, so no arrows are needed
-      await expect(page.locator('.rv__nav')).toBeHidden({ timeout: 2000 }).catch(() => {});
-      const vis = await page.locator('.rv__card').evaluateAll((cs) => cs.filter((c) => { const r = c.getBoundingClientRect(); return r.left >= 0 && r.right <= innerWidth; }).length);
-      expect(vis).toBe(3);
-    }
+    const track = page.locator('.rv__track');
+    expect(await track.evaluate((t) => t.scrollWidth - t.clientWidth), 'row is wider than the window, so it scrolls').toBeGreaterThan(20);
+    await expect(page.locator('.rv__nav--next')).toBeVisible();
+    await expect(page.locator('.rv__nav--prev')).toBeHidden();
+    const before = await track.evaluate((t) => t.scrollLeft);
+    await page.locator('.rv__nav--next').click();
+    await expect.poll(() => track.evaluate((t) => t.scrollLeft)).toBeGreaterThan(before + 50);
+    await expect(page.locator('.rv__nav--prev')).toBeVisible();
+  });
+
+  test('the row moves along by itself, and stops while the pointer is over it', async ({ page }, info) => {
+    test.skip(info.project.name === 'mobile', 'pointer');
+    await page.goto('/testimonial-noplugin-admin.html', { waitUntil: 'networkidle' });
+    const track = page.locator('.rv__track');
+    await page.locator('.rv__summary').scrollIntoViewIfNeeded();
+    await page.mouse.move(2, 2);
+    await expect.poll(() => track.evaluate((t) => t.scrollLeft), { timeout: 9000 }).toBeGreaterThan(50);
+    // back to the start, then hover: it must not move
+    await track.evaluate((t) => t.scrollTo({ left: 0, behavior: 'instant' }));
+    await track.hover();
+    await page.waitForTimeout(6500);
+    expect(await track.evaluate((t) => t.scrollLeft)).toBeLessThan(5);
+  });
+
+  test('the row can be dragged with the mouse', async ({ page }, info) => {
+    test.skip(info.project.name === 'mobile', 'mouse');
+    await page.goto('/testimonial-noplugin-admin.html', { waitUntil: 'networkidle' });
+    const track = page.locator('.rv__track');
+    await track.scrollIntoViewIfNeeded();
+    await track.evaluate((t) => t.scrollTo({ left: 0, behavior: 'instant' }));
+    const box = await track.boundingBox();
+    await page.mouse.move(box.x + box.width - 60, box.y + 120);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width - 260, box.y + 120, { steps: 8 });
+    await page.mouse.up();
+    expect(await track.evaluate((t) => t.scrollLeft)).toBeGreaterThan(80);
+  });
+
+  test('with reduced motion the row does not move by itself', async ({ browser }) => {
+    const ctx = await browser.newContext({ reducedMotion: 'reduce', viewport: { width: 1366, height: 900 } });
+    const page = await ctx.newPage();
+    await page.goto('http://127.0.0.1:4174/testimonial-noplugin-admin.html', { waitUntil: 'networkidle' });
+    await page.waitForTimeout(6500);
+    expect(await page.locator('.rv__track').evaluate((t) => t.scrollLeft)).toBeLessThan(5);
+    await ctx.close();
   });
 
   test('on a phone the row scrolls sideways and the arrow appears', async ({ page }, info) => {

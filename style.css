@@ -352,9 +352,12 @@ p { margin: 0; }
 .rv__star.is-on { fill: #F5B400; }
 .rv__summary .rv__star { width: 1.5rem; height: 1.5rem; }
 .rv__carousel { position: relative; min-width: 0; }
-.rv__track { contain: paint; display: flex; gap: 1.25rem; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding: .6rem .4rem 1.4rem; margin: -.6rem -.4rem -1.4rem; -webkit-overflow-scrolling: touch; }
+.rv__track { scroll-padding-inline: .4rem; contain: paint; display: flex; gap: 1.25rem; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding: .6rem .4rem 1.4rem; margin: -.6rem -.4rem -1.4rem; -webkit-overflow-scrolling: touch; }
 .rv__track::-webkit-scrollbar { display: none; }
 .rv__track:focus-visible { outline-offset: 6px; }
+.rv__track { cursor: grab; }
+.rv__track.is-dragging { cursor: grabbing; scroll-snap-type: none; user-select: none; }
+.rv__track.is-dragging a { pointer-events: none; }
 .rv__card { flex: 0 0 min(21rem, 86%); scroll-snap-align: start; display: grid; gap: .8rem; align-content: start; padding: 1.4rem 1.5rem 1.3rem; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: 0 16px 34px -26px rgba(81, 74, 67, .55); }
 .rv__card header { display: flex; align-items: center; gap: .9rem; }
 .rv__avatar { display: grid; place-items: center; flex: none; width: 2.9rem; height: 2.9rem; border-radius: 50%; color: var(--cream); font-family: var(--font-display); font-size: 1.5rem; line-height: 1; background: var(--sage-deep); }
@@ -371,7 +374,6 @@ p { margin: 0; }
 .rv__nav--prev { left: -1.2rem; }
 .rv__nav--next { right: -1.2rem; }
 .rv__nav:hover { background: var(--sage-deep); border-color: var(--sage-deep); color: var(--cream); }
-@media (min-width: 861px) { .rv__card { flex-basis: max(16.5rem, calc((100% - 2.5rem) / 3)); } .reviews--compact .rv__card { flex-basis: max(15.5rem, calc((100% - 2.5rem) / 3)); } }
 @media (max-width: 860px) { .rv { grid-template-columns: minmax(0, 1fr); } .rv__summary { justify-items: center; text-align: center; } .rv__nav--prev { left: -.4rem; } .rv__nav--next { right: -.4rem; } }
 .reviews--compact .rv__card { flex-basis: min(18rem, 86%); padding: 1.1rem 1.2rem; }
 .reviews--compact .rv__card p { -webkit-line-clamp: 4; font-size: .93rem; }

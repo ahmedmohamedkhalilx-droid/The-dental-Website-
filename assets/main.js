@@ -28,14 +28,19 @@
 
   nav.addEventListener('click', function (e) { if (e.target.closest('a')) { setOpen(false); } });
 
-  // Google reviews: arrows that scroll the row of review cards (swiping and the keyboard work without them).
+  // Google reviews: a scrolling row of review cards. Arrows, swiping, dragging with the mouse and the keyboard all work,
+  // and it moves along by itself every few seconds (paused while you hover, touch or focus it, and for reduced motion).
   document.querySelectorAll('[data-rv]').forEach(function (rv) {
     var track = rv.querySelector('.rv__track');
     var prev = rv.querySelector('.rv__nav--prev');
     var next = rv.querySelector('.rv__nav--next');
     if (!track || !prev || !next) { return; }
+    var paused = false;
+    var resumeTimer = null;
+    var calmMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function maxScroll() { return track.scrollWidth - track.clientWidth; }
     function update() {
-      var max = track.scrollWidth - track.clientWidth;
+      var max = maxScroll();
       var scrolls = max > 4;
       prev.hidden = !scrolls || track.scrollLeft <= 4;
       next.hidden = !scrolls || track.scrollLeft >= max - 4;
@@ -43,12 +48,48 @@
     function step(dir) {
       var card = track.querySelector('.rv__card');
       var by = card ? card.getBoundingClientRect().width + 20 : track.clientWidth * 0.8;
-      track.scrollBy({ left: dir * by, behavior: 'smooth' });
+      track.scrollBy({ left: dir * by, behavior: calmMotion ? 'auto' : 'smooth' });
     }
-    prev.addEventListener('click', function () { step(-1); });
-    next.addEventListener('click', function () { step(1); });
+    function pause() { paused = true; window.clearTimeout(resumeTimer); }
+    function resume(delay) { window.clearTimeout(resumeTimer); resumeTimer = window.setTimeout(function () { paused = false; }, delay || 0); }
+    prev.addEventListener('click', function () { step(-1); pause(); resume(8000); });
+    next.addEventListener('click', function () { step(1); pause(); resume(8000); });
     track.addEventListener('scroll', update, { passive: true });
     window.addEventListener('resize', update);
+    rv.addEventListener('mouseenter', pause);
+    rv.addEventListener('mouseleave', function () { resume(1500); });
+    rv.addEventListener('focusin', pause);
+    rv.addEventListener('focusout', function () { resume(1500); });
+    track.addEventListener('touchstart', pause, { passive: true });
+    track.addEventListener('touchend', function () { resume(8000); }, { passive: true });
+
+    // Drag with the mouse.
+    var down = false, startX = 0, startLeft = 0, moved = false;
+    track.addEventListener('pointerdown', function (e) {
+      if (e.pointerType !== 'mouse' || e.button !== 0) { return; }
+      down = true; moved = false; startX = e.clientX; startLeft = track.scrollLeft;
+    });
+    window.addEventListener('pointermove', function (e) {
+      if (!down) { return; }
+      var dx = e.clientX - startX;
+      if (!moved && Math.abs(dx) > 5) { moved = true; track.classList.add('is-dragging'); }
+      if (moved) { track.scrollLeft = startLeft - dx; }
+    });
+    window.addEventListener('pointerup', function () {
+      if (!down) { return; }
+      down = false;
+      track.classList.remove('is-dragging');
+    });
+
+    // Move along by itself, and wrap back to the start at the end.
+    if (!calmMotion) {
+      window.setInterval(function () {
+        if (paused || document.hidden || maxScroll() <= 4) { return; }
+        var r = rv.getBoundingClientRect();
+        if (r.bottom < 0 || r.top > window.innerHeight) { return; }
+        if (track.scrollLeft >= maxScroll() - 4) { track.scrollTo({ left: 0, behavior: 'smooth' }); } else { step(1); }
+      }, 5000);
+    }
     update();
   });
 

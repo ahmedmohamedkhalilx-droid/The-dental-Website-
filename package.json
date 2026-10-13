@@ -14,7 +14,8 @@
     "theme:complete": "python3 tests/theme/completeness.py tests/theme/out",
     "preview:build": "DH_PREVIEW=1 DH_BASE=/The-dental-Website- DH_ATTACHMENTS=$PWD/tools/preview/attachments.json DH_THEME_DIR=$PWD/wordpress-theme/the-dental-hauz php tools/build-preview.php . && cp wordpress-theme/the-dental-hauz/style.css . && cp -r wordpress-theme/the-dental-hauz/assets/. assets/ && touch .nojekyll",
     "preview:check": "python3 tools/check-preview.py . /The-dental-Website-",
-    "preview:e2e": "playwright test -c playwright.preview.config.js"
+    "preview:e2e": "playwright test -c playwright.preview.config.js",
+    "wp:e2e": "bash tools/wp-e2e/run.sh"
   },
   "devDependencies": {
     "@playwright/test": "^1.56.0",

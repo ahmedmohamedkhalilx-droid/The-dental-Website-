@@ -356,7 +356,12 @@ function dh_handle_form() {
 		);
 	}
 
+	// Sent as "The Dental Hauz <wordpress@yoursite>", the address WordPress uses by default, with the clinic's name.
+	$host    = wp_parse_url( home_url(), PHP_URL_HOST );
 	$headers = array( 'Content-Type: text/plain; charset=UTF-8' );
+	if ( $host ) {
+		$headers[] = 'From: ' . wp_specialchars_decode( get_bloginfo( 'name' ), ENT_QUOTES ) . ' <wordpress@' . preg_replace( '/^www\./', '', $host ) . '>';
+	}
 	if ( ! empty( $values['email'] ) && is_email( $values['email'] ) ) {
 		$headers[] = 'Reply-To: ' . ( $who ? $who : 'Patient' ) . ' <' . $values['email'] . '>';
 	}

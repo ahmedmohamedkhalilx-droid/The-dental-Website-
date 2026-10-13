@@ -1,0 +1,20 @@
+Date: Tue, 13 Oct 2026 20:50:57 +0000
+To: thedentalhauz@gmail.com
+From: The Dental Hauz <wordpress@127.0.0.1>
+Reply-To: Test Patient <patient@example.com>
+Subject: [The Dental Hauz] Appointment request from Test Patient
+Message-ID: <OTsD4sJ6KZ7v0Tgmgr7GmLKfzCIPfm28ESQOwKwrY@127.0.0.1>
+X-Mailer: PHPMailer 7.1.1 (https://github.com/PHPMailer/PHPMailer)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+
+Appointment request
+===================
+First Name: Test
+Last Name: Patient
+Phone: 905 555 0100
+Your Email: patient@example.com
+Service You Would Like to Book: Dental Implants
+Preferred Day: Monday
+Preferred Time: Morning
+

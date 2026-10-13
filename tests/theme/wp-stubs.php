@@ -89,6 +89,7 @@ function is_email( $s ) { return (bool) filter_var( $s, FILTER_VALIDATE_EMAIL );
 function rest_sanitize_boolean( $v ) { return (bool) $v; }
 function number_format_i18n( $n ) { return number_format( $n ); }
 function wp_specialchars_decode( $s ) { return $s; }
+function wp_parse_url( $u, $c = -1 ) { return parse_url( $u, $c ); }
 function add_query_arg( $k, $v = null, $url = null ) {
 	if ( is_array( $k ) ) { $url = $v; $pairs = $k; } else { $pairs = array( $k => $v ); }
 	return $url . ( false === strpos( $url, '?' ) ? '?' : '&' ) . http_build_query( $pairs );

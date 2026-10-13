@@ -42,3 +42,6 @@ npm test
 `npm test` runs, in order: HTML validation of the static site; its 22 browser tests; PHP lint and the form/routing checks for the theme; the theme's pages rendered to HTML with stubbed WordPress; the **completeness check** against the old site's text (`tests/theme/completeness.py`); and 84 browser tests on the rendered theme (desktop and phone sizes). The same checks run on GitHub Actions on every push.
 
 Rebuild the theme zip with `npm run theme:zip`. To regenerate `inc/content.php` from a fresh WordPress export: `python3 tools/build-content.py <export.xml> wordpress-theme/the-dental-hauz/inc`. Never commit the export itself: it contains patient form submissions.
+
+## Real WordPress test (forms)
+`npm run wp:e2e` builds a throw-away real WordPress (core and SQLite, no MySQL) in `tools/wp-e2e/.wp`, installs `the-dental-hauz-theme.zip`, starts a real SMTP server, and drives the real pages in a browser: it submits every form and checks the emails that arrive, the dashboard "Form entries", the error cases (missing fields, spam bot, recipient change, mail server down) and that WordPress logged no theme errors. It writes `tools/wp-e2e/out/REPORT.md` and keeps each email as `tools/wp-e2e/out/mail/*.eml`. Needs network the first time (Composer for WordPress core, git for the SQLite plugin); it is not part of `npm test`.

@@ -7,7 +7,7 @@ const executablePath = process.env.PW_CHROMIUM_PATH || undefined;
 
 module.exports = defineConfig({
   testDir: './tests',
-  testIgnore: ['**/theme/**', '**/preview/**'],
+  testIgnore: ['**/theme/**', '**/preview/**', '**/wp-e2e/**'],
   reporter: [['list']],
   use: {
     baseURL: 'http://127.0.0.1:4173',

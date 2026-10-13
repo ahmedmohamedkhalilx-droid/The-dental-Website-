@@ -26,6 +26,7 @@ class DH_Redirect extends Exception {}
 
 function dh_theme_dir() { return getenv( 'DH_THEME_DIR' ); }
 function get_template_directory() { return dh_theme_dir(); }
+function get_theme_file_path( $p = '' ) { return dh_theme_dir() . '/' . $p; }
 /**
  * Preview mode (DH_PREVIEW=1, DH_BASE=/path): absolute URLs under a base path, real photos from the old
  * site's media library (DH_ATTACHMENTS=json), inert forms and a preview banner. Used by tools/build-preview.php.

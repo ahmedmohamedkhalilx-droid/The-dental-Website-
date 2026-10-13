@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'DH_VERSION', '2.1.0' );
+define( 'DH_VERSION', '2.2.0' );
 
 require_once get_template_directory() . '/inc/customizer.php';
 require_once get_template_directory() . '/inc/forms.php';
@@ -40,10 +40,22 @@ function dh_assets() {
 		array(),
 		null
 	);
-	wp_enqueue_style( 'dh-style', get_stylesheet_uri(), array( 'dh-fonts' ), DH_VERSION );
-	wp_enqueue_script( 'dh-main', get_theme_file_uri( 'assets/main.js' ), array(), DH_VERSION, array( 'in_footer' => true, 'strategy' => 'defer' ) );
+	wp_enqueue_style( 'dh-style', get_stylesheet_uri(), array( 'dh-fonts' ), dh_asset_version( 'style.css' ) );
+	wp_enqueue_script( 'dh-main', get_theme_file_uri( 'assets/main.js' ), array(), dh_asset_version( 'assets/main.js' ), array( 'in_footer' => true, 'strategy' => 'defer' ) );
 }
 add_action( 'wp_enqueue_scripts', 'dh_assets' );
+
+/**
+ * Version string for a theme file: changes whenever the file changes, so browsers and
+ * caching plugins never keep serving an older stylesheet or script after an update.
+ *
+ * @param string $file Path inside the theme.
+ * @return string
+ */
+function dh_asset_version( $file ) {
+	$path = get_theme_file_path( $file );
+	return DH_VERSION . ( is_readable( $path ) ? '.' . filemtime( $path ) : '' );
+}
 
 function dh_resource_hints( $urls, $relation_type ) {
 	if ( 'preconnect' === $relation_type ) {

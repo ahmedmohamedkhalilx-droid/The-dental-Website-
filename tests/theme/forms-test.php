@@ -165,5 +165,11 @@ $GLOBALS['dh_is_admin'] = false;
 ob_start(); dh_elementor_notice(); $visitor = ob_get_clean();
 check( 'visitors never see the notice', '' === $visitor );
 
+// Cache busting: the stylesheet and script links change whenever the files change.
+$css_v = dh_asset_version( 'style.css' );
+check( 'stylesheet version follows the file (not a fixed number)', $css_v === DH_VERSION . '.' . filemtime( getenv( 'DH_THEME_DIR' ) . '/style.css' ) );
+check( 'script version follows the file', dh_asset_version( 'assets/main.js' ) === DH_VERSION . '.' . filemtime( getenv( 'DH_THEME_DIR' ) . '/assets/main.js' ) );
+check( 'theme version was bumped so old copies are replaced', preg_match( '/^Version: ' . preg_quote( DH_VERSION, '/' ) . '$/m', file_get_contents( getenv( 'DH_THEME_DIR' ) . '/style.css' ) ) === 1 );
+
 echo $fails ? "\n$fails FAILED\n" : "\nall form and routing checks passed\n";
 exit( $fails ? 1 : 0 );

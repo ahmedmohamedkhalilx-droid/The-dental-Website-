@@ -8,11 +8,6 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-$dh_addr = dh_address_lines();
-$dh_mail = dh_clinic( 'email' );
-$dh_fb   = dh_clinic( 'facebook' );
-$dh_ig   = dh_clinic( 'instagram' );
-$dh_tel  = dh_tel_href();
 ?><!DOCTYPE html>
 <html <?php language_attributes(); ?>>
 <head>
@@ -23,23 +18,6 @@ $dh_tel  = dh_tel_href();
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
 <a class="skip-link screen-reader-text" href="#top"><?php esc_html_e( 'Skip to content', 'the-dental-hauz' ); ?></a>
-
-<div class="topbar">
-  <div class="wrap">
-    <span class="topbar__contact">
-      <?php if ( $dh_addr ) : ?>
-        <a href="<?php echo esc_url( dh_clinic( 'maps_url' ) ); ?>"><?php echo esc_html( implode( ', ', $dh_addr ) ); ?></a>
-      <?php endif; ?>
-      <?php if ( $dh_mail ) : ?>
-        <a href="mailto:<?php echo esc_attr( antispambot( $dh_mail ) ); ?>"><?php echo esc_html( antispambot( $dh_mail ) ); ?></a>
-      <?php endif; ?>
-    </span>
-    <span class="topbar__social">
-      <?php if ( $dh_fb ) : ?><a href="<?php echo esc_url( $dh_fb ); ?>" rel="noopener" target="_blank"><?php esc_html_e( 'Facebook', 'the-dental-hauz' ); ?></a><?php endif; ?>
-      <?php if ( $dh_ig ) : ?><a href="<?php echo esc_url( $dh_ig ); ?>" rel="noopener" target="_blank"><?php esc_html_e( 'Instagram', 'the-dental-hauz' ); ?></a><?php endif; ?>
-    </span>
-  </div>
-</div>
 
 <header class="site-header">
   <div class="wrap">
@@ -57,9 +35,10 @@ $dh_tel  = dh_tel_href();
         )
       );
       ?>
-      <?php if ( $dh_tel ) : ?>
-        <a class="btn" href="<?php echo esc_url( $dh_tel ); ?>"><?php echo esc_html( dh_clinic( 'phone' ) ); ?></a>
-      <?php endif; ?>
+      <div class="nav-extra">
+        <?php echo dh_social_links( 'social' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+        <a class="btn" href="<?php echo esc_url( dh_book_href() ); ?>"><?php esc_html_e( 'Book Appointment', 'the-dental-hauz' ); ?></a>
+      </div>
     </nav>
   </div>
 </header>

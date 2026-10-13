@@ -251,3 +251,48 @@ function dh_map_src() {
 function dh_reviews_html() {
 	return shortcode_exists( 'trustindex' ) ? do_shortcode( '[trustindex no-registration=google]' ) : '';
 }
+
+/**
+ * Where the header "Book Appointment" button goes: the booking form on this page if it has one,
+ * otherwise the booking form on the home page.
+ */
+function dh_book_href() {
+	if ( is_front_page() ) {
+		return '#book';
+	}
+	if ( is_page() ) {
+		$map  = dh_page_map();
+		$slug = get_post_field( 'post_name', get_queried_object_id() );
+		if ( isset( $map[ $slug ] ) && ! in_array( $map[ $slug ], array( 'form', 'forms' ), true ) ) {
+			return '#book';
+		}
+	}
+	return home_url( '/#book' );
+}
+
+/**
+ * Inline social icons (Facebook, Instagram).
+ */
+function dh_social_icon( $name ) {
+	if ( 'facebook' === $name ) {
+		return '<svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path fill="currentColor" d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z"/></svg>';
+	}
+	return '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.4" cy="6.6" r=".6" fill="currentColor"/></svg>';
+}
+
+/**
+ * Social links as round icon buttons.
+ */
+function dh_social_links( $class = 'social' ) {
+	$items = array(
+		'facebook'  => array( dh_clinic( 'facebook' ), __( 'Facebook', 'the-dental-hauz' ) ),
+		'instagram' => array( dh_clinic( 'instagram' ), __( 'Instagram', 'the-dental-hauz' ) ),
+	);
+	$out = '';
+	foreach ( $items as $key => $item ) {
+		if ( $item[0] ) {
+			$out .= '<li><a class="social__link social__link--' . esc_attr( $key ) . '" href="' . esc_url( $item[0] ) . '" target="_blank" rel="noopener" aria-label="' . esc_attr( $item[1] ) . '">' . dh_social_icon( $key ) . '</a></li>'; // phpcs:ignore WordPress.Security.EscapeOutput
+		}
+	}
+	return $out ? '<ul class="' . esc_attr( $class ) . '">' . $out . '</ul>' : '';
+}

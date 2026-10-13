@@ -65,17 +65,47 @@ test.describe('header, menu and footer', () => {
     }
   });
 
-  test('top bar, header button and footer carry the real contact details', async ({ page }) => {
+  test('no top bar; header has round Facebook and Instagram icons and a Book Appointment button', async ({ page }, info) => {
     await page.goto('/home-default.html');
-    await expect(page.locator('.topbar')).toContainText('8321 Kennedy Rd #22, Markham, ON L3R 5N4');
-    await expect(page.locator('.topbar')).toContainText('thedentalhauz@gmail.com');
-    await expect(page.locator('.topbar a[href*="facebook.com"]')).toHaveCount(1);
-    await expect(page.locator('.topbar a[href*="instagram.com/thedental.hauz"]')).toHaveCount(1);
-    await expect(page.locator('.site-header a.btn')).toHaveAttribute('href', 'tel:9054704289');
-    await expect(page.locator('.site-header a.btn')).toHaveText('(905) 470-4289');
+    await expect(page.locator('.topbar')).toHaveCount(0);
+    const header = page.locator('.site-header');
+    if (info.project.name === 'mobile') await page.click('#menu-toggle');
+    await expect(header.locator('.social a[href*="facebook.com"]')).toHaveAttribute('aria-label', 'Facebook');
+    await expect(header.locator('.social a[href*="instagram.com/thedental.hauz"]')).toHaveAttribute('aria-label', 'Instagram');
+    await expect(header.locator('.social svg')).toHaveCount(2);
+    const hy = await header.locator('.social__link').evaluateAll((as) => as.map((a) => Math.round(a.getBoundingClientRect().top)));
+    expect(hy[0], 'header icons sit side by side').toBe(hy[1]);
+    await expect(header.locator('.social a')).toHaveText(['', '']);
+    const btn = header.locator('a.btn');
+    await expect(btn).toHaveText('Book Appointment');
+    await expect(btn).toHaveAttribute('href', '#book');
+    await expect(header.locator('a.btn[href^="tel:"]')).toHaveCount(0);
+  });
+
+  test('icons are round buttons of a usable size', async ({ page }, info) => {
+    await page.goto('/home-default.html');
+    if (info.project.name === 'mobile') await page.click('#menu-toggle');
+    const boxes = await page.locator('.site-header .social__link').evaluateAll((as) => as.map((a) => { const r = a.getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height)]; }));
+    for (const b of boxes) { expect(b[0]).toBeGreaterThanOrEqual(36); expect(b[0]).toBe(b[1]); }
+  });
+
+  test('header button goes to the booking form on this page, or on the home page where a page has none', async ({ page }) => {
+    await page.goto('/contact-us.html');
+    await expect(page.locator('.site-header a.btn')).toHaveAttribute('href', '#book');
+    await page.goto('/medical-history-form.html');
+    await expect(page.locator('.site-header a.btn')).toHaveAttribute('href', 'https://clinic.test/#book');
+    await page.goto('/forms.html');
+    await expect(page.locator('.site-header a.btn')).toHaveAttribute('href', 'https://clinic.test/#book');
+  });
+
+  test('footer carries the real contact details and the same icons', async ({ page }) => {
+    await page.goto('/home-default.html');
     const foot = page.locator('.footer');
     await expect(foot).toContainText('The Dental Hauz offers trusted dental care in Kennedy Road, Markham, ON.');
-    for (const t of ['Important Link', 'Our Services', 'Get in Touch', 'Working Hours', 'Monday – Friday', '10:00 AM – 6:00 PM', 'Saturday', '9:00 AM – 6:00 PM', 'Sunday', 'Closed']) await expect(foot).toContainText(t);
+    for (const t of ['Important Link', 'Our Services', 'Get in Touch', 'Working Hours', 'Monday – Friday', '10:00 AM – 6:00 PM', 'Saturday', '9:00 AM – 6:00 PM', 'Sunday', 'Closed', '(905) 470-4289', 'thedentalhauz@gmail.com', '8321 Kennedy Rd #22, Markham, ON L3R 5N4']) await expect(foot).toContainText(t);
+    await expect(foot.locator('.social__link')).toHaveCount(2);
+    const fy = await foot.locator('.social__link').evaluateAll((as) => as.map((a) => Math.round(a.getBoundingClientRect().top)));
+    expect(fy[0], 'footer icons sit side by side').toBe(fy[1]);
     await expect(foot.locator('a[href="https://clinic.test/forms/"]')).toHaveCount(1);
     await expect(foot.locator('ul').nth(1).locator('a')).toHaveCount(10);
     await expect(page.locator('body')).not.toContainText(/lorem|dentisto|to be added|king street melbourne/i);
@@ -83,15 +113,16 @@ test.describe('header, menu and footer', () => {
 
   test('details come from the Customizer when changed, and disappear when emptied', async ({ page }) => {
     await page.goto('/home-custom.html');
-    await expect(page.locator('.topbar')).toContainText('1 Test St, Toronto, ON');
-    await expect(page.locator('.topbar')).toContainText('front@example.test');
-    await expect(page.locator('.site-header a.btn')).toHaveAttribute('href', 'tel:4165550100');
+    await expect(page.locator('.quick')).toContainText('(416) 555-0100');
+    await expect(page.locator('.quick a[href="tel:4165550100"]')).toHaveCount(1);
+    await expect(page.locator('.footer')).toContainText('front@example.test');
+    await expect(page.locator('.footer')).toContainText('1 Test St, Toronto, ON');
     await expect(page.locator('.footer .hours li')).toHaveCount(2);
     await page.goto('/home-empty.html');
     await expect(page.locator('.quick')).toHaveCount(0);
-    await expect(page.locator('.site-header a.btn')).toHaveCount(0);
-    await expect(page.locator('.topbar a')).toHaveCount(0);
+    await expect(page.locator('.social')).toHaveCount(0);
     await expect(page.locator('.footer .hours')).toHaveCount(0);
+    await expect(page.locator('.site-header a.btn')).toHaveText('Book Appointment');
   });
 });
 

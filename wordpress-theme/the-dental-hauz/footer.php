@@ -13,8 +13,6 @@ $dh_hours = dh_hours();
 $dh_addr  = dh_address_lines();
 $dh_mail  = dh_clinic( 'email' );
 $dh_tel   = dh_tel_href();
-$dh_fb    = dh_clinic( 'facebook' );
-$dh_ig    = dh_clinic( 'instagram' );
 ?>
 </main>
 
@@ -51,9 +49,8 @@ $dh_ig    = dh_clinic( 'instagram' );
           <?php if ( $dh_tel ) : ?><li><a href="<?php echo esc_url( $dh_tel ); ?>"><?php echo esc_html( dh_clinic( 'phone' ) ); ?></a></li><?php endif; ?>
           <?php if ( $dh_mail ) : ?><li><a href="mailto:<?php echo esc_attr( antispambot( $dh_mail ) ); ?>"><?php echo esc_html( antispambot( $dh_mail ) ); ?></a></li><?php endif; ?>
           <?php if ( $dh_addr ) : ?><li><a href="<?php echo esc_url( dh_clinic( 'maps_url' ) ); ?>"><?php echo esc_html( implode( ', ', $dh_addr ) ); ?></a></li><?php endif; ?>
-          <?php if ( $dh_fb ) : ?><li><a href="<?php echo esc_url( $dh_fb ); ?>" rel="noopener" target="_blank"><?php esc_html_e( 'Facebook', 'the-dental-hauz' ); ?></a></li><?php endif; ?>
-          <?php if ( $dh_ig ) : ?><li><a href="<?php echo esc_url( $dh_ig ); ?>" rel="noopener" target="_blank"><?php esc_html_e( 'Instagram', 'the-dental-hauz' ); ?></a></li><?php endif; ?>
         </ul>
+        <?php echo dh_social_links( 'social social--footer' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
         <?php if ( $dh_hours ) : ?>
           <h4 class="footer-sub"><?php esc_html_e( 'Working Hours', 'the-dental-hauz' ); ?></h4>
           <ul class="hours">

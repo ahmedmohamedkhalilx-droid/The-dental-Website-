@@ -94,10 +94,13 @@
   });
 
   // Touch screens: the first tap on a treatment card shows its details, a second tap opens the page.
+  // On phones the cards are compact tiles without details, so a tap opens the page straight away.
   var allCards = Array.prototype.slice.call(document.querySelectorAll('.svc'));
+  var phone = window.matchMedia ? window.matchMedia('(max-width: 600px)') : { matches: false };
   if (allCards.length && window.matchMedia && window.matchMedia('(hover: none)').matches) {
     allCards.forEach(function (c) {
       c.addEventListener('click', function (e) {
+        if (phone.matches) { return; }
         if (!c.classList.contains('is-open')) {
           e.preventDefault();
           allCards.forEach(function (o) { o.classList.remove('is-open'); });

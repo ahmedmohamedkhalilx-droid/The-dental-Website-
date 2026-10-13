@@ -35,7 +35,7 @@ test.describe('every page of the old site exists in the theme', () => {
       for (const i of imgs) {
         expect(i.ok, `broken: ${i.src}`).toBe(true);
         if (i.shown && i.fit !== 'cover' && i.fit !== 'contain') expect(Math.abs(i.ratio / i.natural - 1), `distorted: ${i.src}`).toBeLessThan(0.02);
-        if (i.fit === 'cover') expect(i.ratio, `frame too tall: ${i.src}`).toBeLessThanOrEqual(1.6);
+        if (i.shown && i.fit === 'cover') expect(i.ratio, `frame too tall: ${i.src}`).toBeLessThanOrEqual(1.6);
       }
 
       const hrefs = await page.$$eval('a[href^="#"]', (as) => [...new Set(as.map((a) => a.getAttribute('href')))]);
@@ -407,6 +407,7 @@ test.describe('treatment card motion', () => {
 
   test('on touch: first tap shows the details, second tap follows the link', async ({ page }, info) => {
     test.skip(info.project.name !== 'mobile', 'touch only');
+    await page.setViewportSize({ width: 820, height: 1100 }); // tablets keep the two-tap reveal
     await page.goto('/our-services.html', { waitUntil: 'networkidle' });
     const card = page.locator('.svc').first();
     await card.scrollIntoViewIfNeeded();
@@ -640,3 +641,30 @@ test('form text stays readable even if a page builder styles labels and inputs',
   expect(fieldBg).toBe('rgb(244, 240, 232)');
   expect(btn).toEqual(['rgb(81, 74, 67)', 'rgb(244, 240, 232)']);
 });
+
+test('phones: treatments are a two-column grid of compact tiles and one tap opens the page', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mobile', 'phone only');
+  await page.goto('/our-services.html', { waitUntil: 'networkidle' });
+  const boxes = await page.locator('.svc').evaluateAll((els) => els.slice(0, 2).map((e) => e.getBoundingClientRect()).map((r) => ({ x: r.x, y: r.y, w: r.width, h: r.height })));
+  expect(Math.abs(boxes[0].y - boxes[1].y)).toBeLessThan(2);
+  expect(boxes[1].x).toBeGreaterThan(boxes[0].x + boxes[0].w);
+  expect(boxes[0].h).toBeLessThan(260);
+  const card = page.locator('.svc').first();
+  await card.scrollIntoViewIfNeeded();
+  await expect(card).not.toHaveClass(/will-reveal/, { timeout: 6000 });
+  const nav = page.waitForRequest((r) => r.isNavigationRequest() && r.url().includes('/comprehensive-oral-examination/'));
+  await card.locator('h3').tap();
+  await nav;
+});
+
+test('phones: photos are never taller than they are wide and image pairs line up', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mobile', 'phone only');
+  for (const url of ['/index.html', '/about-us.html']) {
+    await page.goto(url, { waitUntil: 'networkidle' });
+    const tall = await page.$$eval('.split__media:not(.duo) > img, .intro__media > img, .page-hero__media img, .hero-media img', (imgs) => imgs.filter((i) => { const r = i.getBoundingClientRect(); return r.width && r.height > r.width * 1.01; }).length);
+    expect(tall, url).toBe(0);
+    const tops = await page.$$eval('.duo img', (imgs) => imgs.map((i) => Math.round(i.getBoundingClientRect().top)));
+    if (tops.length === 2) expect(Math.abs(tops[0] - tops[1])).toBeLessThan(2);
+  }
+});
+

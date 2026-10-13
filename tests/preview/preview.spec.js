@@ -39,8 +39,7 @@ test('navigate Home > Services > a treatment page > back, by clicking', async ({
   await expect(page.locator('.svc')).toHaveCount(10);
   const link = page.locator('.svc h3 a', { hasText: 'Dental Implants' });
   await link.click();
-  // on a touch screen the first tap shows the card's details, the second opens the page
-  if (info.project.name === 'mobile') { await expect(page.locator('.svc.is-open')).toHaveCount(1); await link.click(); }
+  // on phones a single tap on a treatment tile opens its page
   await expect(page).toHaveURL(`${BASE}/dental-implants/`);
   await expect(page.locator('h1')).toHaveText('Dental Implants');
   await expect(page.locator('.crumbs')).toContainText('Services');

@@ -495,6 +495,16 @@ body .elementor-location-header, body .elementor-location-footer { display: none
   .quick-wrap { margin-top: -3rem; }
 }
 
+/* Phones, second pass: slimmer banners and a compact footer */
+@media (max-width: 600px) {
+  .page-hero__grid { padding-block: 2rem; gap: 1.4rem; }
+  .page-hero:not(.has-media) .wrap { padding-block: 2rem; }
+  .page-hero__media { aspect-ratio: 16 / 9; max-width: 100%; border-radius: 999px 999px var(--radius-lg) var(--radius-lg) / 100% 100% var(--radius-lg) var(--radius-lg); }
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: 1.8rem 1.25rem; }
+  .footer-grid > .footer-brand, .footer-grid > :last-child { grid-column: 1 / -1; }
+  .form-card h3 { font-size: 1.45rem; }
+}
+
 /* Brand colours win over leftover page-builder styles (Elementor, MetForm, kit colours) */
 body .form { color: var(--umber) !important; }
 body .form .field label, body .form .field legend { color: var(--umber-soft) !important; opacity: 1 !important; }

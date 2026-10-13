@@ -124,7 +124,7 @@ if ( $dh_q_tel || $dh_q_addr || $dh_q_hours ) :
   </div>
 </section>
 
-<?php get_template_part( 'template-parts/reviews', null, $dh_h['reviews'] ); ?>
+<?php get_template_part( 'template-parts/reviews', null, array_merge( $dh_h['reviews'], array( 'compact' => true ) ) ); ?>
 
 <section class="section smile">
   <div class="wrap split split--reverse">

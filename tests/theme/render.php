@@ -43,8 +43,11 @@ $_GET = array( 'dh_form' => 'booking', 'dh_status' => 'invalid' );
 file_put_contents( "$out/home-invalid.html", dh_render( $theme, 'front-page.php' ) );
 $_GET = array();
 
-$GLOBALS['dh_mods'] = array( 'dh_phone' => '(416) 555-0100', 'dh_email' => 'front@example.test', 'dh_address' => "1 Test St\nToronto, ON", 'dh_hours' => "Mon | 9-5\nTue | Closed" );
+$GLOBALS['dh_mods'] = array( 'dh_phone' => '(416) 555-0100', 'dh_email' => 'front@example.test', 'dh_address' => "1 Test St\nToronto, ON", 'dh_hours' => "Mon | 9-5\nTue | Closed", 'dh_reviews_shortcode_home' => '[trustindex data-widget-id=compact123]', 'dh_reviews_shortcode' => '[evil-shortcode]' );
 file_put_contents( "$out/home-custom.html", dh_render( $theme, 'front-page.php' ) );
+$GLOBALS['dh_page'] = array( 'slug' => 'testimonial', 'title' => 'Testimonial' );
+file_put_contents( "$out/testimonial-custom.html", dh_render( $theme, 'page.php' ) );
+$GLOBALS['dh_page'] = array( 'slug' => 'home', 'title' => 'Home' );
 $GLOBALS['dh_mods'] = array( 'dh_phone' => '', 'dh_email' => '', 'dh_address' => '', 'dh_hours' => '', 'dh_facebook' => '', 'dh_instagram' => '' );
 file_put_contents( "$out/home-empty.html", dh_render( $theme, 'front-page.php' ) );
 

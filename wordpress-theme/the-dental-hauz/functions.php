@@ -246,10 +246,26 @@ function dh_map_src() {
 }
 
 /**
- * Reviews block: the Google reviews widget from the Trustindex plugin, if it is active.
+ * Google reviews: the Trustindex widget, if that plugin is active. $where is "full" or "home".
  */
-function dh_reviews_html() {
-	return shortcode_exists( 'trustindex' ) ? do_shortcode( '[trustindex no-registration=google]' ) : '';
+function dh_reviews_html( $where = 'full' ) {
+	if ( ! shortcode_exists( 'trustindex' ) ) {
+		return '';
+	}
+	$key  = ( 'home' === $where ) ? 'dh_reviews_shortcode_home' : 'dh_reviews_shortcode';
+	$code = dh_sanitize_reviews_shortcode( get_theme_mod( $key, '[trustindex no-registration=google]' ) );
+	return do_shortcode( $code );
+}
+
+/**
+ * Shown where the reviews widget would be when the plugin is not active: a link to the Google listing.
+ */
+function dh_reviews_fallback() {
+	$url = dh_clinic( 'maps_url' );
+	if ( ! $url ) {
+		return '';
+	}
+	return '<div class="reviews-fallback"><p>' . esc_html__( 'Read what our patients say about us on Google.', 'the-dental-hauz' ) . '</p><a class="btn" href="' . esc_url( $url ) . '" target="_blank" rel="noopener">' . esc_html__( 'See our Google reviews', 'the-dental-hauz' ) . '</a></div>';
 }
 
 /**

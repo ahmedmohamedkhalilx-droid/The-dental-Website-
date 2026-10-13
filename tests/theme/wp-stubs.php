@@ -134,7 +134,7 @@ function locate_template( $f ) { return dh_theme_dir() . '/' . $f; }
 function have_posts() { return 0 === $GLOBALS['dh_loop']; }
 function the_post() { $GLOBALS['dh_loop']++; }
 function shortcode_exists() { return $GLOBALS['dh_shortcode']; }
-function do_shortcode() { return '<div class="ti-widget">Google reviews widget</div>'; }
+function do_shortcode( $code = '' ) { return '<div class="ti-widget" data-shortcode="' . esc_attr( $code ) . '">Google reviews widget</div>'; }
 function get_header() { include dh_theme_dir() . '/header.php'; }
 function get_footer() { include dh_theme_dir() . '/footer.php'; }
 function get_template_part( $slug, $name = null, $args = array() ) {

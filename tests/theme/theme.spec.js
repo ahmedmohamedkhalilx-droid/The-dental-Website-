@@ -149,14 +149,40 @@ test.describe('home page', () => {
     await expect(page.locator('.programs li')).toHaveCount(8);
     await expect(page.locator('.devices .box')).toHaveCount(3);
     await expect(page.locator('.faq details')).toHaveCount(4);
-    await expect(page.locator('.reviews__widget')).toContainText('Google reviews widget');
+    await expect(page.locator('.reviews--compact .reviews__widget')).toContainText('Google reviews widget');
+    await expect(page.locator('.reviews--compact h2')).toHaveText('Discover Why Patients Trust The Dental Hauz for Care');
+    await expect(page.locator('.reviews--compact .reviews__all a')).toHaveAttribute('href', 'https://clinic.test/testimonial/');
     await expect(page.locator('#book .form')).toBeVisible();
   });
 
-  test('without the video file, a photo takes its place; without the reviews plugin, that block is omitted', async ({ page }) => {
+  test('without the video file a photo takes its place; without the reviews plugin a link to the Google reviews is shown', async ({ page }) => {
     await page.goto('/home-novideo.html');
     await expect(page.locator('.video')).toHaveCount(0);
-    await expect(page.locator('.reviews')).toHaveCount(0);
+    await expect(page.locator('.reviews--compact .ti-widget')).toHaveCount(0);
+    await expect(page.locator('.reviews--compact .reviews-fallback a.btn')).toHaveAttribute('href', 'https://maps.app.goo.gl/tq5NC39rXTekr9da9');
+    await expect(page.locator('.reviews--compact .reviews-fallback')).toContainText('Read what our patients say about us on Google.');
+  });
+
+  test('home uses its own (smaller) widget shortcode; only Trustindex shortcodes are accepted', async ({ page }) => {
+    await page.goto('/home-custom.html');
+    await expect(page.locator('.reviews--compact .ti-widget')).toHaveAttribute('data-shortcode', '[trustindex data-widget-id=compact123]');
+    // the full-size setting held something that is not a Trustindex shortcode, so the default is used instead
+    await page.goto('/testimonial-custom.html');
+    await expect(page.locator('.ti-widget')).toHaveAttribute('data-shortcode', '[trustindex no-registration=google]');
+  });
+
+  test('the compact home block is smaller than the full reviews block on the testimonial page', async ({ page }) => {
+    await page.goto('/index.html');
+    const home = await page.locator('.reviews--compact').boundingBox();
+    const headingH = await page.locator('.reviews--compact h2').evaluate((e) => parseFloat(getComputedStyle(e).fontSize));
+    await page.goto('/testimonial.html');
+    const full = await page.locator('.reviews').first().boundingBox();
+    const fullH = await page.locator('.reviews h2').first().evaluate((e) => parseFloat(getComputedStyle(e).fontSize));
+    expect(headingH).toBeLessThan(fullH);
+    const homePad = await page.goto('/index.html').then(() => page.locator('.reviews--compact').evaluate((e) => parseFloat(getComputedStyle(e).paddingTop)));
+    const fullPad = await page.goto('/testimonial.html').then(() => page.locator('.reviews').first().evaluate((e) => parseFloat(getComputedStyle(e).paddingTop)));
+    expect(homePad).toBeLessThan(fullPad);
+    expect(home && full).toBeTruthy();
   });
 
   test('service cards link to the treatment pages', async ({ page }) => {
@@ -228,8 +254,12 @@ test.describe('inner pages', () => {
   test('testimonial page: reviews widget, or an admin note when the plugin is off', async ({ page }) => {
     await page.goto('/testimonial.html');
     await expect(page.locator('.reviews__widget')).toContainText('Google reviews widget');
+    await expect(page.locator('.reviews--compact')).toHaveCount(0);
+    await expect(page.locator('.ti-widget')).toHaveAttribute('data-shortcode', '[trustindex no-registration=google]');
+    await expect(page.locator('.reviews h2')).toContainText('Patient Experiences That Inspire Confidence');
     await page.goto('/testimonial-noplugin-admin.html');
     await expect(page.locator('.admin-note')).toContainText('Trustindex');
+    await expect(page.locator('.reviews-fallback a.btn')).toHaveAttribute('href', 'https://maps.app.goo.gl/tq5NC39rXTekr9da9');
   });
 
   test('a page that is not from the old site shows its editor content', async ({ page }) => {

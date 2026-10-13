@@ -33,6 +33,14 @@ function dh_clinic( $key ) {
 	return (string) get_theme_mod( 'dh_' . $key, isset( $d[ $key ] ) ? $d[ $key ] : '' );
 }
 
+/**
+ * Only Trustindex shortcodes are accepted for the reviews widget.
+ */
+function dh_sanitize_reviews_shortcode( $value ) {
+	$value = trim( (string) $value );
+	return preg_match( '/^\[trustindex[^\]]*\]$/', $value ) ? $value : '[trustindex no-registration=google]';
+}
+
 function dh_customize_register( $wp_customize ) {
 	$d = dh_clinic_defaults();
 	$wp_customize->add_section(
@@ -60,6 +68,13 @@ function dh_customize_register( $wp_customize ) {
 		$wp_customize->add_setting( 'dh_' . $key, array( 'default' => $default, 'sanitize_callback' => $field[2] ) );
 		$wp_customize->add_control( 'dh_' . $key, array( 'label' => $field[0], 'section' => 'dh_clinic', 'type' => $field[1] ) );
 	}
+
+	// Google reviews come from the Trustindex plugin. Each shortcode below can point at a different Trustindex
+	// widget, for example a compact one for the home page.
+	$wp_customize->add_setting( 'dh_reviews_shortcode', array( 'default' => '[trustindex no-registration=google]', 'sanitize_callback' => 'dh_sanitize_reviews_shortcode' ) );
+	$wp_customize->add_control( 'dh_reviews_shortcode', array( 'label' => __( 'Google reviews widget shortcode (Testimonial, About, Services and FAQ pages)', 'the-dental-hauz' ), 'section' => 'dh_clinic', 'type' => 'text' ) );
+	$wp_customize->add_setting( 'dh_reviews_shortcode_home', array( 'default' => '[trustindex no-registration=google]', 'sanitize_callback' => 'dh_sanitize_reviews_shortcode' ) );
+	$wp_customize->add_control( 'dh_reviews_shortcode_home', array( 'label' => __( 'Google reviews widget shortcode for the home page (smaller)', 'the-dental-hauz' ), 'section' => 'dh_clinic', 'type' => 'text' ) );
 
 	$wp_customize->add_setting( 'dh_store_submissions', array( 'default' => true, 'sanitize_callback' => 'rest_sanitize_boolean' ) );
 	$wp_customize->add_control( 'dh_store_submissions', array( 'label' => __( 'Keep a private copy of form submissions in the dashboard (Form entries)', 'the-dental-hauz' ), 'section' => 'dh_clinic', 'type' => 'checkbox' ) );

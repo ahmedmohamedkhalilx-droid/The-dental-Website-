@@ -1,0 +1,85 @@
+<!--
+  The Dental Hauz - header bar for the OLD (Elementor) site.
+  Paste into an Elementor "HTML" widget at the top of the Header template, or into any page.
+  Self-contained: no plugin, no JavaScript. Brand colours only:
+  #514A43 #657568 #A8B6A5 #D8B8B2 #F4F0E8
+-->
+<style>
+.dhx { --u:#514A43; --sd:#657568; --s:#A8B6A5; --b:#D8B8B2; --c:#F4F0E8; position:relative; z-index:50; background:#F4F0E8; border-bottom:1px solid rgba(81,74,67,.16); font-family:"Jost","Garet",system-ui,sans-serif; }
+.dhx *, .dhx *::before, .dhx *::after { box-sizing:border-box; }
+.dhx a { text-decoration:none; color:#514A43; }
+.dhx ul { list-style:none; margin:0; padding:0; }
+.dhx__bar { max-width:1320px; margin:0 auto; padding:10px 24px; display:flex; align-items:center; justify-content:space-between; gap:24px; }
+.dhx__logo img { display:block; height:52px; width:auto; }
+.dhx__toggle { display:none; }
+.dhx__burger { display:none; cursor:pointer; width:44px; height:44px; border:1px solid rgba(81,74,67,.3); border-radius:12px; align-items:center; justify-content:center; flex-direction:column; gap:5px; }
+.dhx__burger span { display:block; width:20px; height:2px; background:#514A43; }
+.dhx__nav { display:flex; align-items:center; gap:26px; }
+.dhx__menu { display:flex; align-items:center; gap:26px; }
+.dhx__menu > li { position:relative; }
+.dhx__menu > li > a { display:inline-block; padding:10px 0; font-size:12px; letter-spacing:.15em; text-transform:uppercase; white-space:nowrap; color:#514A43; }
+.dhx__menu > li > a:hover, .dhx__menu > li:focus-within > a { color:#657568; }
+.dhx__sub { position:absolute; left:-14px; top:100%; min-width:280px; padding:10px; background:#F4F0E8; border:1px solid rgba(81,74,67,.16); border-radius:16px; box-shadow:0 24px 50px -28px rgba(81,74,67,.5); display:none; }
+.dhx__menu > li:hover > .dhx__sub, .dhx__menu > li:focus-within > .dhx__sub { display:block; }
+.dhx__sub a { display:block; padding:9px 12px; border-radius:10px; font-size:13px; letter-spacing:.04em; text-transform:none; color:#514A43; }
+.dhx__sub a:hover { background:#A8B6A5; }
+.dhx__social { display:flex; align-items:center; gap:16px; padding-left:24px; border-left:1px solid rgba(81,74,67,.2); }
+.dhx__social a { display:flex; width:22px; height:22px; color:#514A43; }
+.dhx__social a:hover { color:#657568; }
+.dhx__social svg { width:100%; height:100%; fill:currentColor; }
+.dhx a.dhx__btn { display:inline-block; padding:14px 26px; border-radius:999px; background:#514A43; color:#F4F0E8; font-size:12px; letter-spacing:.2em; text-transform:uppercase; white-space:nowrap; transition:background .2s; }
+.dhx a.dhx__btn:hover { background:#657568; color:#F4F0E8; }
+@media (max-width:1180px) {
+  .dhx__bar { flex-wrap:wrap; }
+  .dhx__logo img { height:46px; }
+  .dhx__burger { display:flex; }
+  .dhx__nav { display:none; width:100%; flex-direction:column; align-items:stretch; gap:14px; padding:8px 0 18px; }
+  .dhx__toggle:checked ~ .dhx__nav { display:flex; }
+  .dhx__menu { flex-direction:column; align-items:stretch; gap:0; }
+  .dhx__menu > li > a { display:block; padding:13px 0; border-bottom:1px solid rgba(81,74,67,.12); }
+  .dhx__sub { position:static; display:block; min-width:0; padding:4px 0 4px 14px; border:0; box-shadow:none; background:transparent; }
+  .dhx__social { padding-left:0; border-left:0; }
+  .dhx a.dhx__btn { text-align:center; }
+}
+</style>
+
+<header class="dhx">
+  <div class="dhx__bar">
+    <a class="dhx__logo" href="/" aria-label="The Dental Hauz">
+      <img src="https://ahmedmohamedkhalilx-droid.github.io/The-dental-Website-/assets/img/logo-dark.png" alt="The Dental Hauz" width="879" height="258">
+    </a>
+    <input class="dhx__toggle" type="checkbox" id="dhx-toggle" aria-label="Open menu">
+    <label class="dhx__burger" for="dhx-toggle" aria-hidden="true"><span></span><span></span><span></span></label>
+    <nav class="dhx__nav" aria-label="Main">
+      <ul class="dhx__menu">
+        <li><a href="/">Home</a></li>
+        <li><a href="/about-us/">About Us</a></li>
+        <li><a href="/doctors/">Doctors</a></li>
+        <li>
+          <a href="/our-services/">Services &#9662;</a>
+          <ul class="dhx__sub">
+            <li><a href="/comprehensive-oral-examination/">Comprehensive Oral Examination</a></li>
+            <li><a href="/dental-cleaning/">Dental Cleaning</a></li>
+            <li><a href="/tooth-colored-restorations/">Tooth-Colored Restorations</a></li>
+            <li><a href="/crowns-bridges/">Crowns &amp; Bridges</a></li>
+            <li><a href="/dental-implants/">Dental Implants</a></li>
+            <li><a href="/orthodontics-clear-aligners/">Orthodontics &amp; Clear Aligners</a></li>
+            <li><a href="/simple-wisdom-tooth-extractions/">Simple &amp; Wisdom Tooth Extractions</a></li>
+            <li><a href="/root-canal-therapy/">Root Canal Therapy</a></li>
+            <li><a href="/kids-dentistry/">Kids Dentistry</a></li>
+            <li><a href="/teeth-whitening/">Teeth Whitening</a></li>
+          </ul>
+        </li>
+        <li><a href="/testimonial/">Testimonial</a></li>
+        <li><a href="/faqs/">FAQ&rsquo;s</a></li>
+        <li><a href="/forms/">Forms</a></li>
+        <li><a href="/contact-us/">Contact Us</a></li>
+      </ul>
+      <div class="dhx__social">
+        <a href="https://www.facebook.com/profile.php?id=61588796471226" aria-label="Facebook" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 21v-8h2.7l.4-3.2h-3.1V7.8c0-.9.3-1.5 1.6-1.5h1.7V3.4c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.5-4 4.1v2.4H7.7V13h2.7v8h3.1z"/></svg></a>
+        <a href="https://www.instagram.com/thedental.hauz" aria-label="Instagram" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 2h9A5.5 5.5 0 0 1 22 7.5v9a5.5 5.5 0 0 1-5.5 5.5h-9A5.5 5.5 0 0 1 2 16.5v-9A5.5 5.5 0 0 1 7.5 2zm0 2A3.5 3.5 0 0 0 4 7.5v9A3.5 3.5 0 0 0 7.5 20h9a3.5 3.5 0 0 0 3.5-3.5v-9A3.5 3.5 0 0 0 16.5 4h-9zM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm5.3-3.6a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4z"/></svg></a>
+      </div>
+      <a class="dhx__btn" href="/forms/">Book Appointment</a>
+    </nav>
+  </div>
+</header>

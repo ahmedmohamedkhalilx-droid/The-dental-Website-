@@ -28,6 +28,7 @@ $dh_tel   = dh_tel_href();
         <ul>
           <li><a href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php esc_html_e( 'Home', 'the-dental-hauz' ); ?></a></li>
           <li><a href="<?php echo esc_url( dh_page_url( 'about-us' ) ); ?>"><?php esc_html_e( 'About Us', 'the-dental-hauz' ); ?></a></li>
+          <li><a href="<?php echo esc_url( dh_page_url( 'doctors' ) ); ?>"><?php esc_html_e( 'Doctors', 'the-dental-hauz' ); ?></a></li>
           <li><a href="<?php echo esc_url( dh_page_url( 'our-services' ) ); ?>"><?php esc_html_e( 'Our Services', 'the-dental-hauz' ); ?></a></li>
           <li><a href="<?php echo esc_url( dh_page_url( 'testimonial' ) ); ?>"><?php esc_html_e( 'Testimonial', 'the-dental-hauz' ); ?></a></li>
           <li><a href="<?php echo esc_url( dh_page_url( 'faqs' ) ); ?>"><?php esc_html_e( "FAQ's", 'the-dental-hauz' ); ?></a></li>

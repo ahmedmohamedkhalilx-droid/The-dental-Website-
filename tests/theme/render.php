@@ -16,7 +16,7 @@ function dh_render( $theme, $file ) {
 	return ob_get_clean();
 }
 
-$titles = dh_known_titles();
+$titles = dh_page_titles();
 $map    = dh_page_map();
 $n      = 0;
 
@@ -43,7 +43,7 @@ $_GET = array( 'dh_form' => 'booking', 'dh_status' => 'invalid' );
 file_put_contents( "$out/home-invalid.html", dh_render( $theme, 'front-page.php' ) );
 $_GET = array();
 
-$GLOBALS['dh_mods'] = array( 'dh_phone' => '(416) 555-0100', 'dh_email' => 'front@example.test', 'dh_address' => "1 Test St\nToronto, ON", 'dh_hours' => "Mon | 9-5\nTue | Closed", 'dh_reviews_shortcode_home' => '[trustindex data-widget-id=compact123]', 'dh_reviews_shortcode' => '[evil-shortcode]' );
+$GLOBALS['dh_mods'] = array( 'dh_phone' => '(416) 555-0100', 'dh_email' => 'front@example.test', 'dh_address' => "1 Test St\nToronto, ON", 'dh_hours' => "Mon | 9-5\nTue | Closed", 'dh_reviews_shortcode_home' => '[trustindex data-widget-id=compact123]', 'dh_reviews_shortcode' => '[evil-shortcode]', 'dh_trustindex_id' => 'abc123abc123abc123' );
 file_put_contents( "$out/home-custom.html", dh_render( $theme, 'front-page.php' ) );
 $GLOBALS['dh_page'] = array( 'slug' => 'testimonial', 'title' => 'Testimonial' );
 file_put_contents( "$out/testimonial-custom.html", dh_render( $theme, 'page.php' ) );
@@ -51,6 +51,11 @@ $GLOBALS['dh_page'] = array( 'slug' => 'home', 'title' => 'Home' );
 $GLOBALS['dh_mods'] = array( 'dh_phone' => '', 'dh_email' => '', 'dh_address' => '', 'dh_hours' => '', 'dh_facebook' => '', 'dh_instagram' => '' );
 file_put_contents( "$out/home-empty.html", dh_render( $theme, 'front-page.php' ) );
 
+$GLOBALS['dh_mods'] = array( 'dh_trustindex_id' => 'abc123abc123abc123' ); $GLOBALS['dh_shortcode'] = false;
+$GLOBALS['dh_page'] = array( 'slug' => 'testimonial', 'title' => 'Testimonial' );
+file_put_contents( "$out/testimonial-custom-noplugin.html", dh_render( $theme, 'page.php' ) );
+$GLOBALS['dh_mods'] = array( 'dh_trustindex_id' => 'bad id!' );
+file_put_contents( "$out/testimonial-badid.html", dh_render( $theme, 'page.php' ) );
 $GLOBALS['dh_mods'] = array(); $GLOBALS['dh_shortcode'] = false; $GLOBALS['dh_video'] = false; $GLOBALS['dh_is_admin'] = true;
 $GLOBALS['dh_page'] = array( 'slug' => 'testimonial', 'title' => 'Testimonial' );
 file_put_contents( "$out/testimonial-noplugin-admin.html", dh_render( $theme, 'page.php' ) );

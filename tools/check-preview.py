@@ -10,7 +10,7 @@ from html.parser import HTMLParser
 from urllib.parse import urlparse, unquote
 
 root, base = sys.argv[1], sys.argv[2].rstrip('/')
-slugs = list(json.load(open(os.path.join(root, 'tests/theme/fixtures/source-strings.json'))).keys())
+slugs = ['home'] + json.load(open(os.path.join(root, 'tools/preview/pages.json')))
 
 
 class P(HTMLParser):

@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 const SLUGS = Object.keys(JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures/source-strings.json'), 'utf8')));
+const ALL = SLUGS.concat(['doctors', 'dr-summer-al-maqdassy']);
 const file = (slug) => (slug === 'home' ? '/index.html' : `/${slug}.html`);
 const SERVICES = ['comprehensive-oral-examination', 'dental-cleaning', 'tooth-colored-restorations', 'crowns-bridges', 'dental-implants', 'orthodontics-clear-aligners', 'simple-wisdom-tooth-extractions', 'root-canal-therapy', 'kids-dentistry', 'teeth-whitening'];
 
@@ -12,7 +13,7 @@ test.describe('every page of the old site exists in the theme', () => {
     expect(SLUGS.length).toBe(21);
   });
 
-  for (const slug of SLUGS) {
+  for (const slug of ALL) {
     test(`${slug}: loads cleanly, one h1, no sideways scroll, images keep their shape, anchors resolve`, async ({ page }) => {
       const errors = [];
       const bad = [];
@@ -47,7 +48,7 @@ test.describe('header, menu and footer', () => {
   test('menu has the old site\'s items in order, and Services lists all ten treatments', async ({ page }, info) => {
     await page.goto('/index.html');
     const top = await page.$$eval('#site-nav > ul > li > a', (as) => as.map((a) => a.textContent.trim()));
-    expect(top).toEqual(['Home', 'About Us', 'Services', 'Testimonial', "FAQ's", 'Forms', 'Contact Us']);
+    expect(top).toEqual(['Home', 'About Us', 'Doctors', 'Services', 'Testimonial', "FAQ's", 'Forms', 'Contact Us']);
     const subs = await page.$$eval('#site-nav .sub-menu a', (as) => as.map((a) => a.textContent.trim()));
     expect(subs).toEqual(['Comprehensive Oral Examination', 'Dental Cleaning', 'Tooth-Colored Restorations', 'Crowns & Bridges', 'Dental Implants', 'Orthodontics & Clear Aligners', 'Simple & Wisdom Tooth Extractions', 'Root Canal Therapy', 'Kids Dentistry', 'Teeth whitening'].map((s) => s === 'Teeth whitening' ? 'Teeth whitening' : s));
     if (info.project.name === 'mobile') {
@@ -82,11 +83,23 @@ test.describe('header, menu and footer', () => {
     await expect(header.locator('a.btn[href^="tel:"]')).toHaveCount(0);
   });
 
-  test('icons are round buttons of a usable size', async ({ page }, info) => {
+  test('social icons have no frame, are a usable size and sit on the bar centre line', async ({ page }, info) => {
+    test.skip(info.project.name === 'mobile', 'desktop header');
     await page.goto('/home-default.html');
-    if (info.project.name === 'mobile') await page.click('#menu-toggle');
-    const boxes = await page.locator('.site-header .social__link').evaluateAll((as) => as.map((a) => { const r = a.getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height)]; }));
-    for (const b of boxes) { expect(b[0]).toBeGreaterThanOrEqual(36); expect(b[0]).toBe(b[1]); }
+    const m = await page.evaluate(() => {
+      const mid = (e) => { const r = e.getBoundingClientRect(); return r.top + r.height / 2; };
+      const links = [...document.querySelectorAll('.site-header .social__link')];
+      const btn = document.querySelector('.site-header a.btn');
+      const menu = document.querySelector('#site-nav > ul > li > a');
+      return {
+        borders: links.map((a) => getComputedStyle(a).borderTopWidth + '/' + getComputedStyle(a).backgroundColor),
+        sizes: links.map((a) => Math.round(a.getBoundingClientRect().width)),
+        iconMids: links.map(mid), btnMid: mid(btn), menuMid: mid(menu),
+      };
+    });
+    for (const b of m.borders) expect(b).toBe('0px/rgba(0, 0, 0, 0)');
+    for (const w of m.sizes) expect(w).toBeGreaterThanOrEqual(28);
+    for (const y of m.iconMids) { expect(Math.abs(y - m.btnMid), 'centred on the button').toBeLessThanOrEqual(1.5); expect(Math.abs(y - m.menuMid), 'centred on the menu text').toBeLessThanOrEqual(2.5); }
   });
 
   test('header button goes to the booking form on this page, or on the home page where a page has none', async ({ page }) => {
@@ -106,6 +119,7 @@ test.describe('header, menu and footer', () => {
     await expect(foot.locator('.social__link')).toHaveCount(2);
     const fy = await foot.locator('.social__link').evaluateAll((as) => as.map((a) => Math.round(a.getBoundingClientRect().top)));
     expect(fy[0], 'footer icons sit side by side').toBe(fy[1]);
+    expect(await foot.locator('.social__link').first().evaluate((a) => getComputedStyle(a).borderTopWidth)).toBe('0px');
     await expect(foot.locator('a[href="https://clinic.test/forms/"]')).toHaveCount(1);
     await expect(foot.locator('ul').nth(1).locator('a')).toHaveCount(10);
     await expect(page.locator('body')).not.toContainText(/lorem|dentisto|to be added|king street melbourne/i);
@@ -467,4 +481,45 @@ test.describe('header proportions', () => {
       expect(m.over).toBeLessThanOrEqual(0);
     });
   }
+});
+
+test.describe('doctors', () => {
+  test('doctors page: a card per doctor linking to the doctor\'s own page, only known facts shown', async ({ page }) => {
+    await page.goto('/doctors.html');
+    await expect(page.locator('h1')).toHaveText('Doctors');
+    await expect(page.locator('.doc-card')).toHaveCount(1);
+    await expect(page.locator('.doc-card h3 a')).toHaveText('Dr. Summer Al Maqdassy');
+    await expect(page.locator('.doc-card h3 a')).toHaveAttribute('href', 'https://clinic.test/dr-summer-al-maqdassy/');
+    await expect(page.locator('.doc-card .doc-placeholder')).toHaveCount(1);
+    await expect(page.locator('.doc-card .more')).toContainText('View Profile');
+    await expect(page.locator('.doc-card__role')).toHaveCount(0);
+    await expect(page.locator('#book .form')).toBeVisible();
+  });
+
+  test('doctor page: hero with breadcrumb, profile section and booking form', async ({ page }) => {
+    await page.goto('/dr-summer-al-maqdassy.html');
+    await expect(page.locator('h1')).toHaveText('Dr. Summer Al Maqdassy');
+    await expect(page.locator('.crumbs')).toContainText('Doctors');
+    await expect(page.locator('.doctor')).toContainText('sees patients at The Dental Hauz in Markham, Ontario.');
+    await expect(page.locator('.doctor a.btn')).toHaveAttribute('href', '#book');
+    await expect(page.locator('#book .form')).toBeVisible();
+    await expect(page.locator('.doctor .checks')).toHaveCount(0);
+  });
+
+  test('doctors are in the menu and the footer', async ({ page }) => {
+    await page.goto('/index.html');
+    await expect(page.locator('#site-nav > ul > li > a', { hasText: 'Doctors' })).toHaveAttribute('href', 'https://clinic.test/doctors/');
+    await expect(page.locator('.footer a', { hasText: 'Doctors' })).toHaveCount(1);
+  });
+});
+
+test.describe('google reviews by widget ID', () => {
+  test('without the plugin, a Trustindex ID embeds the widget; a bad ID is ignored', async ({ page }) => {
+    await page.goto('/testimonial-custom-noplugin.html');
+    await expect(page.locator('script[src="https://cdn.trustindex.io/loader.js?abc123abc123abc123"]')).toHaveCount(1);
+    await expect(page.locator('.reviews-fallback')).toHaveCount(0);
+    await page.goto('/testimonial-badid.html');
+    await expect(page.locator('script[src*="cdn.trustindex.io"]')).toHaveCount(0);
+    await expect(page.locator('.reviews-fallback')).toHaveCount(1);
+  });
 });

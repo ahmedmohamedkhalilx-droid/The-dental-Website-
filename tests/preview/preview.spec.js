@@ -49,7 +49,7 @@ test('navigate Home > Services > a treatment page > back, by clicking', async ({
 });
 
 test('every page opens and has a heading, all images are requested from the old site or the theme', async ({ page }) => {
-  const slugs = Object.keys(JSON.parse(fs.readFileSync(path.join(__dirname, '../theme/fixtures/source-strings.json'), 'utf8'))).filter((s) => s !== 'home');
+  const slugs = JSON.parse(fs.readFileSync(path.join(__dirname, '../../tools/preview/pages.json'), 'utf8'));
   for (const s of slugs) {
     const r = await page.goto(`${BASE}/${s}/`, { waitUntil: 'networkidle' });
     expect(r?.status(), s).toBe(200);

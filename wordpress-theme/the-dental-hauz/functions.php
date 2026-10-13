@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'DH_VERSION', '2.0.0' );
+define( 'DH_VERSION', '2.1.0' );
 
 require_once get_template_directory() . '/inc/customizer.php';
 require_once get_template_directory() . '/inc/forms.php';
@@ -76,6 +76,67 @@ function dh_content( $key = null ) {
 }
 
 /**
+ * The doctors (inc/doctors.php).
+ *
+ * @return array<int, array>
+ */
+function dh_doctors() {
+	static $d = null;
+	if ( null === $d ) {
+		$d = require get_template_directory() . '/inc/doctors.php';
+	}
+	return $d;
+}
+
+/**
+ * Titles of every page the theme renders itself, by slug.
+ *
+ * @return array<string,string>
+ */
+function dh_page_titles() {
+	$titles = dh_content( 'titles' );
+	$titles['doctors'] = __( 'Doctors', 'the-dental-hauz' );
+	foreach ( dh_doctors() as $doctor ) {
+		$titles[ $doctor['slug'] ] = $doctor['name'];
+	}
+	return $titles;
+}
+
+/**
+ * Create the Doctors page and one page per doctor if they do not exist yet.
+ * Runs when the theme is activated and, once per theme version, in the dashboard.
+ */
+function dh_ensure_pages() {
+	$titles = dh_page_titles();
+	$wanted = array( 'doctors' );
+	foreach ( dh_doctors() as $doctor ) {
+		$wanted[] = $doctor['slug'];
+	}
+	foreach ( $wanted as $slug ) {
+		if ( get_page_by_path( $slug ) ) {
+			continue;
+		}
+		wp_insert_post(
+			array(
+				'post_type'   => 'page',
+				'post_status' => 'publish',
+				'post_title'  => $titles[ $slug ],
+				'post_name'   => $slug,
+			)
+		);
+	}
+}
+add_action( 'after_switch_theme', 'dh_ensure_pages' );
+
+function dh_maybe_ensure_pages() {
+	if ( get_option( 'dh_pages_version' ) !== DH_VERSION ) {
+		dh_ensure_pages();
+		update_option( 'dh_pages_version', DH_VERSION );
+	}
+}
+add_action( 'admin_init', 'dh_maybe_ensure_pages' );
+
+/**
  * Which template part renders which page, by page slug.
  *
  * @return array<string,string>
@@ -95,6 +156,10 @@ function dh_page_map() {
 	);
 	foreach ( array_keys( dh_content( 'service_pages' ) ) as $slug ) {
 		$map[ $slug ] = 'service';
+	}
+	$map['doctors'] = 'doctors';
+	foreach ( dh_doctors() as $doctor ) {
+		$map[ $doctor['slug'] ] = 'doctor';
 	}
 	return $map;
 }
@@ -190,6 +255,7 @@ function dh_fallback_menu() {
 	echo '<ul>';
 	printf( '<li><a href="%s">%s</a></li>', esc_url( home_url( '/' ) ), esc_html__( 'Home', 'the-dental-hauz' ) );
 	printf( '<li><a href="%s">%s</a></li>', esc_url( dh_page_url( 'about-us' ) ), esc_html__( 'About Us', 'the-dental-hauz' ) );
+	printf( '<li><a href="%s">%s</a></li>', esc_url( dh_page_url( 'doctors' ) ), esc_html__( 'Doctors', 'the-dental-hauz' ) );
 	printf( '<li class="menu-item-has-children"><a href="%s">%s</a><ul class="sub-menu">', esc_url( dh_page_url( 'our-services' ) ), esc_html__( 'Services', 'the-dental-hauz' ) );
 	foreach ( $c['services'] as $s ) {
 		printf( '<li><a href="%s">%s</a></li>', esc_url( dh_page_url( $s['slug'] ) ), esc_html( $c['service_pages'][ $s['slug'] ]['title'] ) );
@@ -246,15 +312,20 @@ function dh_map_src() {
 }
 
 /**
- * Google reviews: the Trustindex widget, if that plugin is active. $where is "full" or "home".
+ * Google reviews: the Trustindex plugin's widget, or the widget embedded by its ID. $where is "full" or "home".
  */
 function dh_reviews_html( $where = 'full' ) {
-	if ( ! shortcode_exists( 'trustindex' ) ) {
-		return '';
+	if ( shortcode_exists( 'trustindex' ) ) {
+		$key  = ( 'home' === $where ) ? 'dh_reviews_shortcode_home' : 'dh_reviews_shortcode';
+		$code = dh_sanitize_reviews_shortcode( get_theme_mod( $key, '[trustindex no-registration=google]' ) );
+		return do_shortcode( $code );
 	}
-	$key  = ( 'home' === $where ) ? 'dh_reviews_shortcode_home' : 'dh_reviews_shortcode';
-	$code = dh_sanitize_reviews_shortcode( get_theme_mod( $key, '[trustindex no-registration=google]' ) );
-	return do_shortcode( $code );
+	// Without the plugin, the widget's own embed code works from its ID.
+	$id = dh_sanitize_trustindex_id( get_theme_mod( 'dh_trustindex_id', '' ) );
+	if ( $id ) {
+		return '<script defer async src="' . esc_url( 'https://cdn.trustindex.io/loader.js?' . $id ) . '"></script>';
+	}
+	return '';
 }
 
 /**
@@ -311,4 +382,15 @@ function dh_social_links( $class = 'social' ) {
 		}
 	}
 	return $out ? '<ul class="' . esc_attr( $class ) . '">' . $out . '</ul>' : '';
+}
+
+/**
+ * A doctor's portrait, or a brand-coloured panel with the logo mark when there is no photo yet.
+ */
+function dh_doctor_photo( $doctor, $size = 'large' ) {
+	$img = $doctor['photo'] ? dh_img( $doctor['photo'], $size, array( 'alt' => $doctor['name'] ) ) : '';
+	if ( $img ) {
+		return $img;
+	}
+	return '<span class="doc-placeholder" role="img" aria-label="' . esc_attr( $doctor['name'] ) . '"><img src="' . esc_url( get_theme_file_uri( 'assets/img/mark-light.png' ) ) . '" alt="" width="300" height="299"></span>';
 }

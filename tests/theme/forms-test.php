@@ -136,7 +136,22 @@ $GLOBALS['dh_page'] = array( 'slug' => 'privacy-policy', 'title' => 'Privacy' );
 check( 'any other page keeps whatever template WordPress chose', dh_force_templates( '/x/custom.php' ) === '/x/custom.php' );
 $all = array_keys( dh_page_map() );
 sort( $all );
-check( 'all 20 inner pages of the old site are mapped (10 treatments + 10 others)', count( $all ) === 20 );
+check( 'all 20 inner pages of the old site plus Doctors and each doctor are mapped', count( $all ) === 22 );
+
+echo "\n[doctors pages]\n";
+$GLOBALS['dh_existing_pages'] = array();
+$GLOBALS['dh_posts'] = array();
+dh_ensure_pages();
+$made = array_column( $GLOBALS['dh_posts'], 'post_name' );
+check( 'activation creates the Doctors page and one page per doctor', $made === array( 'doctors', 'dr-summer-al-maqdassy' ) );
+check( 'created pages are published pages with the right titles', $GLOBALS['dh_posts'][0]['post_title'] === 'Doctors' && $GLOBALS['dh_posts'][1]['post_title'] === 'Dr. Summer Al Maqdassy' && 'publish' === $GLOBALS['dh_posts'][1]['post_status'] && 'page' === $GLOBALS['dh_posts'][1]['post_type'] );
+$GLOBALS['dh_existing_pages'] = array( 'doctors', 'dr-summer-al-maqdassy' );
+$GLOBALS['dh_posts'] = array();
+dh_ensure_pages();
+check( 'pages that already exist are left alone', count( $GLOBALS['dh_posts'] ) === 0 );
+$GLOBALS['dh_existing_pages'] = null;
+check( 'doctor pages are routed to the theme templates', ( dh_page_map()['doctors'] ?? '' ) === 'doctors' && ( dh_page_map()['dr-summer-al-maqdassy'] ?? '' ) === 'doctor' );
+check( 'every doctor has the fields the templates read', ! array_filter( dh_doctors(), function ( $d ) { return array_diff( array( 'slug', 'name', 'role', 'photo', 'summary', 'bio', 'credentials' ), array_keys( $d ) ); } ) );
 
 echo $fails ? "\n$fails FAILED\n" : "\nall form and routing checks passed\n";
 exit( $fails ? 1 : 0 );

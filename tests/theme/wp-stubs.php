@@ -48,6 +48,7 @@ function has_site_icon() { return false; }
 function has_custom_logo() { return false; }
 function get_theme_mod( $k, $d = '' ) { return array_key_exists( $k, $GLOBALS['dh_mods'] ) ? $GLOBALS['dh_mods'][ $k ] : $d; }
 function get_option( $k ) { return $GLOBALS['dh_options'][ $k ] ?? ''; }
+function update_option( $k, $v ) { $GLOBALS['dh_options'][ $k ] = $v; }
 function home_url( $p = '' ) { return dh_base() . $p; }
 function admin_url( $p = '' ) { return dh_preview() ? '#preview' : 'https://clinic.test/wp-admin/' . $p; }
 function user_trailingslashit( $s ) { return rtrim( $s, '/' ) . '/'; }
@@ -119,8 +120,8 @@ function wp_get_attachment_image_url( $id ) { $map = dh_attachments(); return $m
 function wp_get_attachment_url( $id ) { $map = dh_attachments(); if ( $map ) { return $map[ $id ] ?? false; } return $GLOBALS['dh_video'] ? 'assets/video.mp4' : false; }
 
 // Pages, loop and templates.
-function dh_known_titles() { static $t = null; if ( null === $t ) { $t = ( require dh_theme_dir() . '/inc/content.php' )['titles']; } return $t; }
-function get_page_by_path( $slug ) { return isset( dh_known_titles()[ $slug ] ) ? (object) array( 'slug' => $slug ) : null; }
+function dh_known_titles() { return dh_page_titles(); }
+function get_page_by_path( $slug ) { $ex = $GLOBALS['dh_existing_pages'] ?? null; if ( is_array( $ex ) ) { return in_array( $slug, $ex, true ) ? (object) array( 'slug' => $slug ) : null; } return isset( dh_known_titles()[ $slug ] ) ? (object) array( 'slug' => $slug ) : null; }
 function get_permalink( $p ) { return dh_base() . '/' . $p->slug . '/'; }
 function get_the_title() { return $GLOBALS['dh_page']['title']; }
 function the_title() { echo esc_html( get_the_title() ); }

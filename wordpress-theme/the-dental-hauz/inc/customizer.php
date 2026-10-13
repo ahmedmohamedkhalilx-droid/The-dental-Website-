@@ -41,6 +41,14 @@ function dh_sanitize_reviews_shortcode( $value ) {
 	return preg_match( '/^\[trustindex[^\]]*\]$/', $value ) ? $value : '[trustindex no-registration=google]';
 }
 
+/**
+ * A Trustindex widget ID: letters and digits only.
+ */
+function dh_sanitize_trustindex_id( $value ) {
+	$value = preg_replace( '/[^a-zA-Z0-9]/', '', (string) $value );
+	return ( strlen( $value ) >= 10 && strlen( $value ) <= 64 ) ? $value : '';
+}
+
 function dh_customize_register( $wp_customize ) {
 	$d = dh_clinic_defaults();
 	$wp_customize->add_section(
@@ -75,6 +83,9 @@ function dh_customize_register( $wp_customize ) {
 	$wp_customize->add_control( 'dh_reviews_shortcode', array( 'label' => __( 'Google reviews widget shortcode (Testimonial, About, Services and FAQ pages)', 'the-dental-hauz' ), 'section' => 'dh_clinic', 'type' => 'text' ) );
 	$wp_customize->add_setting( 'dh_reviews_shortcode_home', array( 'default' => '[trustindex no-registration=google]', 'sanitize_callback' => 'dh_sanitize_reviews_shortcode' ) );
 	$wp_customize->add_control( 'dh_reviews_shortcode_home', array( 'label' => __( 'Google reviews widget shortcode for the home page (smaller)', 'the-dental-hauz' ), 'section' => 'dh_clinic', 'type' => 'text' ) );
+
+	$wp_customize->add_setting( 'dh_trustindex_id', array( 'default' => '', 'sanitize_callback' => 'dh_sanitize_trustindex_id' ) );
+	$wp_customize->add_control( 'dh_trustindex_id', array( 'label' => __( 'Trustindex widget ID (shows the Google reviews without the plugin; from the widget\'s embed code, the text after loader.js?)', 'the-dental-hauz' ), 'section' => 'dh_clinic', 'type' => 'text' ) );
 
 	$wp_customize->add_setting( 'dh_store_submissions', array( 'default' => true, 'sanitize_callback' => 'rest_sanitize_boolean' ) );
 	$wp_customize->add_control( 'dh_store_submissions', array( 'label' => __( 'Keep a private copy of form submissions in the dashboard (Form entries)', 'the-dental-hauz' ), 'section' => 'dh_clinic', 'type' => 'checkbox' ) );

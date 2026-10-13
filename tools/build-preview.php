@@ -24,16 +24,21 @@ function dh_write( $path, $html ) {
 	file_put_contents( $path, $html );
 }
 
-$titles = dh_known_titles();
+$titles = dh_page_titles();
+$settings = is_file( __DIR__ . '/preview/settings.json' ) ? json_decode( file_get_contents( __DIR__ . '/preview/settings.json' ), true ) : array();
+$GLOBALS['dh_mods'] = is_array( $settings ) ? $settings : array();
+$built = array();
 $n      = 0;
 foreach ( dh_page_map() as $slug => $part ) {
 	$GLOBALS['dh_page'] = array( 'slug' => $slug, 'title' => html_entity_decode( $titles[ $slug ] ) );
 	$GLOBALS['wp']->request = $slug;
 	dh_write( "$out/$slug/index.html", dh_build( $theme, 'page.php' ) );
+	$built[] = $slug;
 	$n++;
 }
 $GLOBALS['dh_page'] = array( 'slug' => 'home', 'title' => 'Home' );
 $GLOBALS['wp']->request = '';
 dh_write( "$out/index.html", dh_build( $theme, 'front-page.php' ) );
 dh_write( "$out/404.html", dh_build( $theme, '404.php' ) );
+file_put_contents( __DIR__ . '/preview/pages.json', json_encode( $built, JSON_PRETTY_PRINT ) . "\n" );
 echo 'built ' . ( $n + 2 ) . " pages\n";

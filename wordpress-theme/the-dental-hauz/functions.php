@@ -483,6 +483,21 @@ function dh_elementor_locations( $manager ) {
 add_action( 'elementor/theme/register_locations', 'dh_elementor_locations' );
 
 /**
+ * Elementor applies its site-wide style kit (fonts, heading colours, button and label styles) through
+ * an `elementor-kit-N` body class. Every page here is drawn by the theme, so drop that class and the
+ * brand typography and colours apply instead of the old kit's.
+ *
+ * @param string[] $classes Body classes.
+ * @return string[]
+ */
+function dh_drop_elementor_kit_class( $classes ) {
+	return array_values( array_filter( $classes, function ( $c ) {
+		return 0 !== strpos( $c, 'elementor-kit-' );
+	} ) );
+}
+add_filter( 'body_class', 'dh_drop_elementor_kit_class', 99 );
+
+/**
  * Dashboard reminder while the old page builder is still active (the fix that always works is to deactivate it).
  */
 function dh_elementor_notice() {

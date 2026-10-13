@@ -85,6 +85,9 @@ p { margin: 0; }
 .btn--outline-light { background: transparent; color: var(--cream); border-color: rgba(244, 240, 232, .6); }
 .btn--outline-light:hover { background: var(--cream); color: var(--umber); }
 
+/* The old Elementor header and footer must never show over the theme's own. */
+body .elementor-location-header, body .elementor-location-footer { display: none !important; }
+
 /* ---------- Header ---------- */
 .site-header { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 50; background: rgba(244, 240, 232, .95); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
 .admin-bar .site-header { top: calc(env(safe-area-inset-top, 0px) + 32px); }

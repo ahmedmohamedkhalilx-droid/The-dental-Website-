@@ -153,5 +153,17 @@ $GLOBALS['dh_existing_pages'] = null;
 check( 'doctor pages are routed to the theme templates', ( dh_page_map()['doctors'] ?? '' ) === 'doctors' && ( dh_page_map()['dr-summer-al-maqdassy'] ?? '' ) === 'doctor' );
 check( 'every doctor has the fields the templates read', ! array_filter( dh_doctors(), function ( $d ) { return array_diff( array( 'slug', 'name', 'role', 'photo', 'summary', 'bio', 'credentials' ), array_keys( $d ) ); } ) );
 
+echo "\n[old page builder protection]\n";
+check( 'Elementor Pro is told not to override the header and footer', isset( $GLOBALS['dh_hooks']['elementor/theme/need_override_location'] ) && '__return_false' === $GLOBALS['dh_hooks']['elementor/theme/need_override_location'][0] );
+$GLOBALS['dh_is_admin'] = true;
+ob_start(); dh_elementor_notice(); $quiet = ob_get_clean();
+check( 'no dashboard notice when Elementor is not active', '' === $quiet );
+define( 'ELEMENTOR_PRO_VERSION', '3.0' );
+ob_start(); dh_elementor_notice(); $notice = ob_get_clean();
+check( 'dashboard notice appears when Elementor is active, naming the plugins to deactivate', false !== strpos( $notice, 'deactivate' ) && false !== strpos( $notice, 'Elementor Pro' ) );
+$GLOBALS['dh_is_admin'] = false;
+ob_start(); dh_elementor_notice(); $visitor = ob_get_clean();
+check( 'visitors never see the notice', '' === $visitor );
+
 echo $fails ? "\n$fails FAILED\n" : "\nall form and routing checks passed\n";
 exit( $fails ? 1 : 0 );

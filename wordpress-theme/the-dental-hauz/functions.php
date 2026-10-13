@@ -450,3 +450,20 @@ function dh_doctor_photo( $doctor, $size = 'large' ) {
 	}
 	return '<span class="doc-placeholder" role="img" aria-label="' . esc_attr( $doctor['name'] ) . '"><img src="' . esc_url( get_theme_file_uri( 'assets/img/mark-light.png' ) ) . '" alt="" width="300" height="299"></span>';
 }
+
+/**
+ * If Elementor / Elementor Pro (the old site's page builder) is still active, its Theme Builder would print the old
+ * header, top bar and footer over this theme's own. Tell it to leave the header and footer to the theme.
+ */
+add_filter( 'elementor/theme/need_override_location', '__return_false' );
+
+/**
+ * Dashboard reminder while the old page builder is still active (the fix that always works is to deactivate it).
+ */
+function dh_elementor_notice() {
+	if ( ! current_user_can( 'edit_theme_options' ) || ! ( defined( 'ELEMENTOR_VERSION' ) || defined( 'ELEMENTOR_PRO_VERSION' ) ) ) {
+		return;
+	}
+	echo '<div class="notice notice-warning"><p><strong>The Dental Hauz theme:</strong> Elementor is still active. If the old header, top bar or footer shows above the new design, go to Plugins and deactivate <strong>Elementor, Elementor Pro, ElementsKit and MetForm</strong> (keep Trustindex and Rank Math).</p></div>';
+}
+add_action( 'admin_notices', 'dh_elementor_notice' );

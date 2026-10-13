@@ -153,8 +153,8 @@ test.describe('home page', () => {
     await expect(page.locator('.quick')).toContainText('8321 Kennedy Rd #22, Markham, ON L3R 5N4');
     await expect(page.locator('.quick')).toContainText('Monday – Friday: 10:00 AM – 6:00 PM');
     await expect(page.locator('.quick')).toContainText('Sunday: Closed');
-    await expect(page.locator('.video video')).toHaveCount(1);
-    await expect(page.locator('.video figcaption')).toHaveText('Watch Our Video');
+    await expect(page.locator('video')).toHaveCount(0);
+    await expect(page.locator('.intro__media img')).toHaveCount(1);
     await expect(page.locator('.svc')).toHaveCount(10);
     await expect(page.locator('.svc__num').first()).toHaveText('01');
     await expect(page.locator('.svc__num').last()).toHaveText('10');
@@ -169,7 +169,7 @@ test.describe('home page', () => {
     await expect(page.locator('#book .form')).toBeVisible();
   });
 
-  test('without the video file a photo takes its place; without the reviews plugin the built-in Google reviews are shown', async ({ page }) => {
+  test('the home page has no video; without the reviews plugin the built-in Google reviews are shown', async ({ page }) => {
     await page.goto('/home-novideo.html');
     await expect(page.locator('.video')).toHaveCount(0);
     await expect(page.locator('.reviews--compact .ti-widget')).toHaveCount(0);
@@ -618,4 +618,14 @@ test.describe('built-in Google reviews', () => {
     const full = await page.locator('.rv__card p').first().evaluate((p) => parseFloat(getComputedStyle(p).fontSize));
     expect(fs).toBeLessThan(full);
   });
+});
+
+test('the stylesheet uses only the five brand colours', async () => {
+  const css = require('fs').readFileSync('wordpress-theme/the-dental-hauz/style.css', 'utf8');
+  const brand = new Set(['#514a43', '#657568', '#a8b6a5', '#d8b8b2', '#f4f0e8']);
+  const hex = (css.match(/#[0-9a-fA-F]{3,8}\b/g) || []).map((h) => h.toLowerCase());
+  expect(hex.filter((h) => !brand.has(h))).toEqual([]);
+  const brandRgb = new Set(['244, 240, 232', '81, 74, 67', '168, 182, 165', '101, 117, 104', '216, 184, 178']);
+  const rgb = [...css.matchAll(/rgba?\(\s*(\d+,\s*\d+,\s*\d+)/g)].map((m) => m[1].replace(/\s+/g, ' '));
+  expect(rgb.filter((c) => !brandRgb.has(c))).toEqual([]);
 });

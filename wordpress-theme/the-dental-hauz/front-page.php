@@ -10,7 +10,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 $dh_h     = dh_content( 'home' );
 $dh_c     = dh_content();
-$dh_video = wp_get_attachment_url( $dh_h['intro']['video_url_id'] );
 get_header();
 ?>
 
@@ -68,16 +67,7 @@ if ( $dh_q_tel || $dh_q_addr || $dh_q_hours ) :
 <section class="section intro" id="about">
   <div class="wrap intro__grid">
     <div class="intro__media">
-      <?php if ( $dh_video ) : ?>
-        <figure class="video">
-          <video controls preload="none" playsinline <?php echo wp_get_attachment_image_url( $dh_h['intro']['video_poster'], 'large' ) ? 'poster="' . esc_url( wp_get_attachment_image_url( $dh_h['intro']['video_poster'], 'large' ) ) . '"' : ''; ?>>
-            <source src="<?php echo esc_url( $dh_video ); ?>" type="video/mp4">
-          </video>
-          <figcaption><?php echo esc_html( $dh_h['intro']['video_label'] ); ?></figcaption>
-        </figure>
-      <?php else : ?>
-        <?php echo dh_img( $dh_h['intro']['video_poster'], 'large', array( 'alt' => '' ), 'scrubs.jpg' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
-      <?php endif; ?>
+      <?php echo dh_img( 0, 'large', array( 'alt' => '' ), 'oral-health.jpg' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
     </div>
     <div class="intro__copy">
       <p class="eyebrow"><?php echo esc_html( $dh_h['intro']['eyebrow'] ); ?></p>

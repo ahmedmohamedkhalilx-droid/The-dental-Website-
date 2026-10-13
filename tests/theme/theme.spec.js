@@ -115,7 +115,7 @@ test.describe('header, menu and footer', () => {
     await page.goto('/home-default.html');
     const foot = page.locator('.footer');
     await expect(foot).toContainText('The Dental Hauz offers trusted dental care in Kennedy Road, Markham, ON.');
-    for (const t of ['Important Link', 'Our Services', 'Get in Touch', 'Working Hours', 'Monday – Friday', '10:00 AM – 6:00 PM', 'Saturday', '9:00 AM – 6:00 PM', 'Sunday', 'Closed', '(905) 470-4289', 'thedentalhauz@gmail.com', '8321 Kennedy Rd #22, Markham, ON L3R 5N4']) await expect(foot).toContainText(t);
+    for (const t of ['Important Link', 'Our Services', 'Get in Touch', 'Working Hours', 'Monday', '10:00 AM – 6:00 PM', 'Tuesday', '12:00 PM – 4:00 PM', 'Thursday', 'Saturday', 'Last Saturday of the month, 9:00 AM – 6:00 PM', 'Sunday', 'Closed', '(905) 470-4289', 'thedentalhauz@gmail.com', '8321 Kennedy Rd #22, Markham, ON L3R 5N4']) await expect(foot).toContainText(t);
     await expect(foot.locator('.social__link')).toHaveCount(2);
     const fy = await foot.locator('.social__link').evaluateAll((as) => as.map((a) => Math.round(a.getBoundingClientRect().top)));
     expect(fy[0], 'footer icons sit side by side').toBe(fy[1]);
@@ -151,7 +151,7 @@ test.describe('home page', () => {
     await expect(page.locator('.quick__item')).toHaveCount(3);
     await expect(page.locator('.quick')).toContainText('(905) 470-4289');
     await expect(page.locator('.quick')).toContainText('8321 Kennedy Rd #22, Markham, ON L3R 5N4');
-    await expect(page.locator('.quick')).toContainText('Monday – Friday: 10:00 AM – 6:00 PM');
+    await expect(page.locator('.quick')).toContainText('Tuesday: 12:00 PM – 4:00 PM');
     await expect(page.locator('.quick')).toContainText('Sunday: Closed');
     await expect(page.locator('video')).toHaveCount(0);
     await expect(page.locator('.intro__media img')).toHaveCount(1);
@@ -244,7 +244,7 @@ test.describe('inner pages', () => {
     await expect(cards.nth(0)).toContainText('thedentalhauz@gmail.com');
     await expect(cards.nth(1)).toContainText('8321 Kennedy Rd #22');
     await expect(cards.nth(2)).toContainText('(905) 470-4289');
-    await expect(cards.nth(3)).toContainText('Monday – Friday: 10:00 AM – 6:00 PM');
+    await expect(cards.nth(3)).toContainText('Tuesday: 12:00 PM – 4:00 PM');
     await expect(cards.nth(3)).toContainText('Sunday: Closed');
     const src = await page.locator('.map iframe').getAttribute('src');
     expect(decodeURIComponent(src)).toContain('The Dental Hauz 8321 Kennedy Rd #22, Markham, ON L3R 5N4, Canada');
@@ -298,7 +298,7 @@ test.describe('forms', () => {
     await expect(form.locator('input[name="dh_form"]')).toHaveValue('booking');
     const opts = async (n) => form.locator(`select[name="${n}"] option`).allTextContents();
     expect(await opts('dh_service')).toEqual(['Select', 'New Patient Exam', 'Comprehensive Oral Examination', 'Dental Cleaning', 'Tooth-Colored Restorations', 'Crowns & Bridges', 'Dental Implants', 'Orthodontics & Clear Aligners', 'Simple & Wisdom Tooth Extractions', 'Root Canal Therapy', 'Kids Dentistry', 'Teeth whitening', 'Emergency Exam', 'Other']);
-    expect(await opts('dh_day')).toEqual(['Select', 'Monday', 'Wednesday', 'Friday', 'Saturday']);
+    expect(await opts('dh_day')).toEqual(['Select', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']);
     expect(await opts('dh_time')).toEqual(['Select', 'Morning', 'Afternoon', 'Evening', 'No Preference']);
     for (const n of ['dh_first_name', 'dh_phone', 'dh_email', 'dh_service', 'dh_day', 'dh_time']) await expect(form.locator(`[name="${n}"]`)).toHaveAttribute('required', '');
     await expect(form.locator('[name="dh_last_name"]')).not.toHaveAttribute('required', '');

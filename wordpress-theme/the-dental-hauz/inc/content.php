@@ -238,7 +238,7 @@ return array(
 				'num' => '04',
 				'image' => 446,
 				'title' => 'Working Hours',
-				'lines' => array( 'Monday - Friday: 10AM - 6PM', 'Saturday: 9:00AM – 6:00PM', 'Sunday: Close' ),
+				'lines' => array( 'Monday: 10AM - 6PM', 'Tuesday: 12PM - 4PM', 'Wednesday: 10AM - 6PM', 'Thursday: 12PM - 4PM', 'Friday: 10AM - 6PM', 'Saturday: Last Saturday of the month, 9AM - 6PM', 'Sunday: Closed' ),
 				'link' => '',
 			),
 		),

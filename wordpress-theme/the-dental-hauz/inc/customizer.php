@@ -17,7 +17,7 @@ function dh_clinic_defaults() {
 		'phone'     => '(905) 470-4289',
 		'email'     => 'thedentalhauz@gmail.com',
 		'address'   => "8321 Kennedy Rd #22\nMarkham, ON L3R 5N4",
-		'hours'     => "Monday – Friday | 10:00 AM – 6:00 PM\nSaturday | 9:00 AM – 6:00 PM\nSunday | Closed",
+		'hours'     => "Monday | 10:00 AM – 6:00 PM\nTuesday | 12:00 PM – 4:00 PM\nWednesday | 10:00 AM – 6:00 PM\nThursday | 12:00 PM – 4:00 PM\nFriday | 10:00 AM – 6:00 PM\nSaturday | Last Saturday of the month, 9:00 AM – 6:00 PM\nSunday | Closed",
 		'maps_url'  => 'https://maps.app.goo.gl/tq5NC39rXTekr9da9',
 		'map_query' => 'The Dental Hauz 8321 Kennedy Rd #22, Markham, ON L3R 5N4, Canada',
 		'facebook'  => 'https://www.facebook.com/profile.php?id=61588796471226',

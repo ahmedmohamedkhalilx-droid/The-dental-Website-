@@ -69,7 +69,7 @@ function dh_forms() {
 				'required' => true,
 				'options'  => dh_booking_services(),
 			) ),
-			dh_f( 'day', 'Preferred Day', 'select', array( 'required' => true, 'half' => true, 'options' => array( 'Monday', 'Wednesday', 'Friday', 'Saturday' ) ) ),
+			dh_f( 'day', 'Preferred Day', 'select', array( 'required' => true, 'half' => true, 'options' => array( 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday' ) ) ),
 			dh_f( 'time', 'Preferred Time', 'select', array( 'required' => true, 'half' => true, 'options' => array( 'Morning', 'Afternoon', 'Evening', 'No Preference' ) ) ),
 		),
 	);

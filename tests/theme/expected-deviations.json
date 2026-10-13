@@ -3,6 +3,18 @@
   {
    "string": "Divider",
    "reason": "Page-builder widget label, not visible text on the old site"
+  },
+  {
+   "string": "Monday - Friday: 10AM - 6PM",
+   "reason": "Working hours updated by the owner"
+  },
+  {
+   "string": "Saturday: 9:00AM – 6:00PM",
+   "reason": "Working hours updated by the owner"
+  },
+  {
+   "string": "Sunday: Close",
+   "reason": "Working hours updated by the owner"
   }
  ],
  "home": [

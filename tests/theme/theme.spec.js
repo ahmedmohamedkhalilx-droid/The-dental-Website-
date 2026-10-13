@@ -445,3 +445,26 @@ test.describe('treatment cards without script or with reduced motion', () => {
     });
   });
 });
+
+test.describe('header proportions', () => {
+  for (const w of [1241, 1280, 1366, 1440, 1536, 1920]) {
+    test(`at ${w}px every menu item stays on one line and nothing overflows`, async ({ page }, info) => {
+      test.skip(info.project.name === 'mobile', 'desktop widths');
+      await page.setViewportSize({ width: w, height: 800 });
+      await page.goto('/home-default.html', { waitUntil: 'networkidle' });
+      const m = await page.evaluate(() => {
+        const items = [...document.querySelectorAll('#site-nav > ul > li > a')].map((a) => Math.round(a.getBoundingClientRect().height));
+        const btn = document.querySelector('.site-header a.btn').getBoundingClientRect();
+        const hdr = document.querySelector('.site-header').getBoundingClientRect();
+        const wrap = document.querySelector('.site-header .wrap');
+        return { items, btnH: Math.round(btn.height), hdrH: Math.round(hdr.height), over: wrap.scrollWidth - wrap.clientWidth, toggle: getComputedStyle(document.querySelector('#menu-toggle')).display };
+      });
+      expect(m.toggle).toBe('none');
+      expect(new Set(m.items).size, 'all menu links have the same height').toBe(1);
+      expect(m.items[0], 'one line of text').toBeLessThan(40);
+      expect(m.btnH, 'button is one line').toBeLessThan(60);
+      expect(m.hdrH, 'header stays slim').toBeLessThan(90);
+      expect(m.over).toBeLessThanOrEqual(0);
+    });
+  }
+});

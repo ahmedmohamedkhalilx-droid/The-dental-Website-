@@ -154,6 +154,9 @@ check( 'doctor pages are routed to the theme templates', ( dh_page_map()['doctor
 check( 'every doctor has the fields the templates read', ! array_filter( dh_doctors(), function ( $d ) { return array_diff( array( 'slug', 'name', 'role', 'photo', 'summary', 'bio', 'credentials' ), array_keys( $d ) ); } ) );
 
 echo "\n[old page builder protection]\n";
+$dh_locs = new class { public $l = array(); public function register_core_location( $x ) { $this->l[] = $x; } };
+dh_elementor_locations( $dh_locs );
+check( 'theme claims the header and footer locations so Elementor Pro / PRO Elements cannot replace them', array( 'header', 'footer' ) === $dh_locs->l );
 check( 'Elementor Pro is told not to override the header and footer', isset( $GLOBALS['dh_hooks']['elementor/theme/need_override_location'] ) && '__return_false' === $GLOBALS['dh_hooks']['elementor/theme/need_override_location'][0] );
 $GLOBALS['dh_is_admin'] = true;
 ob_start(); dh_elementor_notice(); $quiet = ob_get_clean();

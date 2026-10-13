@@ -470,6 +470,19 @@ function dh_doctor_photo( $doctor, $size = 'large' ) {
 add_filter( 'elementor/theme/need_override_location', '__return_false' );
 
 /**
+ * Elementor Pro / PRO Elements only swap in their Theme Builder header and footer when the theme
+ * has not registered those locations itself. Registering them here (and never printing them in
+ * header.php / footer.php) keeps the theme's own header and footer in place.
+ *
+ * @param object $manager Elementor Pro locations manager.
+ */
+function dh_elementor_locations( $manager ) {
+	$manager->register_core_location( 'header' );
+	$manager->register_core_location( 'footer' );
+}
+add_action( 'elementor/theme/register_locations', 'dh_elementor_locations' );
+
+/**
  * Dashboard reminder while the old page builder is still active (the fix that always works is to deactivate it).
  */
 function dh_elementor_notice() {

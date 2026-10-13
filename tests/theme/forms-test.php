@@ -156,6 +156,10 @@ check( 'every doctor has the fields the templates read', ! array_filter( dh_doct
 echo "\n[old page builder protection]\n";
 $dh_locs = new class { public $l = array(); public function register_core_location( $x ) { $this->l[] = $x; } };
 dh_elementor_locations( $dh_locs );
+$dh_el = array( 'elementor-frontend', 'elementor-post-29', 'elementor-webpack-runtime', 'elementor-frontend-modules', 'e-animation-fadeInUp', 'e-shapes', 'widget-heading', 'base-desktop', 'default-desktop' );
+$dh_keep = array( 'dh-style', 'dh-fonts', 'dh-main', 'ti-widget-css-google', 'trustindex-loader', 'rank-math', 'wp-block-library', 'jquery' );
+check( 'Elementor front-end files are recognised', count( array_filter( $dh_el, 'dh_is_elementor_asset' ) ) === count( $dh_el ) );
+check( 'theme, reviews and SEO files are kept', ! array_filter( $dh_keep, 'dh_is_elementor_asset' ) );
 check( 'Elementor style kit class is removed so brand headings apply', array( 'home', 'page' ) === dh_drop_elementor_kit_class( array( 'home', 'elementor-kit-29', 'page' ) ) );
 check( 'theme claims the header and footer locations so Elementor Pro / PRO Elements cannot replace them', array( 'header', 'footer' ) === $dh_locs->l );
 check( 'Elementor Pro is told not to override the header and footer', isset( $GLOBALS['dh_hooks']['elementor/theme/need_override_location'] ) && '__return_false' === $GLOBALS['dh_hooks']['elementor/theme/need_override_location'][0] );

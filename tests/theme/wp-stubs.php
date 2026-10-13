@@ -70,6 +70,11 @@ function body_class() { echo 'class="page"'; }
 function post_class( $c = '' ) { echo 'class="' . esc_attr( $c ) . '"'; }
 function wp_date( $f ) { return gmdate( $f ); }
 function antispambot( $e ) { return $e; }
+function is_admin() { return false; }
+function wp_styles() { return (object) array( 'queue' => array_keys( $GLOBALS['dh_styles'] ) ); }
+function wp_scripts() { return (object) array( 'queue' => array_keys( $GLOBALS['dh_scripts'] ) ); }
+function wp_dequeue_style( $h ) { unset( $GLOBALS['dh_styles'][ $h ] ); }
+function wp_dequeue_script( $h ) { unset( $GLOBALS['dh_scripts'][ $h ] ); }
 function current_user_can() { return $GLOBALS['dh_is_admin']; }
 function wp_nav_menu( $a ) { if ( ! empty( $a['fallback_cb'] ) ) { call_user_func( $a['fallback_cb'] ); } }
 function __( $s ) { return $s; }

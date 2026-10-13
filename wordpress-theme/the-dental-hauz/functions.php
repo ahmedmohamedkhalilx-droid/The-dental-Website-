@@ -498,6 +498,40 @@ function dh_drop_elementor_kit_class( $classes ) {
 add_filter( 'body_class', 'dh_drop_elementor_kit_class', 99 );
 
 /**
+ * Whether a script/style handle belongs to Elementor's front end.
+ *
+ * @param string $handle Asset handle.
+ * @return bool
+ */
+function dh_is_elementor_asset( $handle ) {
+	return (bool) preg_match( '/^(elementor|e-animation|e-shapes|widget-(heading|divider|image|image-box|icon-box|icon-list|text-editor|spacer|button|video|google_maps|social-icons|nav-menu|form)|base-(desktop|mobile)|default-desktop)/', $handle );
+}
+
+/**
+ * Pages are drawn by the theme, not by Elementor, so its front-end files have nothing to do here.
+ * Leaving them in costs downloads and throws "elementorFrontendConfig is not defined".
+ * The Elementor editor and its preview are left untouched.
+ */
+function dh_strip_elementor_assets() {
+	if ( is_admin() || isset( $_GET['elementor-preview'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+		return;
+	}
+	foreach ( (array) wp_styles()->queue as $handle ) {
+		if ( dh_is_elementor_asset( $handle ) ) {
+			wp_dequeue_style( $handle );
+		}
+	}
+	foreach ( (array) wp_scripts()->queue as $handle ) {
+		if ( dh_is_elementor_asset( $handle ) ) {
+			wp_dequeue_script( $handle );
+		}
+	}
+}
+add_action( 'wp_enqueue_scripts', 'dh_strip_elementor_assets', 9999 );
+add_action( 'wp_footer', 'dh_strip_elementor_assets', 1 );
+add_action( 'wp_print_footer_scripts', 'dh_strip_elementor_assets', 1 );
+
+/**
  * Dashboard reminder while the old page builder is still active (the fix that always works is to deactivate it).
  */
 function dh_elementor_notice() {

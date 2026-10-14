@@ -209,4 +209,30 @@
         });
     });
   });
+
+  // Phones: long text sections show their first paragraph, the rest folds behind "Read more".
+  if (window.matchMedia && window.matchMedia('(max-width: 600px)').matches) {
+    Array.prototype.slice.call(document.querySelectorAll('.split__copy, .intro__copy')).forEach(function (box) {
+      var paras = Array.prototype.slice.call(box.children).filter(function (el) {
+        return el.tagName === 'P' && !el.classList.contains('eyebrow') && !el.classList.contains('lead');
+      });
+      var hasLead = !!box.querySelector(':scope > p.lead');
+      var keep = hasLead ? 0 : 1;
+      var extra = paras.slice(keep);
+      if (!extra.length) { return; }
+      extra.forEach(function (p) { p.classList.add('fold-extra'); });
+      box.classList.add('is-folded');
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'read-more';
+      btn.textContent = 'Read more';
+      btn.setAttribute('aria-expanded', 'false');
+      extra[extra.length - 1].insertAdjacentElement('afterend', btn);
+      btn.addEventListener('click', function () {
+        var open = box.classList.toggle('is-folded') === false;
+        btn.textContent = open ? 'Read less' : 'Read more';
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+    });
+  }
 })();

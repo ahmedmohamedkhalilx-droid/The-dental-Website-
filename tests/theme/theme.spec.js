@@ -697,3 +697,18 @@ test('phone menu: Services sits in its own row between Doctors and Testimonial, 
   await expect(page.locator('#site-nav .sub-menu a', { hasText: 'Dental Implants' })).toBeVisible();
 });
 
+test('phones: checklist in two columns, extra paragraphs fold behind Read more', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mobile', 'phone only');
+  await page.goto('/index.html', { waitUntil: 'networkidle' });
+  const tops = await page.$$eval('.checks li', (lis) => lis.slice(0, 2).map((li) => Math.round(li.getBoundingClientRect().top)));
+  expect(tops[0]).toBe(tops[1]);
+  const box = page.locator('.intro__copy');
+  const extra = box.locator('p.fold-extra').first();
+  await expect(extra).toBeHidden();
+  await box.locator('.read-more').click();
+  await expect(extra).toBeVisible();
+  await expect(box.locator('.read-more')).toHaveText('Read less');
+  const fs = await page.$eval('.intro__copy p:not(.eyebrow)', (p) => parseFloat(getComputedStyle(p).fontSize));
+  expect(fs).toBeLessThanOrEqual(15);
+});
+

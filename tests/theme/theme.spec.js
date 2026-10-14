@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 const SLUGS = Object.keys(JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures/source-strings.json'), 'utf8')));
-const ALL = SLUGS.concat(['doctors', 'dr-summer-al-maqdassy']);
+const ALL = SLUGS.concat(['doctors']);
 const file = (slug) => (slug === 'home' ? '/index.html' : `/${slug}.html`);
 const SERVICES = ['comprehensive-oral-examination', 'dental-cleaning', 'tooth-colored-restorations', 'crowns-bridges', 'dental-implants', 'orthodontics-clear-aligners', 'simple-wisdom-tooth-extractions', 'root-canal-therapy', 'kids-dentistry', 'teeth-whitening'];
 
@@ -330,7 +330,7 @@ test.describe('forms', () => {
     await expect(page.locator('fieldset.field--choices').filter({ has: page.locator('input[type=radio]') })).toHaveCount(16);
     await expect(page.locator('input[name="dh_conditions[]"]')).toHaveCount(21);
     await expect(page.locator('input[name="dh_consent"]')).toHaveAttribute('required', '');
-    await expect(page.locator('.field--agree')).toContainText('Dr. Summer Al Maqdassy');
+    await expect(page.locator('.field--agree')).toContainText('The Dental Hauz dentists or their staff');
     await expect(page.getByRole('button', { name: 'Submit' })).toBeVisible();
     // "If yes" follow-ups are not required
     await expect(page.locator('input[name$="_more"][required]')).toHaveCount(0);
@@ -491,26 +491,19 @@ test.describe('header proportions', () => {
 });
 
 test.describe('doctors', () => {
-  test('doctors page: a card per doctor linking to the doctor\'s own page, only known facts shown', async ({ page }) => {
+  test('doctors page: no doctor is listed yet, so it shows a short note and the booking form', async ({ page }) => {
     await page.goto('/doctors.html');
     await expect(page.locator('h1')).toHaveText('Doctors');
-    await expect(page.locator('.doc-card')).toHaveCount(1);
-    await expect(page.locator('.doc-card h3 a')).toHaveText('Dr. Summer Al Maqdassy');
-    await expect(page.locator('.doc-card h3 a')).toHaveAttribute('href', 'https://clinic.test/dr-summer-al-maqdassy/');
-    await expect(page.locator('.doc-card .doc-placeholder')).toHaveCount(1);
-    await expect(page.locator('.doc-card .more')).toContainText('View Profile');
-    await expect(page.locator('.doc-card__role')).toHaveCount(0);
+    await expect(page.locator('.doc-card')).toHaveCount(0);
+    await expect(page.locator('.doctors')).toContainText('Our team profiles are coming soon');
     await expect(page.locator('#book .form')).toBeVisible();
   });
 
-  test('doctor page: hero with breadcrumb, profile section and booking form', async ({ page }) => {
-    await page.goto('/dr-summer-al-maqdassy.html');
-    await expect(page.locator('h1')).toHaveText('Dr. Summer Al Maqdassy');
-    await expect(page.locator('.crumbs')).toContainText('Doctors');
-    await expect(page.locator('.doctor')).toContainText('sees patients at The Dental Hauz in Markham, Ontario.');
-    await expect(page.locator('.doctor a.btn')).toHaveAttribute('href', '#book');
-    await expect(page.locator('#book .form')).toBeVisible();
-    await expect(page.locator('.doctor .checks')).toHaveCount(0);
+  test('Dr. Summer Al Maqdassy appears nowhere on the site', async ({ page }) => {
+    for (const slug of ALL.concat(['index'])) {
+      await page.goto(`/${slug}.html`);
+      await expect(page.locator('body'), slug).not.toContainText(/summer|maqdassy/i);
+    }
   });
 
   test('doctors are in the menu and the footer', async ({ page }) => {

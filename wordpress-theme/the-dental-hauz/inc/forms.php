@@ -188,7 +188,7 @@ function dh_forms() {
 		$q( 'pregnant', 'For women only: Are you breastfeeding or pregnant?', 'If pregnant, what is the expected delivery date?' ),
 		array(
 			dh_f( 'h_consent', 'Consent', 'heading' ),
-			dh_f( 'consent', 'I, the undersigned, acknowledge that I have provided an accurate personal medical/dental history. I will inform you if there are any changes in my health or medications at future appointments. Dr. Summer Al Maqdassy or her staff may contact my physician, if necessary, to discuss any relevant medical information. I, the undersigned, consent to the performing of dental procedures, x-rays, and diagnostic tests agreed to be necessary or advisable for this case.', 'checkbox', array( 'required' => true ) ),
+			dh_f( 'consent', 'I, the undersigned, acknowledge that I have provided an accurate personal medical/dental history. I will inform you if there are any changes in my health or medications at future appointments. The Dental Hauz dentists or their staff may contact my physician, if necessary, to discuss any relevant medical information. I, the undersigned, consent to the performing of dental procedures, x-rays, and diagnostic tests agreed to be necessary or advisable for this case.', 'checkbox', array( 'required' => true ) ),
 			dh_f( 'date', 'Date', 'date', array( 'half' => true ) ),
 		)
 	);

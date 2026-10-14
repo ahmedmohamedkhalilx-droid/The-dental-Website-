@@ -144,7 +144,7 @@ test('both booking forms (Contact page and Home page) email the clinic', async (
 
 test('the other forms (medical history, records request, two payment agreements) email the clinic', async ({ page }) => {
   const forms = [
-    ['Medical history form', '/medical-history-form/', 'medical-history-form', 'Medical history form', 'Dr. Summer Al Maqdassy'],
+    ['Medical history form', '/medical-history-form/', 'medical-history-form', 'Medical history form', 'The Dental Hauz dentists or their staff'],
     ['Request for records', '/request-for-records/', 'request-for-records', 'Request for records', 'Radiographs'],
     ['Dental treatment payment agreement', '/dental-treatment-payment-agreement/', 'dental-treatment-payment-agreement', 'Dental treatment payment agreement', 'Deposit Due Prior to Appointment'],
     ['Payment agreement', '/payment-agreement/', 'payment-agreement', 'Payment agreement', 'Full Name'],

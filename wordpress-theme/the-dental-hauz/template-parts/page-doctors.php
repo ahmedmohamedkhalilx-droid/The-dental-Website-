@@ -16,6 +16,9 @@ get_template_part( 'template-parts/hero', null, array( 'title' => get_the_title(
       <p class="eyebrow"><?php esc_html_e( 'Meet the team', 'the-dental-hauz' ); ?></p>
       <h2><?php esc_html_e( 'The dentists behind your smile', 'the-dental-hauz' ); ?></h2>
     </div>
+    <?php if ( ! dh_doctors() ) : ?>
+      <p class="lead"><?php esc_html_e( 'Our team profiles are coming soon. In the meantime, book your visit below or get in touch, and we will be happy to help.', 'the-dental-hauz' ); ?></p>
+    <?php else : ?>
     <div class="svc-grid svc-grid--doctors">
       <?php foreach ( dh_doctors() as $dh_n => $dh_d ) : ?>
         <?php $dh_url = dh_page_url( $dh_d['slug'] ); ?>
@@ -37,6 +40,7 @@ get_template_part( 'template-parts/hero', null, array( 'title' => get_the_title(
         </article>
       <?php endforeach; ?>
     </div>
+    <?php endif; ?>
   </div>
 </section>
 <?php get_template_part( 'template-parts/book' ); ?>

@@ -253,6 +253,7 @@ test('every accepted request is also kept under "Form entries" in the WordPress 
   await page.fill('#user_login', 'admin');
   await page.fill('#user_pass', 'e2e-password');
   await page.click('#wp-submit');
+  await page.waitForURL(/\/wp-admin\//); // let the login finish before opening the list
   await page.goto('/wp-admin/edit.php?post_type=dh_submission');
   const titles = await page.locator('#the-list .row-title').allTextContents();
   // 2 bookings + 4 other forms + recipient test + mail-down test = 8 saved; the invalid request and the bot are not saved

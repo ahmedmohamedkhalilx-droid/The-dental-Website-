@@ -127,7 +127,8 @@ test.describe('header, menu and footer', () => {
 
   test('details come from the Customizer when changed, and disappear when emptied', async ({ page }) => {
     await page.goto('/home-custom.html');
-    await expect(page.locator('.quick')).toContainText('(416) 555-0100');
+    await expect(page.locator('.quick')).toContainText('front@example.test');
+    await expect(page.locator('.quick a[href="mailto:front@example.test"]')).toHaveCount(1);
     await expect(page.locator('.quick a[href="tel:4165550100"]')).toHaveCount(1);
     await expect(page.locator('.footer')).toContainText('front@example.test');
     await expect(page.locator('.footer')).toContainText('1 Test St, Toronto, ON');
@@ -149,10 +150,11 @@ test.describe('home page', () => {
     await expect(page.locator('.hero-actions a.btn').first()).toHaveAttribute('href', '#book');
     await expect(page.locator('.hero-actions a.btn').nth(1)).toHaveAttribute('href', 'tel:9054704289');
     await expect(page.locator('.quick__item')).toHaveCount(3);
+    await expect(page.locator('.quick__label')).toHaveText(['Call Us', 'Email Us', 'Location']);
     await expect(page.locator('.quick')).toContainText('(905) 470-4289');
+    await expect(page.locator('.quick')).toContainText('thedentalhauz@gmail.com');
     await expect(page.locator('.quick')).toContainText('8321 Kennedy Rd #22, Markham, ON L3R 5N4');
-    await expect(page.locator('.quick')).toContainText('Tuesday: 12:00 PM – 4:00 PM');
-    await expect(page.locator('.quick')).toContainText('Sunday: Closed');
+    await expect(page.locator('.quick')).not.toContainText('Working Hours');
     await expect(page.locator('video')).toHaveCount(0);
     await expect(page.locator('.intro__media img')).toHaveCount(1);
     await expect(page.locator('.svc')).toHaveCount(10);

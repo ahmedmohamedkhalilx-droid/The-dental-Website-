@@ -32,10 +32,10 @@ get_header();
 </section>
 
 <?php
-$dh_q_tel   = dh_tel_href();
-$dh_q_addr  = dh_address_lines();
-$dh_q_hours = dh_hours();
-if ( $dh_q_tel || $dh_q_addr || $dh_q_hours ) :
+$dh_q_tel  = dh_tel_href();
+$dh_q_mail = dh_clinic( 'email' );
+$dh_q_addr = dh_address_lines();
+if ( $dh_q_tel || $dh_q_mail || $dh_q_addr ) :
 	?>
 <div class="wrap quick-wrap">
   <div class="quick">
@@ -45,19 +45,16 @@ if ( $dh_q_tel || $dh_q_addr || $dh_q_hours ) :
         <span class="quick__value"><a href="<?php echo esc_url( $dh_q_tel ); ?>"><?php echo esc_html( dh_clinic( 'phone' ) ); ?></a></span>
       </div>
     <?php endif; ?>
+    <?php if ( $dh_q_mail ) : ?>
+      <div class="quick__item">
+        <span class="quick__label"><?php esc_html_e( 'Email Us', 'the-dental-hauz' ); ?></span>
+        <span class="quick__value"><a href="<?php echo esc_url( 'mailto:' . $dh_q_mail ); ?>"><?php echo esc_html( $dh_q_mail ); ?></a></span>
+      </div>
+    <?php endif; ?>
     <?php if ( $dh_q_addr ) : ?>
       <div class="quick__item">
         <span class="quick__label"><?php esc_html_e( 'Location', 'the-dental-hauz' ); ?></span>
         <span class="quick__value"><a href="<?php echo esc_url( dh_clinic( 'maps_url' ) ); ?>"><?php echo esc_html( implode( ', ', $dh_q_addr ) ); ?></a></span>
-      </div>
-    <?php endif; ?>
-    <?php if ( $dh_q_hours ) : ?>
-      <div class="quick__item">
-        <span class="quick__label"><?php esc_html_e( 'Working Hours', 'the-dental-hauz' ); ?></span>
-        <span class="quick__value"><?php echo esc_html( $dh_q_hours[0][0] . ( $dh_q_hours[0][1] ? ': ' . $dh_q_hours[0][1] : '' ) ); ?></span>
-        <?php foreach ( array_slice( $dh_q_hours, 1 ) as $dh_q_row ) : ?>
-          <span class="quick__sub"><?php echo esc_html( $dh_q_row[0] . ( $dh_q_row[1] ? ': ' . $dh_q_row[1] : '' ) ); ?></span>
-        <?php endforeach; ?>
       </div>
     <?php endif; ?>
   </div>

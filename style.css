@@ -178,11 +178,11 @@ body .elementor-location-header, body .elementor-location-footer { display: none
 
 /* Quick facts bar that overlaps the hero */
 .quick-wrap { position: relative; z-index: 2; margin-top: calc(clamp(5.5rem, 9vw, 7.5rem) * -.62); }
-.quick { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; }
+.quick { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; }
 .quick__item { display: grid; gap: .25rem; padding: clamp(1.1rem, 2.5vw, 1.8rem) clamp(1.1rem, 2.5vw, 2rem); align-content: start; min-width: 0; }
 .quick__item + .quick__item { border-left: 1px solid var(--line); }
 .quick__label { font-size: .72rem; letter-spacing: .26em; text-transform: uppercase; color: var(--sage-deep); }
-.quick__value { font-family: var(--font-display); font-size: 1.45rem; line-height: 1.25; }
+.quick__value { font-family: var(--font-display); font-size: 1.45rem; line-height: 1.25; overflow-wrap: anywhere; }
 .quick__value a { text-decoration: none; }
 .quick__value a:hover { text-decoration: underline; }
 .quick__sub { font-size: .9rem; color: var(--umber-soft); }

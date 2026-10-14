@@ -28,6 +28,10 @@ test.describe('every page of the old site exists in the theme', () => {
       const w = await page.evaluate(() => [document.documentElement.scrollWidth, document.documentElement.clientWidth]);
       expect(w[0], 'horizontal scroll').toBeLessThanOrEqual(w[1]);
 
+      // Scroll through like a visitor so lazy-loaded photos further down actually load, then check them.
+      await page.evaluate(async () => { for (let y = 0; y < document.body.scrollHeight; y += 400) { window.scrollTo(0, y); await new Promise((r) => setTimeout(r, 30)); } window.scrollTo(0, 0); });
+      await page.waitForLoadState('networkidle');
+      await page.waitForFunction(() => [...document.images].every((i) => i.complete));
       const imgs = await page.$$eval('img', (list) => list.map((i) => {
         const r = i.getBoundingClientRect();
         return { src: i.getAttribute('src'), ok: i.complete && i.naturalWidth > 0, fit: getComputedStyle(i).objectFit, ratio: r.height / r.width, natural: i.naturalHeight / i.naturalWidth, shown: r.width > 0 };

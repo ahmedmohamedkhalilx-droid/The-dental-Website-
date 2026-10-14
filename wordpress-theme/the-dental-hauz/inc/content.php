@@ -89,7 +89,7 @@ return array(
 	'services' => array(
 		array(
 			'num' => '01',
-			'image' => 1494,
+			'image' => 'svc-oral-examination.jpg',
 			'title' => 'Comprehensive Oral Examination',
 			'summary' => 'Detect dental concerns early with comprehensive exams and digital assessments designed to support your long-term oral health.',
 			'button' => 'Learn More',
@@ -105,7 +105,7 @@ return array(
 		),
 		array(
 			'num' => '03',
-			'image' => 1496,
+			'image' => 'svc-tooth-colored.jpg',
 			'title' => 'Tooth-Colored Restorations',
 			'summary' => 'Restore damaged teeth with durable, natural-looking fillings that blend seamlessly with your smile and protect your oral health.',
 			'button' => 'Learn More',
@@ -113,7 +113,7 @@ return array(
 		),
 		array(
 			'num' => '04',
-			'image' => 1497,
+			'image' => 'svc-crowns-bridges.jpg',
 			'title' => 'Crowns & Bridges',
 			'summary' => 'Restore damaged or missing teeth with custom crowns and bridges designed to improve strength, function, and smile appearance.',
 			'button' => 'Learn More',
@@ -121,7 +121,7 @@ return array(
 		),
 		array(
 			'num' => '05',
-			'image' => 1498,
+			'image' => 'svc-dental-implants.jpg',
 			'title' => 'Dental Implants',
 			'summary' => 'Replace missing teeth with natural-looking dental implants that restore chewing function, smile confidence, and jawbone support.',
 			'button' => 'Learn More',
@@ -317,7 +317,7 @@ return array(
 	'service_pages' => array(
 		'comprehensive-oral-examination' => array(
 			'title' => 'Comprehensive Oral Examination',
-			'hero' => 1785,
+			'hero' => 'svc-oral-examination.jpg',
 			'eyebrow' => 'Complete Care Starts Here',
 			'heading' => 'Comprehensive Oral Examination in Markham, ON',
 			'lead' => 'A comprehensive oral examination gives you a clear understanding of your dental health. At The Dental Hauz, we carefully assess your teeth, gums, bite, jaw, and surrounding oral tissues to identify existing concerns and signs of potential problems. Based on our findings, we explain your options and recommend a personalized care plan designed around your specific needs.',
@@ -371,7 +371,7 @@ return array(
 		),
 		'tooth-colored-restorations' => array(
 			'title' => 'Tooth-Colored Restorations',
-			'hero' => 1854,
+			'hero' => 'svc-tooth-colored.jpg',
 			'eyebrow' => 'Natural-Looking Dental Repair',
 			'heading' => 'Tooth-Colored Restorations in Markham, ON',
 			'lead' => 'Tooth-colored restorations repair teeth affected by cavities, minor chips, cracks, or wear while preserving a natural-looking smile. At The Dental Hauz, we use carefully selected composite resin that closely matches the shade of your surrounding teeth. Each restoration is shaped and polished to support comfortable function, a balanced bite, and a seamless appearance.',
@@ -398,7 +398,7 @@ return array(
 		),
 		'crowns-bridges' => array(
 			'title' => 'Crowns & Bridges',
-			'hero' => 1902,
+			'hero' => 'svc-crowns-bridges.jpg',
 			'eyebrow' => 'Restore Strength and Complete Your Smile',
 			'heading' => 'Comprehensive Dental Crowns & Bridges in Markham, ON',
 			'lead' => 'Dental crowns and bridges help restore damaged teeth and replace missing teeth with custom-made restorations designed for comfort, function, and a natural appearance. At The Dental Hauz, we carefully evaluate your teeth, gums, and bite before recommending a suitable option. Each restoration is planned to blend with your smile while supporting confident biting, chewing, and speaking.',
@@ -425,7 +425,7 @@ return array(
 		),
 		'dental-implants' => array(
 			'title' => 'Dental Implants',
-			'hero' => 1879,
+			'hero' => 'svc-dental-implants.jpg',
 			'eyebrow' => 'A Lasting Foundation for Your Smile',
 			'heading' => 'Dental Implants in Markham, ON',
 			'lead' => 'Dental implants offer a stable, natural-looking way to replace one or more missing teeth. An implant is placed in the jawbone to support a custom dental crown, bridge, or other suitable restoration. At The Dental Hauz, we carefully assess your oral health and discuss your options to create a personalized treatment plan focused on comfort, function, appearance, and long-term care.',

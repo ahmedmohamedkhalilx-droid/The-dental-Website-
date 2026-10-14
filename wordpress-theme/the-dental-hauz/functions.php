@@ -218,6 +218,11 @@ function dh_page_url( $slug ) {
  * An image from the media library by attachment ID, with an optional brand-photo fallback.
  */
 function dh_img( $id, $size = 'large', $attr = array(), $fallback = '' ) {
+	// A file name instead of an attachment ID means a photo shipped inside the theme (assets/img).
+	if ( is_string( $id ) && '' !== $id && ! ctype_digit( $id ) ) {
+		$fallback = $id;
+		$id       = 0;
+	}
 	$id = (int) $id;
 	if ( $id && wp_attachment_is_image( $id ) ) {
 		if ( isset( $attr['alt'] ) && '' !== (string) get_post_meta( $id, '_wp_attachment_image_alt', true ) ) {

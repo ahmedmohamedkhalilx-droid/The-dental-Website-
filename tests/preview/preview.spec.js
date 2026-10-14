@@ -87,9 +87,9 @@ test('the earlier single-page design is still available', async ({ page }) => {
   await expect(page).toHaveTitle('The Dental Hauz');
 });
 
-test('"Make Appointment" jumps straight to the booking form on the same page', async ({ page }) => {
+test('"Request Appointment" jumps straight to the booking form on the same page', async ({ page }) => {
   await page.goto(`${BASE}/`);
-  await page.locator('.hero-actions a.btn', { hasText: 'Make Appointment' }).click();
+  await page.locator('.hero-actions a.btn', { hasText: 'Request Appointment' }).click();
   await expect(page).toHaveURL(`${BASE}/#book`);
   await expect(page.locator('#book')).toBeInViewport();
   await expect(page.locator('#form-booking')).toBeInViewport();

@@ -25,6 +25,10 @@
   {
    "string": "Watch Our Video",
    "reason": "Intro video removed at the owner's request"
+  },
+  {
+   "string": "Make Appointment",
+   "reason": "Hero button renamed to \"Request Appointment\" at the owner's request"
   }
  ],
  "contact-us": [

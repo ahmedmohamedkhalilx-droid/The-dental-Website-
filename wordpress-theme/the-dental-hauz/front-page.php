@@ -32,22 +32,15 @@ get_header();
 </section>
 
 <?php
-$dh_q_tel  = dh_tel_href();
 $dh_q_mail = dh_clinic( 'email' );
 $dh_q_addr = dh_address_lines();
-if ( $dh_q_tel || $dh_q_mail || $dh_q_addr ) :
+if ( $dh_q_mail || $dh_q_addr ) :
 	?>
 <div class="wrap quick-wrap">
   <div class="quick">
-    <?php if ( $dh_q_tel ) : ?>
-      <div class="quick__item">
-        <span class="quick__label"><?php esc_html_e( 'Call Us', 'the-dental-hauz' ); ?></span>
-        <span class="quick__value"><a href="<?php echo esc_url( $dh_q_tel ); ?>"><?php echo esc_html( dh_clinic( 'phone' ) ); ?></a></span>
-      </div>
-    <?php endif; ?>
     <?php if ( $dh_q_mail ) : ?>
       <div class="quick__item">
-        <span class="quick__label"><?php esc_html_e( 'Email Us', 'the-dental-hauz' ); ?></span>
+        <span class="quick__label"><?php esc_html_e( 'Contact Us', 'the-dental-hauz' ); ?></span>
         <span class="quick__value"><a href="<?php echo esc_url( 'mailto:' . $dh_q_mail ); ?>"><?php echo esc_html( $dh_q_mail ); ?></a></span>
       </div>
     <?php endif; ?>

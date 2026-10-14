@@ -148,7 +148,12 @@ body .elementor-location-header, body .elementor-location-footer { display: none
   .nav .menu-item-has-children.is-open > .sub-menu { display: flex; }
   .nav li:hover > .sub-menu { display: none; }
   .nav li.is-open:hover > .sub-menu, .nav li.is-open:focus-within > .sub-menu { display: flex; }
-  .sub-toggle { display: block; background: none; border: 0; border-bottom: 1px solid var(--line); height: 100%; min-height: 3rem; padding: 0 .8rem; cursor: pointer; color: var(--umber); font-size: 1.4rem; line-height: 1; }
+  .sub-toggle { display: block; align-self: stretch; background: none; border: 0; border-bottom: 1px solid var(--line); min-height: 3rem; padding: 0 .8rem; cursor: pointer; color: var(--umber); font-size: 1.4rem; line-height: 1; }
+  /* iPhone Safari draws positioned rows inside a blurred sticky header in the wrong place once the page is scrolled
+     (the Services row ended up at the bottom of the open menu). Keep phone menu rows unpositioned and the header unblurred. */
+  .nav li, .nav .menu-item-has-children { position: static; }
+  .site-header { -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .nav { max-height: calc(100vh - 6rem); max-height: calc(100dvh - 6rem); -webkit-overflow-scrolling: touch; }
   .brand img, .brand .custom-logo { height: 38px; }
 }
 

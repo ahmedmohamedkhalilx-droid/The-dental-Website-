@@ -682,3 +682,18 @@ test('phones: photos are never taller than they are wide and image pairs line up
   }
 });
 
+test('phone menu: Services sits in its own row between Doctors and Testimonial, even after scrolling', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mobile', 'phone only');
+  await page.goto('/about-us.html', { waitUntil: 'networkidle' });
+  await page.evaluate(() => window.scrollTo(0, 1500));
+  await page.click('#menu-toggle');
+  const rows = await page.$$eval('#site-nav > ul > li', (lis) => lis.map((li) => ({ text: li.firstElementChild.textContent.trim(), top: li.getBoundingClientRect().top, pos: getComputedStyle(li).position })));
+  const names = rows.map((r) => r.text);
+  expect(names.slice(2, 5)).toEqual(['Doctors', 'Services', 'Testimonial']);
+  for (let i = 1; i < rows.length; i++) expect(rows[i].top).toBeGreaterThan(rows[i - 1].top);
+  expect(rows.every((r) => r.pos === 'static')).toBe(true);
+  expect(await page.$eval('.site-header', (h) => getComputedStyle(h).backdropFilter)).toBe('none');
+  await page.locator('#site-nav .sub-toggle').click();
+  await expect(page.locator('#site-nav .sub-menu a', { hasText: 'Dental Implants' })).toBeVisible();
+});
+

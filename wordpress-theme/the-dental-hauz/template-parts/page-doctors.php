@@ -14,7 +14,7 @@ get_template_part( 'template-parts/hero', null, array( 'title' => get_the_title(
   <div class="wrap">
     <div class="section-head">
       <p class="eyebrow"><?php esc_html_e( 'Meet the team', 'the-dental-hauz' ); ?></p>
-      <h2><?php esc_html_e( 'The dentists behind your smile', 'the-dental-hauz' ); ?></h2>
+      <h2><?php esc_html_e( 'The team behind your smile', 'the-dental-hauz' ); ?></h2>
     </div>
     <?php if ( ! dh_doctors() ) : ?>
       <p class="lead"><?php esc_html_e( 'Our team profiles are coming soon. In the meantime, book your visit below or get in touch, and we will be happy to help.', 'the-dental-hauz' ); ?></p>

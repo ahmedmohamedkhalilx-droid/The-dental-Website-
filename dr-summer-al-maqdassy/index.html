@@ -180,6 +180,21 @@
   </div>
 </footer>
 
+<div class="dh-modal" id="dh-thanks" role="dialog" aria-modal="true" aria-labelledby="dh-thanks-title" hidden>
+  <div class="dh-modal__box">
+    <button type="button" class="dh-modal__close" data-close aria-label="Close">&times;</button>
+    <img class="dh-modal__mark" src="/The-dental-Website-/assets/img/mark-dark.png" alt="" width="64" height="64">
+    <h2 id="dh-thanks-title">Thank you!</h2>
+    <p class="dh-modal__lead">Your registration is done. Our team will contact you shortly to confirm.</p>
+    <ul class="dh-modal__contact">
+              <li><span>Email</span><a href="mailto:thedentalhauz@gmail.com">thedentalhauz@gmail.com</a></li>
+                    <li><span>Phone</span><a href="tel:9054704289">(905) 470-4289</a></li>
+                    <li><span>Location</span><a href="https://maps.app.goo.gl/tq5NC39rXTekr9da9">8321 Kennedy Rd #22, Markham, ON L3R 5N4</a></li>
+          </ul>
+    <button type="button" class="btn dh-modal__done" data-close>Done</button>
+  </div>
+</div>
+
 <script src="/The-dental-Website-/assets/main.js" defer></script>
 <script>document.querySelectorAll("form.form").forEach(function(f){f.addEventListener("submit",function(e){e.preventDefault();var n=f.querySelector(".form-note");if(!n){n=document.createElement("p");n.className="form-note";n.setAttribute("role","status");f.insertBefore(n,f.querySelector(".fields"));}n.textContent="This is a preview. The form sends an email to the clinic once the theme is installed on thedentalhauz.com.";n.scrollIntoView({block:"center"});});});</script>
 </body>

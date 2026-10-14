@@ -69,6 +69,27 @@ $dh_tel   = dh_tel_href();
   </div>
 </footer>
 
+<div class="dh-modal" id="dh-thanks" role="dialog" aria-modal="true" aria-labelledby="dh-thanks-title" hidden>
+  <div class="dh-modal__box">
+    <button type="button" class="dh-modal__close" data-close aria-label="<?php esc_attr_e( 'Close', 'the-dental-hauz' ); ?>">&times;</button>
+    <img class="dh-modal__mark" src="<?php echo esc_url( get_theme_file_uri( 'assets/img/mark-dark.png' ) ); ?>" alt="" width="64" height="64">
+    <h2 id="dh-thanks-title"><?php esc_html_e( 'Thank you!', 'the-dental-hauz' ); ?></h2>
+    <p class="dh-modal__lead"><?php esc_html_e( 'Your registration is done. Our team will contact you shortly to confirm.', 'the-dental-hauz' ); ?></p>
+    <ul class="dh-modal__contact">
+      <?php if ( $dh_mail ) : ?>
+        <li><span><?php esc_html_e( 'Email', 'the-dental-hauz' ); ?></span><a href="<?php echo esc_url( 'mailto:' . $dh_mail ); ?>"><?php echo esc_html( $dh_mail ); ?></a></li>
+      <?php endif; ?>
+      <?php if ( $dh_tel ) : ?>
+        <li><span><?php esc_html_e( 'Phone', 'the-dental-hauz' ); ?></span><a href="<?php echo esc_url( $dh_tel ); ?>"><?php echo esc_html( dh_clinic( 'phone' ) ); ?></a></li>
+      <?php endif; ?>
+      <?php if ( $dh_addr ) : ?>
+        <li><span><?php esc_html_e( 'Location', 'the-dental-hauz' ); ?></span><a href="<?php echo esc_url( dh_clinic( 'maps_url' ) ); ?>"><?php echo esc_html( implode( ', ', $dh_addr ) ); ?></a></li>
+      <?php endif; ?>
+    </ul>
+    <button type="button" class="btn dh-modal__done" data-close><?php esc_html_e( 'Done', 'the-dental-hauz' ); ?></button>
+  </div>
+</div>
+
 <?php wp_footer(); ?>
 </body>
 </html>

@@ -136,4 +136,77 @@
     // Safety net: whatever has not appeared after a few seconds is shown anyway.
     window.setTimeout(function () { below.forEach(show); }, 4000);
   }
+
+  // Forms are sent in the background so the visitor stays on the page and sees a thank-you pop-up.
+  // Without JavaScript (or if the background send fails) the form posts normally and still works.
+  var modal = document.getElementById('dh-thanks');
+  var lastFocus = null;
+  function openThanks() {
+    if (!modal) { return; }
+    lastFocus = document.activeElement;
+    modal.hidden = false;
+    document.documentElement.style.overflow = 'hidden';
+    var done = modal.querySelector('.dh-modal__done');
+    if (done) { done.focus(); }
+  }
+  function closeThanks() {
+    if (!modal || modal.hidden) { return; }
+    modal.hidden = true;
+    document.documentElement.style.overflow = '';
+    if (lastFocus && lastFocus.focus) { lastFocus.focus(); }
+  }
+  if (modal) {
+    modal.addEventListener('click', function (e) {
+      if (e.target === modal || e.target.closest('[data-close]')) { closeThanks(); }
+    });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { closeThanks(); } });
+  }
+  // Arrived back from a normal (non-background) submission: show the same pop-up and tidy the address bar.
+  if (/[?&]dh_status=sent\b/.test(window.location.search)) {
+    openThanks();
+    if (window.history && window.history.replaceState) {
+      var clean = window.location.pathname + window.location.search.replace(/([?&])dh_(form|status)=[^&]*/g, '$1').replace(/[?&]+$/, '').replace(/\?&+/, '?');
+      window.history.replaceState(null, '', clean);
+    }
+  }
+  Array.prototype.slice.call(document.querySelectorAll('form.form[action*="admin-post.php"]')).forEach(function (form) {
+    form.addEventListener('submit', function (e) {
+      if (e.defaultPrevented || form.dataset.native === '1' || !window.fetch || !window.FormData) { return; }
+      e.preventDefault();
+      var data = new FormData(form);
+      data.append('dh_ajax', '1');
+      var btn = form.querySelector('button[type=submit]');
+      var label = btn ? btn.textContent : '';
+      form.classList.add('is-sending');
+      if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
+      var note = form.querySelector('.form-note');
+      fetch(form.getAttribute('action'), { method: 'POST', body: data, credentials: 'same-origin', headers: { 'Accept': 'application/json' } })
+        .then(function (r) { return r.json(); })
+        .then(function (res) {
+          form.classList.remove('is-sending');
+          if (btn) { btn.disabled = false; btn.textContent = label; }
+          if (res && res.ok) {
+            form.reset();
+            if (note) { note.remove(); }
+            openThanks();
+          } else {
+            if (!note) {
+              note = document.createElement('p');
+              note.setAttribute('role', 'status');
+              form.insertBefore(note, form.querySelector('.fields'));
+            }
+            note.className = 'form-note is-error';
+            note.textContent = (res && res.message) || 'Something went wrong. Please try again or call the clinic.';
+            note.scrollIntoView({ block: 'center', behavior: 'smooth' });
+          }
+        })
+        .catch(function () {
+          // Fall back to a normal submission.
+          form.dataset.native = '1';
+          form.classList.remove('is-sending');
+          if (btn) { btn.disabled = false; btn.textContent = label; }
+          HTMLFormElement.prototype.submit.call(form);
+        });
+    });
+  });
 })();

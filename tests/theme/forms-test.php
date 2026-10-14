@@ -11,6 +11,9 @@ function check( $label, $cond ) {
 	echo ( $cond ? '  ok   ' : '  FAIL ' ) . $label . "\n";
 	if ( ! $cond ) { $fails++; }
 }
+/** Emails sent to the clinic (not the patient's thank-you copy). */
+function clinic_mail() { return array_values( array_filter( $GLOBALS['dh_mail'], function ( $m ) { return 0 !== strpos( $m['subject'], '[The Dental Hauz] Thank you' ); } ) ); }
+function patient_mail() { return array_values( array_filter( $GLOBALS['dh_mail'], function ( $m ) { return 0 === strpos( $m['subject'], '[The Dental Hauz] Thank you' ); } ) ); }
 function submit( $post, $ip = '1.1.1.1' ) {
 	$_POST = $post;
 	$_SERVER['REMOTE_ADDR'] = $ip;
@@ -51,8 +54,16 @@ foreach ( $ids as $id ) {
 
 	$r = submit( valid_post( $id ), $ip );
 	check( 'valid submission redirects back to the form with status=sent', $r === "https://clinic.test/some-page/?dh_form=$id&dh_status=sent#form-$id" );
-	check( 'one email is sent to the clinic address', count( $GLOBALS['dh_mail'] ) === 1 && $GLOBALS['dh_mail'][0]['to'] === 'thedentalhauz@gmail.com' );
-	$body = $GLOBALS['dh_mail'][0]['body'] ?? '';
+	check( 'one email is sent to the clinic address', count( clinic_mail() ) === 1 && clinic_mail()[0]['to'] === 'thedentalhauz@gmail.com' );
+	$body = clinic_mail()[0]['body'] ?? '';
+	check( 'clinic email is branded HTML (brand colours, table of answers)', false !== strpos( $body, '#657568' ) && false !== strpos( $body, '<table' ) && in_array( 'Content-Type: text/html; charset=UTF-8', clinic_mail()[0]['headers'], true ) );
+	$has_email = (bool) array_filter( $form['fields'], function ( $f ) { return 'email' === $f['type']; } );
+	if ( $has_email ) {
+		$pm = patient_mail();
+		check( 'the patient gets a thank-you email with the clinic contact details', 1 === count( $pm ) && 'patient@example.test' === $pm[0]['to'] && false !== strpos( $pm[0]['body'], 'your registration is done' ) && false !== strpos( $pm[0]['body'], 'thedentalhauz@gmail.com' ) );
+		check( 'the thank-you email repeats no free text the visitor typed', false === strpos( $pm[0]['body'], 'Sample ' ) );
+		check( 'replies to the thank-you email go to the clinic', in_array( 'Reply-To: The Dental Hauz <thedentalhauz@gmail.com>', $pm[0]['headers'], true ) );
+	}
 	$allin = true;
 	foreach ( $form['fields'] as $f ) {
 		if ( in_array( $f['type'], array( 'note' ), true ) ) { continue; }
@@ -78,7 +89,14 @@ foreach ( $ids as $id ) {
 	$p = valid_post( $id );
 	foreach ( $form['fields'] as $f ) { if ( 'text' === $f['type'] ) { $p[ 'dh_' . $f['name'] ] = '<script>alert(1)</script>Bob'; break; } }
 	submit( $p, $ip );
-	check( 'HTML is stripped from text fields', strpos( $GLOBALS['dh_mail'][0]['body'] ?? '', '<script>' ) === false && count( $GLOBALS['dh_mail'] ) === 1 );
+	check( 'HTML is stripped from text fields', strpos( clinic_mail()[0]['body'] ?? '', '<script>' ) === false && count( clinic_mail() ) === 1 );
+
+	$r = submit( valid_post( $id ) + array( 'dh_ajax' => '1' ), $ip );
+	check( 'background send answers with JSON for the thank-you pop-up', 0 === strpos( (string) $r, 'json:' ) && true === json_decode( substr( $r, 5 ), true )['ok'] );
+	$p = valid_post( $id ) + array( 'dh_ajax' => '1' );
+	foreach ( $form['fields'] as $f ) { if ( ! empty( $f['required'] ) ) { unset( $p[ 'dh_' . $f['name'] ] ); break; } }
+	$j = json_decode( substr( (string) submit( $p, $ip ), 5 ), true );
+	check( 'background send reports a missing field without sending', false === $j['ok'] && 'invalid' === $j['status'] && 0 === count( $GLOBALS['dh_mail'] ) );
 }
 
 echo "\n[shared behaviour]\n";
@@ -108,7 +126,7 @@ submit( valid_post( 'booking' ), '9.9.9.2' );
 check( 'empty recipient falls back to the site admin email', $GLOBALS['dh_mail'][0]['to'] === 'admin@example.test' );
 $GLOBALS['dh_mods'] = array( 'dh_store_submissions' => false );
 submit( valid_post( 'booking' ), '9.9.9.1' );
-check( 'dashboard copies can be switched off', count( $GLOBALS['dh_posts'] ) === 0 && count( $GLOBALS['dh_mail'] ) === 1 );
+check( 'dashboard copies can be switched off', count( $GLOBALS['dh_posts'] ) === 0 && count( clinic_mail() ) === 1 );
 $GLOBALS['dh_mods'] = array();
 
 $last = null;

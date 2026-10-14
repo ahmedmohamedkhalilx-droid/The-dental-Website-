@@ -20,15 +20,49 @@ function parseEml(file) {
   const head = raw.slice(0, split).replace(/\r\n[ \t]+/g, ' ');
   const headers = {};
   for (const l of head.split('\r\n')) { const i = l.indexOf(':'); if (i > 0) headers[l.slice(0, i).toLowerCase()] = l.slice(i + 1).trim(); }
-  return { file: path.basename(file), headers, body: raw.slice(split + 4).replace(/\r\n/g, '\n').trim() };
+  const rawBody = raw.slice(split + 4);
+  const parts = mimeParts(headers['content-type'] || '', rawBody);
+  return { file: path.basename(file), headers, body: (parts.text || parts.html || '').replace(/\r\n/g, '\n').trim(), html: parts.html || '' };
 }
+/** Decoded text/plain and text/html parts of a message (handles multipart/alternative, quoted-printable, base64). */
+function mimeParts(ctype, body) {
+  const decode = (enc, s) => {
+    enc = (enc || '').toLowerCase();
+    if (enc === 'base64') return Buffer.from(s.replace(/\s+/g, ''), 'base64').toString('utf8');
+    if (enc === 'quoted-printable') return Buffer.from(s.replace(/=\r?\n/g, '').replace(/=([0-9A-F]{2})/gi, (m, h) => String.fromCharCode(parseInt(h, 16))), 'latin1').toString('utf8');
+    return s;
+  };
+  const out = {};
+  const b = /boundary="?([^";]+)"?/i.exec(ctype);
+  if (!b) { out[/html/i.test(ctype) ? 'html' : 'text'] = body; return out; }
+  for (const chunk of body.split('--' + b[1])) {
+    const i = chunk.indexOf('\r\n\r\n'); if (i < 0) continue;
+    const h = chunk.slice(0, i).toLowerCase(); const c = chunk.slice(i + 4);
+    const enc = (/content-transfer-encoding:\s*([^\r\n;]+)/.exec(h) || [])[1];
+    if (h.includes('text/plain')) out.text = decode(enc, c);
+    else if (h.includes('text/html')) out.html = decode(enc, c);
+  }
+  return out;
+}
+/** New mails since `before`, split into the clinic's copy and the patient's thank-you. */
+const since = (before) => mails().slice(before);
+const clinicMail = (before, to = CLINIC) => since(before).find((m) => m.headers.to === to);
+const patientMail = (before, to) => since(before).find((m) => m.headers.to === to);
+const thanks = (page) => page.locator('#dh-thanks');
 const mails = () => (fs.existsSync(MAIL) ? fs.readdirSync(MAIL).filter((f) => f.endsWith('.eml')).sort().map((f) => parseEml(path.join(MAIL, f))) : []);
 const envelope = () => fs.readFileSync(path.join(MAIL, 'log.jsonl'), 'utf8').trim().split('\n').map((l) => JSON.parse(l));
 
 /** Watch the browser's own requests to the form handler. */
 function watch(page) {
   const seen = { post: null, redirect: null };
-  const onRequest = (r) => { if (r.method() === 'POST' && r.url().includes('/wp-admin/admin-post.php')) seen.post = { url: r.url(), fields: Object.fromEntries(new URLSearchParams(r.postData() || '')) }; };
+  const fieldsOf = (r) => {
+    const d = (r.postDataBuffer() || Buffer.from('')).toString('utf8');
+    if (!/multipart\/form-data/.test(r.headers()['content-type'] || '')) return Object.fromEntries(new URLSearchParams(d));
+    const f = {}; const re = /name="([^"]+)"\r?\n\r?\n([^\r\n]*)/g; let m;
+    while ((m = re.exec(d))) f[m[1]] = m[2];
+    return f;
+  };
+  const onRequest = (r) => { if (r.method() === 'POST' && r.url().includes('/wp-admin/admin-post.php')) seen.post = { url: r.url(), fields: fieldsOf(r) }; };
   const onResponse = (r) => { if (r.url().includes('/wp-admin/admin-post.php')) seen.redirect = { status: r.status(), location: r.headers()['location'] || '' }; };
   page.on('request', onRequest);
   page.on('response', onResponse);
@@ -72,11 +106,28 @@ test('both booking forms (Contact page and Home page) email the clinic', async (
     await page.selectOption('#f-booking-day', 'Monday');
     await page.selectOption('#f-booking-time', 'Morning');
     await page.getByRole('button', { name: 'Book Appointment' }).last().click();
-    await expect(page).toHaveURL(/dh_status=sent/);
-    await expect(page.locator('#form-booking .form-note')).toContainText('Your submission was successful');
-    await expect.poll(() => mails().length, { timeout: 15000 }).toBe(before + 1);
-    const m = mails()[before];
-    expect(m.headers.to).toBe(CLINIC);
+    // The visitor stays on the same page and sees the thank-you pop-up with the clinic's contact details.
+    await expect(thanks(page)).toBeVisible();
+    await expect(thanks(page)).toContainText('Thank you!');
+    await expect(thanks(page)).toContainText('Your registration is done');
+    await expect(thanks(page)).toContainText(CLINIC);
+    expect(page.url()).not.toMatch(/dh_status/);
+    await expect(page.locator('#f-booking-first_name')).toHaveValue('');
+    await expect.poll(() => since(before).length, { timeout: 15000 }).toBe(2);
+    const m = clinicMail(before);
+    expect(m, 'clinic copy').toBeTruthy();
+    expect(m.headers['content-type']).toMatch(/multipart\/alternative/);
+    expect(m.html).toContain('#657568');
+    expect(m.html).toContain('Dental Implants');
+    const p = patientMail(before, 'patient@example.com');
+    expect(p, 'patient thank-you').toBeTruthy();
+    expect(p.headers.subject).toBe('[The Dental Hauz] Thank you, we received your appointment request');
+    expect(p.headers['reply-to']).toBe('The Dental Hauz <thedentalhauz@gmail.com>');
+    expect(p.html).toContain('your registration is done');
+    expect(p.html).toContain('Dental Implants');
+    expect(p.html).not.toContain('Test Patient');
+    await thanks(page).getByRole('button', { name: 'Done' }).click();
+    await expect(thanks(page)).toBeHidden();
     expect(m.headers.from).toBe('The Dental Hauz <wordpress@127.0.0.1>');
     expect(m.headers.subject).toBe('[The Dental Hauz] Appointment request from Test Patient');
     expect(m.headers['reply-to']).toBe('Test Patient <patient@example.com>');
@@ -84,9 +135,10 @@ test('both booking forms (Contact page and Home page) email the clinic', async (
     expect(seen.post?.url).toMatch(/\/wp-admin\/admin-post\.php$/);
     expect(seen.post?.fields.action).toBe('dh_form');
     expect(seen.post?.fields.dh_form).toBe('booking');
-    expect(seen.redirect?.status).toBe(302);
+    expect(seen.post?.fields.dh_ajax).toBe('1');
+    expect(seen.redirect?.status).toBe(200);
     seen.stop();
-    report.push({ test: `Booking form on the ${name}`, seen, mail: m, envelope: envelope()[before] });
+    report.push({ test: `Booking form on the ${name}`, seen, mail: m, patient: p, envelope: envelope()[before] });
   }
 });
 
@@ -102,12 +154,14 @@ test('the other forms (medical history, records request, two payment agreements)
     const seen = watch(page);
     await page.goto(url);
     await fillForm(page, `#form-${id}`);
+    const hasEmail = await page.locator(`#form-${id} input[type=email]`).count();
     await page.locator(`#form-${id} button[type=submit]`).click();
-    await expect(page).toHaveURL(/dh_status=sent/);
-    await expect(page.locator(`#form-${id} .form-note`)).toContainText('Your submission was successful');
-    await expect.poll(() => mails().length, { timeout: 15000 }).toBe(before + 1);
-    const m = mails()[before];
-    expect(m.headers.to).toBe(CLINIC);
+    await expect(thanks(page)).toBeVisible();
+    await expect.poll(() => since(before).length, { timeout: 15000 }).toBe(hasEmail ? 2 : 1);
+    const m = clinicMail(before);
+    expect(m, 'clinic copy').toBeTruthy();
+    if (hasEmail) expect(patientMail(before, 'patient@example.com'), 'patient thank-you').toBeTruthy();
+    await thanks(page).getByRole('button', { name: 'Done' }).click();
     expect(m.headers.subject).toContain(subjectPart);
     expect(m.body).toContain(bodyPart);
     expect(seen.post?.fields.dh_form).toBe(id);
@@ -123,11 +177,11 @@ test('a form with missing required fields is refused and sends no email', async 
   await page.evaluate(() => document.querySelectorAll('#form-booking [required]').forEach((e) => e.removeAttribute('required'))); // get past the browser's own check
   await page.fill('#f-booking-last_name', 'OnlyLastName');
   await page.getByRole('button', { name: 'Book Appointment' }).last().click();
-  await expect(page).toHaveURL(/dh_status=invalid/);
   await expect(page.locator('#form-booking .form-note')).toContainText('the form is invalid');
+  await expect(thanks(page)).toBeHidden();
   await page.waitForTimeout(1500);
   expect(mails().length).toBe(before);
-  report.push({ test: 'Missing required fields (browser check bypassed)', seen, note: 'Redirected back with an error message. No email was sent.' });
+  report.push({ test: 'Missing required fields (browser check bypassed)', seen, note: 'The form shows an error message in place. No email was sent.' });
 });
 
 test('a spam bot that fills the hidden field gets no email', async ({ page }) => {
@@ -142,7 +196,7 @@ test('a spam bot that fills the hidden field gets no email', async ({ page }) =>
   await page.selectOption('#f-booking-time', 'Evening');
   await page.evaluate(() => { document.querySelector('input[name=dh_website]').value = 'http://spam.example'; });
   await page.getByRole('button', { name: 'Book Appointment' }).last().click();
-  await expect(page).toHaveURL(/dh_status=sent/);
+  await expect(thanks(page)).toBeVisible();
   await page.waitForTimeout(1500);
   expect(mails().length).toBe(before);
   report.push({ test: 'Spam bot (hidden field filled)', seen, note: 'The bot is told it worked, but no email is sent and nothing is saved.' });
@@ -161,10 +215,11 @@ test('the recipient can be changed in the Customizer setting', async ({ page }) 
     await page.selectOption('#f-booking-day', 'Wednesday');
     await page.selectOption('#f-booking-time', 'Afternoon');
     await page.getByRole('button', { name: 'Book Appointment' }).last().click();
-    await expect(page).toHaveURL(/dh_status=sent/);
-    await expect.poll(() => mails().length, { timeout: 15000 }).toBe(before + 1);
-    expect(mails()[before].headers.to).toBe('frontdesk@example.test');
-    report.push({ test: 'Recipient changed in the Customizer (Send form submissions to)', seen, mail: mails()[before], envelope: envelope()[before] });
+    await expect(thanks(page)).toBeVisible();
+    await expect.poll(() => since(before).length, { timeout: 15000 }).toBe(2);
+    const m = clinicMail(before, 'frontdesk@example.test');
+    expect(m, 'clinic copy to the new address').toBeTruthy();
+    report.push({ test: 'Recipient changed in the Customizer (Send form submissions to)', seen, mail: m, envelope: envelope()[before] });
   } finally {
     execFileSync('php', [path.join(E2E, 'set-mod.php'), WP, 'dh_form_email']);
   }
@@ -183,8 +238,8 @@ test('if the mail server is down the patient is told, and the request is still k
     await page.selectOption('#f-booking-day', 'Saturday');
     await page.selectOption('#f-booking-time', 'No Preference');
     await page.getByRole('button', { name: 'Book Appointment' }).last().click();
-    await expect(page).toHaveURL(/dh_status=error/);
     await expect(page.locator('#form-booking .form-note')).toContainText('failed because of an error');
+    await expect(thanks(page)).toBeHidden();
     await page.waitForTimeout(1000);
     expect(mails().length).toBe(before);
     report.push({ test: 'Mail server down', seen, note: 'The patient sees an error message and no email is sent, but the request is saved under Form entries in the dashboard (checked next).' });
@@ -233,3 +288,23 @@ test.afterAll(() => {
   }
   fs.writeFileSync(path.join(OUT, 'REPORT.md'), md.join('\n'));
 });
+
+test('without JavaScript the form still sends, by a normal page load', async ({ browser }) => {
+  const ctx = await browser.newContext({ javaScriptEnabled: false, baseURL: test.info().project.use.baseURL });
+  const page = await ctx.newPage();
+  const before = mails().length;
+  await page.goto('/contact-us/');
+  await page.fill('#f-booking-first_name', 'NoScript');
+  await page.fill('#f-booking-phone', '905 555 0133');
+  await page.fill('#f-booking-email', 'noscript@example.com');
+  await page.selectOption('#f-booking-service', 'Kids Dentistry');
+  await page.selectOption('#f-booking-day', 'Tuesday');
+  await page.selectOption('#f-booking-time', 'Morning');
+  await page.getByRole('button', { name: 'Book Appointment' }).last().click();
+  await expect(page).toHaveURL(/dh_status=sent/);
+  await expect(page.locator('#form-booking .form-note')).toContainText('Your submission was successful');
+  await expect.poll(() => since(before).length, { timeout: 15000 }).toBe(2);
+  expect(clinicMail(before)).toBeTruthy();
+  await ctx.close();
+});
+

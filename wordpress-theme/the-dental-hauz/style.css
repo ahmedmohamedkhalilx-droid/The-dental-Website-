@@ -477,6 +477,23 @@ body .elementor-location-header, body .elementor-location-footer { display: none
 @media (max-width: 960px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 520px) { .footer-grid { grid-template-columns: 1fr; } }
 
+/* Thank-you pop-up after a form is sent */
+.dh-modal { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 20px; background: rgba(81, 74, 67, .55); backdrop-filter: blur(3px); }
+.dh-modal[hidden] { display: none; }
+.dh-modal__box { position: relative; width: 100%; max-width: 28rem; max-height: calc(100vh - 40px); overflow: auto; background: var(--cream); border-radius: var(--radius-lg); padding: 2.4rem 2rem 2rem; text-align: center; box-shadow: 0 40px 80px -30px rgba(81, 74, 67, .6); animation: dh-pop .35s cubic-bezier(.2, .8, .2, 1) both; }
+.dh-modal__mark { width: 64px; height: auto; margin: 0 auto 1rem; }
+.dh-modal h2 { font-size: 2.2rem; margin-bottom: .5rem; }
+.dh-modal__lead { color: var(--umber-soft); margin: 0 auto 1.4rem; max-width: 22rem; }
+.dh-modal__contact { list-style: none; margin: 0 0 1.6rem; padding: 0; border-top: 1px solid var(--line); text-align: left; }
+.dh-modal__contact li { display: grid; grid-template-columns: 6rem 1fr; gap: .8rem; padding: .75rem 0; border-bottom: 1px solid var(--line); font-size: .95rem; }
+.dh-modal__contact span { font-size: .7rem; letter-spacing: .2em; text-transform: uppercase; color: var(--sage-deep); padding-top: .2rem; }
+.dh-modal__contact a { text-decoration: none; overflow-wrap: anywhere; }
+.dh-modal__close { position: absolute; top: .8rem; right: .9rem; width: 2.4rem; height: 2.4rem; border: 0; border-radius: 50%; background: transparent; color: var(--umber); font-size: 1.6rem; line-height: 1; cursor: pointer; }
+.dh-modal__close:hover { background: var(--blush); }
+.dh-modal__done { min-width: 10rem; }
+@keyframes dh-pop { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: none; } }
+.form.is-sending { opacity: .7; pointer-events: none; }
+
 /* ---------- Phone layout (600px and below) ----------
    One system for every page: 20px side margins, one spacing rhythm, one type scale,
    photos at a calm 3:2 so text leads, and image pairs that line up. */

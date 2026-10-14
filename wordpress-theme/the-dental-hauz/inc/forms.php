@@ -232,9 +232,20 @@ function dh_form_recipient() {
 }
 
 /**
- * Redirect back to the form with a status.
+ * Redirect back to the form with a status. When the page sent the form in the background
+ * (so it can show the thank-you pop-up without leaving the page), answer with JSON instead.
  */
 function dh_form_redirect( $return, $id, $status ) {
+	if ( ! empty( $_POST['dh_ajax'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification -- public form, same checks as the redirect path.
+		$msg = dh_form_message( $status );
+		wp_send_json(
+			array(
+				'ok'      => 'sent' === $status,
+				'status'  => $status,
+				'message' => $msg ? $msg[1] : '',
+			)
+		);
+	}
 	$url = add_query_arg( array( 'dh_form' => $id, 'dh_status' => $status ), $return );
 	wp_safe_redirect( $url . '#form-' . $id );
 	exit;
@@ -322,11 +333,13 @@ function dh_handle_form() {
 	}
 	set_transient( $key, $hits + 1, HOUR_IN_SECONDS );
 
-	// Build a readable message, grouped by the form's headings.
-	$body = $form['title'] . "\n" . str_repeat( '=', strlen( $form['title'] ) ) . "\n";
+	// Build a readable message, grouped by the form's headings (plain text, plus the same rows for the HTML email).
+	$body     = $form['title'] . "\n" . str_repeat( '=', strlen( $form['title'] ) ) . "\n";
+	$sections = array( array( 'heading' => '', 'rows' => array() ) );
 	foreach ( $form['fields'] as $f ) {
 		if ( 'heading' === $f['type'] ) {
-			$body .= "\n" . strtoupper( $f['label'] ) . "\n";
+			$body      .= "\n" . strtoupper( $f['label'] ) . "\n";
+			$sections[] = array( 'heading' => $f['label'], 'rows' => array() );
 			continue;
 		}
 		if ( 'note' === $f['type'] ) {
@@ -334,6 +347,7 @@ function dh_handle_form() {
 		}
 		$v     = $values[ $f['name'] ];
 		$body .= $f['label'] . ': ' . ( '' !== $v ? $v : '-' ) . "\n";
+		$sections[ count( $sections ) - 1 ]['rows'][] = array( $f['label'], $v, $f['type'] );
 	}
 
 	$who = '';
@@ -365,7 +379,22 @@ function dh_handle_form() {
 	if ( ! empty( $values['email'] ) && is_email( $values['email'] ) ) {
 		$headers[] = 'Reply-To: ' . ( $who ? $who : 'Patient' ) . ' <' . $values['email'] . '>';
 	}
-	$sent = wp_mail( dh_form_recipient(), $subject, $body, $headers );
+	$html = dh_email_layout(
+		$form['title'],
+		sprintf(
+			/* translators: %s: date and time */
+			esc_html__( 'A new submission arrived from the website on %s.', 'the-dental-hauz' ),
+			esc_html( wp_date( 'l, F j, Y \a\t g:i A' ) )
+		),
+		dh_email_rows_html( $sections )
+	);
+	$sent = dh_mail_html( dh_form_recipient(), $subject, $html, $body, $headers );
+
+	// A thank-you copy for the patient, when they gave an email address. It repeats only the
+	// choices picked from the form's own lists (never free text), so it cannot be used to relay messages.
+	if ( $sent && ! empty( $values['email'] ) && is_email( $values['email'] ) ) {
+		dh_send_confirmation( $values['email'], $form, $sections, $headers );
+	}
 	dh_form_redirect( $return, $id, $sent ? 'sent' : 'error' );
 }
 add_action( 'admin_post_nopriv_dh_form', 'dh_handle_form' );
@@ -384,6 +413,15 @@ function dh_form_notice( $id ) {
 	if ( $which !== $id ) {
 		return null;
 	}
+	return dh_form_message( $status );
+}
+
+/**
+ * Message shown for a submission status.
+ *
+ * @return array{0:string,1:string}|null
+ */
+function dh_form_message( $status ) {
 	switch ( $status ) {
 		case 'sent':
 			return array( 'is-ok', __( 'Thank you. Your submission was successful and the team will be in touch.', 'the-dental-hauz' ) );
@@ -509,3 +547,162 @@ function dh_current_url() {
 	$path = isset( $wp->request ) ? $wp->request : '';
 	return remove_query_arg( array( 'dh_form', 'dh_status' ), home_url( user_trailingslashit( $path ) ) );
 }
+
+/**
+ * Send an HTML email with a plain-text alternative for mail apps that do not show HTML.
+ *
+ * @param string   $to      Recipient.
+ * @param string   $subject Subject.
+ * @param string   $html    HTML body.
+ * @param string   $text    Plain-text body.
+ * @param string[] $headers Headers (any Content-Type is replaced).
+ * @return bool
+ */
+function dh_mail_html( $to, $subject, $html, $text, $headers ) {
+	$headers   = array_values( array_filter( $headers, function ( $h ) { return 0 !== stripos( $h, 'Content-Type:' ); } ) );
+	$headers[] = 'Content-Type: text/html; charset=UTF-8';
+	$alt       = function ( $mailer ) use ( $text ) {
+		$mailer->AltBody = $text; // phpcs:ignore WordPress.NamingConventions.ValidVariableName
+	};
+	add_action( 'phpmailer_init', $alt );
+	$ok = wp_mail( $to, $subject, $html, $headers );
+	remove_action( 'phpmailer_init', $alt );
+	return (bool) $ok;
+}
+
+/**
+ * Brand-styled email shell (inline styles only, table layout, so it renders the same in Gmail, Outlook and phones).
+ *
+ * @param string $title   Heading (plain text).
+ * @param string $intro   Intro line (already escaped HTML).
+ * @param string $content Body HTML (already escaped).
+ * @return string
+ */
+function dh_email_layout( $title, $intro, $content ) {
+	$umber = '#514A43';
+	$sage  = '#657568';
+	$light = '#A8B6A5';
+	$blush = '#D8B8B2';
+	$cream = '#F4F0E8';
+	$serif = "Georgia, 'Times New Roman', serif";
+	$sans  = "'Helvetica Neue', Arial, sans-serif";
+	$logo  = get_theme_file_uri( 'assets/img/logo-light.png' );
+	$name  = wp_specialchars_decode( get_bloginfo( 'name' ), ENT_QUOTES );
+
+	$contact = array();
+	if ( dh_clinic( 'phone' ) ) {
+		$contact[] = '<a href="' . esc_url( dh_tel_href() ) . '" style="color:' . $umber . ';text-decoration:none;">' . esc_html( dh_clinic( 'phone' ) ) . '</a>';
+	}
+	if ( dh_clinic( 'email' ) ) {
+		$contact[] = '<a href="mailto:' . esc_attr( dh_clinic( 'email' ) ) . '" style="color:' . $umber . ';text-decoration:none;">' . esc_html( dh_clinic( 'email' ) ) . '</a>';
+	}
+	if ( dh_address_lines() ) {
+		$contact[] = esc_html( implode( ', ', dh_address_lines() ) );
+	}
+
+	return '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' . esc_html( $title ) . '</title></head>'
+		. '<body style="margin:0;padding:0;background:' . $cream . ';">'
+		. '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:' . $cream . ';"><tr><td align="center" style="padding:24px 12px;">'
+		. '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:14px;overflow:hidden;border:1px solid ' . $light . ';">'
+		// Header band.
+		. '<tr><td style="background:' . $sage . ';padding:26px 28px;" align="left">'
+		. '<img src="' . esc_url( $logo ) . '" alt="' . esc_attr( $name ) . '" width="170" style="display:block;width:170px;height:auto;border:0;">'
+		. '</td></tr>'
+		. '<tr><td style="height:6px;background:' . $blush . ';font-size:0;line-height:0;">&nbsp;</td></tr>'
+		// Title + intro.
+		. '<tr><td style="padding:28px 28px 8px 28px;">'
+		. '<h1 style="margin:0 0 8px 0;font-family:' . $serif . ';font-weight:normal;font-size:26px;line-height:1.2;color:' . $umber . ';">' . esc_html( $title ) . '</h1>'
+		. '<p style="margin:0;font-family:' . $sans . ';font-size:14px;line-height:1.6;color:' . $sage . ';">' . $intro . '</p>'
+		. '</td></tr>'
+		// Content.
+		. '<tr><td style="padding:12px 28px 28px 28px;">' . $content . '</td></tr>'
+		// Footer.
+		. '<tr><td style="background:' . $cream . ';padding:20px 28px;border-top:1px solid ' . $light . ';font-family:' . $sans . ';font-size:13px;line-height:1.7;color:' . $umber . ';">'
+		. '<strong style="font-family:' . $serif . ';font-weight:normal;font-size:16px;">' . esc_html( $name ) . '</strong><br>'
+		. implode( '<br>', $contact )
+		. '<br><span style="letter-spacing:2px;font-size:11px;color:' . $sage . ';text-transform:uppercase;">Your smile &middot; Your experience &middot; Your Hauz</span>'
+		. '</td></tr>'
+		. '</table></td></tr></table></body></html>';
+}
+
+/**
+ * The answers as a tidy table, section by section, like a form response sheet.
+ *
+ * @param array $sections Each: heading, rows of [label, value, type].
+ * @return string
+ */
+function dh_email_rows_html( $sections ) {
+	$out = '';
+	foreach ( $sections as $sec ) {
+		if ( ! $sec['rows'] && '' === $sec['heading'] ) {
+			continue;
+		}
+		if ( '' !== $sec['heading'] ) {
+			$out .= '<p style="margin:22px 0 8px 0;font-family:\'Helvetica Neue\',Arial,sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#657568;">' . esc_html( $sec['heading'] ) . '</p>';
+		}
+		if ( ! $sec['rows'] ) {
+			continue;
+		}
+		$out .= '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:separate;border-spacing:0;border:1px solid #A8B6A5;border-radius:10px;overflow:hidden;">';
+		$i    = 0;
+		foreach ( $sec['rows'] as $row ) {
+			$bg    = ( $i++ % 2 ) ? '#ffffff' : '#F4F0E8';
+			$value = '' !== (string) $row[1] ? nl2br( esc_html( $row[1] ) ) : '<span style="color:#A8B6A5;">&mdash;</span>';
+			if ( 'email' === $row[2] && '' !== (string) $row[1] ) {
+				$value = '<a href="mailto:' . esc_attr( $row[1] ) . '" style="color:#514A43;">' . esc_html( $row[1] ) . '</a>';
+			} elseif ( 'tel' === $row[2] && '' !== (string) $row[1] ) {
+				$value = '<a href="tel:' . esc_attr( preg_replace( '/[^0-9+]/', '', $row[1] ) ) . '" style="color:#514A43;">' . esc_html( $row[1] ) . '</a>';
+			}
+			$out .= '<tr>'
+				. '<td valign="top" style="background:' . $bg . ';padding:11px 14px;width:42%;font-family:\'Helvetica Neue\',Arial,sans-serif;font-size:13px;line-height:1.5;color:#657568;border-bottom:1px solid #EDE6DA;">' . esc_html( $row[0] ) . '</td>'
+				. '<td valign="top" style="background:' . $bg . ';padding:11px 14px;font-family:\'Helvetica Neue\',Arial,sans-serif;font-size:14px;line-height:1.5;color:#514A43;border-bottom:1px solid #EDE6DA;">' . $value . '</td>'
+				. '</tr>';
+		}
+		$out .= '</table>';
+	}
+	return $out;
+}
+
+/**
+ * Thank-you email to the person who filled in the form.
+ *
+ * @param string $to       Patient email.
+ * @param array  $form     Form definition.
+ * @param array  $sections Answers by section.
+ * @param array  $headers  Base headers (From).
+ */
+function dh_send_confirmation( $to, $form, $sections, $headers ) {
+	$picked = array();
+	foreach ( $sections as $sec ) {
+		foreach ( $sec['rows'] as $row ) {
+			if ( in_array( $row[2], array( 'select', 'radio' ), true ) && '' !== (string) $row[1] ) {
+				$picked[] = $row;
+			}
+		}
+	}
+	$name    = wp_specialchars_decode( get_bloginfo( 'name' ), ENT_QUOTES );
+	$subject = sprintf( '[%s] Thank you, we received your %s', $name, strtolower( $form['title'] ) );
+	$intro   = esc_html__( 'Thank you, your registration is done. Our team will review it and contact you shortly to confirm. If anything changes, simply reply to this email or call us.', 'the-dental-hauz' );
+	$content = $picked ? dh_email_rows_html( array( array( 'heading' => __( 'Your request', 'the-dental-hauz' ), 'rows' => $picked ) ) ) : '';
+	$hours   = dh_hours();
+	if ( $hours ) {
+		$rows = array();
+		foreach ( $hours as $h ) {
+			$rows[] = array( $h[0], $h[1], 'text' );
+		}
+		$content .= dh_email_rows_html( array( array( 'heading' => __( 'Opening hours', 'the-dental-hauz' ), 'rows' => $rows ) ) );
+	}
+	$text = $form['title'] . "\n\n" . wp_strip_all_tags( $intro ) . "\n";
+	foreach ( $picked as $row ) {
+		$text .= $row[0] . ': ' . $row[1] . "\n";
+	}
+	$text .= "\n" . $name . "\n" . dh_clinic( 'phone' ) . "\n" . dh_clinic( 'email' ) . "\n" . implode( ', ', dh_address_lines() ) . "\n";
+
+	$headers   = array_values( array_filter( $headers, function ( $h ) { return 0 !== stripos( $h, 'Reply-To:' ); } ) );
+	$clinic    = dh_clinic( 'email' );
+	if ( $clinic && is_email( $clinic ) ) {
+		$headers[] = 'Reply-To: ' . $name . ' <' . $clinic . '>';
+	}
+	return dh_mail_html( $to, $subject, dh_email_layout( __( 'Thank you!', 'the-dental-hauz' ), $intro, $content ), $text, $headers );
+}
+

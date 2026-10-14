@@ -4,7 +4,8 @@ const fs = require('fs');
 const path = require('path');
 
 const SLUGS = Object.keys(JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures/source-strings.json'), 'utf8')));
-const ALL = SLUGS.concat(['doctors']);
+const DOCTORS = ['dr-rosemarie-sia', 'dr-sarah-assaya', 'dr-sherief-mohamed'];
+const ALL = SLUGS.concat(['doctors'], DOCTORS);
 const file = (slug) => (slug === 'home' ? '/index.html' : `/${slug}.html`);
 const SERVICES = ['comprehensive-oral-examination', 'dental-cleaning', 'tooth-colored-restorations', 'crowns-bridges', 'dental-implants', 'orthodontics-clear-aligners', 'simple-wisdom-tooth-extractions', 'root-canal-therapy', 'kids-dentistry', 'teeth-whitening'];
 
@@ -491,12 +492,26 @@ test.describe('header proportions', () => {
 });
 
 test.describe('doctors', () => {
-  test('doctors page: no doctor is listed yet, so it shows a short note and the booking form', async ({ page }) => {
+  test('doctors page: a card per doctor, in order, each linking to the doctor\'s own page', async ({ page }) => {
     await page.goto('/doctors.html');
     await expect(page.locator('h1')).toHaveText('Doctors');
-    await expect(page.locator('.doc-card')).toHaveCount(0);
-    await expect(page.locator('.doctors')).toContainText('Our team profiles are coming soon');
+    await expect(page.locator('.doc-card h3 a')).toHaveText(['Dr. Rosemarie Sia', 'Dr. Sarah Assaya', 'Dr. Sherief Mohamed']);
+    for (const [i, slug] of DOCTORS.entries()) await expect(page.locator('.doc-card h3 a').nth(i)).toHaveAttribute('href', `https://clinic.test/${slug}/`);
+    await expect(page.locator('.doctors')).not.toContainText('coming soon');
     await expect(page.locator('#book .form')).toBeVisible();
+  });
+
+  test('doctor page: hero with breadcrumb, profile section and booking form', async ({ page }) => {
+    await page.goto('/dr-sherief-mohamed.html');
+    await expect(page.locator('h1')).toHaveText('Dr. Sherief Mohamed');
+    await expect(page.locator('.crumbs')).toContainText('Doctors');
+    await expect(page.locator('.doctor')).toContainText('sees patients at The Dental Hauz in Markham, Ontario.');
+    await expect(page.locator('#book .form')).toBeVisible();
+  });
+
+  test('about page uses the new cover photo', async ({ page }) => {
+    await page.goto('/about-us.html');
+    await expect(page.locator('.page-hero__media img')).toHaveAttribute('src', /about-hero\.jpg$/);
   });
 
   test('Dr. Summer Al Maqdassy appears nowhere on the site', async ({ page }) => {

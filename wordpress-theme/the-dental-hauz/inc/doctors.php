@@ -15,6 +15,33 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 return array(
+	array(
+		'slug'        => 'dr-rosemarie-sia',
+		'name'        => 'Dr. Rosemarie Sia',
+		'role'        => '',
+		'photo'       => 0,
+		'summary'     => '',
+		'bio'         => array(),
+		'credentials' => array(),
+	),
+	array(
+		'slug'        => 'dr-sarah-assaya',
+		'name'        => 'Dr. Sarah Assaya',
+		'role'        => '',
+		'photo'       => 0,
+		'summary'     => '',
+		'bio'         => array(),
+		'credentials' => array(),
+	),
+	array(
+		'slug'        => 'dr-sherief-mohamed',
+		'name'        => 'Dr. Sherief Mohamed',
+		'role'        => '',
+		'photo'       => 0,
+		'summary'     => '',
+		'bio'         => array(),
+		'credentials' => array(),
+	),
 	// Add a doctor like this (a page is created for each entry when the theme is activated or updated):
 	// array(
 	// 	'slug'        => 'dr-first-last',

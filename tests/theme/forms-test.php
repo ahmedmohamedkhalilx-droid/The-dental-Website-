@@ -154,21 +154,22 @@ $GLOBALS['dh_page'] = array( 'slug' => 'privacy-policy', 'title' => 'Privacy' );
 check( 'any other page keeps whatever template WordPress chose', dh_force_templates( '/x/custom.php' ) === '/x/custom.php' );
 $all = array_keys( dh_page_map() );
 sort( $all );
-check( 'all 20 inner pages of the old site plus Doctors are mapped', count( $all ) === 21 );
+check( 'all 20 inner pages of the old site plus Doctors and each doctor are mapped', count( $all ) === 24 );
 
 echo "\n[doctors pages]\n";
 $GLOBALS['dh_existing_pages'] = array();
 $GLOBALS['dh_posts'] = array();
 dh_ensure_pages();
 $made = array_column( $GLOBALS['dh_posts'], 'post_name' );
-check( 'activation creates the Doctors page (no doctor pages while the list is empty)', $made === array( 'doctors' ) );
-check( 'created pages are published pages with the right titles', $GLOBALS['dh_posts'][0]['post_title'] === 'Doctors' && 'publish' === $GLOBALS['dh_posts'][0]['post_status'] && 'page' === $GLOBALS['dh_posts'][0]['post_type'] );
-$GLOBALS['dh_existing_pages'] = array( 'doctors' );
+check( 'activation creates the Doctors page and one page per doctor', $made === array( 'doctors', 'dr-rosemarie-sia', 'dr-sarah-assaya', 'dr-sherief-mohamed' ) );
+check( 'created pages are published pages with the right titles', $GLOBALS['dh_posts'][0]['post_title'] === 'Doctors' && $GLOBALS['dh_posts'][3]['post_title'] === 'Dr. Sherief Mohamed' && 'publish' === $GLOBALS['dh_posts'][3]['post_status'] && 'page' === $GLOBALS['dh_posts'][3]['post_type'] );
+$GLOBALS['dh_existing_pages'] = array( 'doctors', 'dr-rosemarie-sia', 'dr-sarah-assaya', 'dr-sherief-mohamed' );
 $GLOBALS['dh_posts'] = array();
 dh_ensure_pages();
 check( 'pages that already exist are left alone', count( $GLOBALS['dh_posts'] ) === 0 );
 $GLOBALS['dh_existing_pages'] = null;
-check( 'the Doctors page is routed to the theme template; no Dr. Summer page', ( dh_page_map()['doctors'] ?? '' ) === 'doctors' && ! isset( dh_page_map()['dr-summer-al-maqdassy'] ) );
+check( 'doctor pages are routed to the theme templates; no Dr. Summer page', ( dh_page_map()['doctors'] ?? '' ) === 'doctors' && ( dh_page_map()['dr-sherief-mohamed'] ?? '' ) === 'doctor' && ! isset( dh_page_map()['dr-summer-al-maqdassy'] ) );
+check( 'every doctor has the fields the templates read', ! array_filter( dh_doctors(), function ( $d ) { return array_diff( array( 'slug', 'name', 'role', 'photo', 'summary', 'bio', 'credentials' ), array_keys( $d ) ); } ) );
 check( 'every doctor has the fields the templates read', ! array_filter( dh_doctors(), function ( $d ) { return array_diff( array( 'slug', 'name', 'role', 'photo', 'summary', 'bio', 'credentials' ), array_keys( $d ) ); } ) );
 
 echo "\n[old page builder protection]\n";

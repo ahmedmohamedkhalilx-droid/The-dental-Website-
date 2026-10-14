@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 $dh_a = dh_content( 'about' );
-get_template_part( 'template-parts/hero', null, array( 'title' => get_the_title(), 'image' => 248, 'alt' => '' ) );
+get_template_part( 'template-parts/hero', null, array( 'title' => get_the_title(), 'image' => 'about-hero.jpg', 'alt' => '' ) );
 ?>
 <section class="section about-intro">
   <div class="wrap split">

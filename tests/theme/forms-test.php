@@ -239,5 +239,20 @@ foreach ( array( 1, 4 ) as $dh_keep ) {
 }
 check( 'markup without reviews is left alone', '<p>x</p>' === dh_only_five_star_reviews( '<p>x</p>' ) );
 
+echo "\n[Rank Math main image]\n";
+$GLOBALS['dh_page'] = array( 'slug' => 'faqs', 'title' => "FAQ's" );
+$dh_old = 'https://clinic.test/wp-content/uploads/2026/07/faq-section1-p1-1.jpg';
+$dh_ld  = array(
+	'primaryImage' => array( '@type' => 'ImageObject', '@id' => $dh_old, 'url' => $dh_old, 'width' => 540, 'height' => 487 ),
+	'WebPage'      => array( '@type' => 'WebPage', 'primaryImageOfPage' => array( '@id' => $dh_old ) ),
+	'richSnippet'  => array( '@type' => 'Article', 'image' => array( '@id' => $dh_old ) ),
+);
+$dh_out  = dh_rank_math_primary_image( $dh_ld );
+$dh_json = json_encode( $dh_out );
+check( 'the old stored photo is no longer named anywhere in the page data', false === strpos( $dh_json, 'faq-section1' ) );
+check( 'main image, page and article all point to the real photo', 'clinic-storefront.jpg' === basename( $dh_out['primaryImage']['url'] ) && $dh_out['WebPage']['primaryImageOfPage']['@id'] === $dh_out['primaryImage']['@id'] && $dh_out['richSnippet']['image']['@id'] === $dh_out['primaryImage']['@id'] );
+check( 'hooked into Rank Math', isset( $GLOBALS['dh_hooks']['rank_math/json_ld'] ) );
+$GLOBALS['dh_page'] = null;
+
 echo $fails ? "\n$fails FAILED\n" : "\nall form and routing checks passed\n";
 exit( $fails ? 1 : 0 );

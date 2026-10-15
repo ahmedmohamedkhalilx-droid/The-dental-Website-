@@ -304,6 +304,44 @@ add_action( 'rank_math/opengraph/facebook/add_images', 'dh_rank_math_images' );
 add_action( 'rank_math/opengraph/twitter/add_images', 'dh_rank_math_images' );
 
 /**
+ * Rank Math's page data names a "main image" taken from the old page builder content still stored with each page,
+ * which can be a photo the site no longer shows. Point it at the page's real photo instead (same as the share image).
+ *
+ * @param array $data Rank Math JSON-LD entities.
+ * @return array
+ */
+function dh_rank_math_primary_image( $data ) {
+	if ( ! is_array( $data ) || empty( $data['primaryImage'] ) || ! ( is_page() || is_front_page() ) ) {
+		return $data;
+	}
+	$old = $data['primaryImage']['@id'] ?? '';
+	$img = dh_share_image();
+	$data['primaryImage'] = array_merge(
+		$data['primaryImage'],
+		array(
+			'@id'     => $img['url'],
+			'url'     => $img['url'],
+			'width'   => $img['width'],
+			'height'  => $img['height'],
+			'caption' => $img['alt'],
+		)
+	);
+	if ( '' === $old || $old === $img['url'] ) {
+		return $data;
+	}
+	array_walk_recursive(
+		$data,
+		function ( &$v ) use ( $old, $img ) {
+			if ( $v === $old ) {
+				$v = $img['url'];
+			}
+		}
+	);
+	return $data;
+}
+add_filter( 'rank_math/json_ld', 'dh_rank_math_primary_image', 100 );
+
+/**
  * Without Rank Math, print the basic sharing tags ourselves.
  */
 function dh_share_meta() {

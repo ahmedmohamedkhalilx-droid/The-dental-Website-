@@ -93,6 +93,15 @@ function dh_content( $key = null ) {
  * @return array<int, array>
  */
 function dh_doctors() {
+	return array_values( array_filter( dh_team(), function ( $m ) { return '' !== (string) $m['slug']; } ) );
+}
+
+/**
+ * Everyone on the Our Team page, in order (dentists, hygienist, assistant, front desk).
+ *
+ * @return array[]
+ */
+function dh_team() {
 	static $d = null;
 	if ( null === $d ) {
 		$d = require get_template_directory() . '/inc/doctors.php';
@@ -107,7 +116,7 @@ function dh_doctors() {
  */
 function dh_page_titles() {
 	$titles = dh_content( 'titles' );
-	$titles['doctors'] = __( 'Doctors', 'the-dental-hauz' );
+	$titles['doctors'] = __( 'Our Team', 'the-dental-hauz' );
 	foreach ( dh_doctors() as $doctor ) {
 		$titles[ $doctor['slug'] ] = $doctor['name'];
 	}
@@ -354,7 +363,7 @@ function dh_fallback_menu() {
 	echo '<ul>';
 	printf( '<li><a href="%s">%s</a></li>', esc_url( home_url( '/' ) ), esc_html__( 'Home', 'the-dental-hauz' ) );
 	printf( '<li><a href="%s">%s</a></li>', esc_url( dh_page_url( 'about-us' ) ), esc_html__( 'About Us', 'the-dental-hauz' ) );
-	printf( '<li><a href="%s">%s</a></li>', esc_url( dh_page_url( 'doctors' ) ), esc_html__( 'Doctors', 'the-dental-hauz' ) );
+	printf( '<li><a href="%s">%s</a></li>', esc_url( dh_page_url( 'doctors' ) ), esc_html__( 'Our Team', 'the-dental-hauz' ) );
 	printf( '<li class="menu-item-has-children"><a href="%s">%s</a><ul class="sub-menu">', esc_url( dh_page_url( 'our-services' ) ), esc_html__( 'Services', 'the-dental-hauz' ) );
 	foreach ( $c['services'] as $s ) {
 		printf( '<li><a href="%s">%s</a></li>', esc_url( dh_page_url( $s['slug'] ) ), esc_html( $c['service_pages'][ $s['slug'] ]['title'] ) );

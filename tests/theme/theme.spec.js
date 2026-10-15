@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 const SLUGS = Object.keys(JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures/source-strings.json'), 'utf8')));
-const DOCTORS = ['dr-rosemarie-sia', 'dr-sarah-assaya', 'dr-sherief-mohamed'];
+const DOCTORS = ['dr-sarah-assaya', 'dr-sherief-mohamed', 'dr-rosemarie-sia'];
 const ALL = SLUGS.concat(['doctors'], DOCTORS);
 const file = (slug) => (slug === 'home' ? '/index.html' : `/${slug}.html`);
 const SERVICES = ['comprehensive-oral-examination', 'dental-cleaning', 'tooth-colored-restorations', 'crowns-bridges', 'dental-implants', 'orthodontics-clear-aligners', 'simple-wisdom-tooth-extractions', 'root-canal-therapy', 'kids-dentistry', 'teeth-whitening'];
@@ -59,7 +59,7 @@ test.describe('header, menu and footer', () => {
   test('menu has the old site\'s items in order, and Services lists all ten treatments', async ({ page }, info) => {
     await page.goto('/index.html');
     const top = await page.$$eval('#site-nav > ul > li > a', (as) => as.map((a) => a.textContent.trim()));
-    expect(top).toEqual(['Home', 'About Us', 'Doctors', 'Services', 'Testimonial', "FAQ's", 'Forms', 'Contact Us']);
+    expect(top).toEqual(['Home', 'About Us', 'Our Team', 'Services', 'Testimonial', "FAQ's", 'Forms', 'Contact Us']);
     const subs = await page.$$eval('#site-nav .sub-menu a', (as) => as.map((a) => a.textContent.trim()));
     expect(subs).toEqual(['Comprehensive Oral Examination', 'Dental Cleaning', 'Tooth-Colored Restorations', 'Crowns & Bridges', 'Dental Implants', 'Orthodontics & Clear Aligners', 'Simple & Wisdom Tooth Extractions', 'Root Canal Therapy', 'Kids Dentistry', 'Teeth whitening'].map((s) => s === 'Teeth whitening' ? 'Teeth whitening' : s));
     if (info.project.name === 'mobile') {
@@ -498,20 +498,25 @@ test.describe('header proportions', () => {
 });
 
 test.describe('doctors', () => {
-  test('doctors page: a card per doctor, in order, each linking to the doctor\'s own page', async ({ page }) => {
+  test('our team page: an editorial list of all six, dentists link to their profile', async ({ page }) => {
     await page.goto('/doctors.html');
-    await expect(page.locator('h1')).toHaveText('Doctors');
-    await expect(page.locator('.doc-card h3 a')).toHaveText(['Dr. Rosemarie Sia', 'Dr. Sarah Assaya', 'Dr. Sherief Mohamed']);
-    for (const [i, slug] of DOCTORS.entries()) await expect(page.locator('.doc-card h3 a').nth(i)).toHaveAttribute('href', `https://clinic.test/${slug}/`);
-    await expect(page.locator('.doctors')).not.toContainText('coming soon');
+    await expect(page.locator('h1')).toHaveText('Our Team');
+    await expect(page.locator('.team h2')).toHaveText('The team behind your smile');
+    await expect(page.locator('.team-row h3')).toHaveText(['Dr. Sarah Assaya', 'Dr. Sherief Mohamed', 'Dr. Rosemarie Sia', 'Agnes Manuz', 'Tahura', 'Diane']);
+    await expect(page.locator('.team-row__role')).toHaveText(['Principal Dentist', 'General Dentist', 'Certified Dentist', 'Registered Dental Hygienist', 'Dental Assistant', 'Front Desk']);
+    await expect(page.locator('.team-row h3 a')).toHaveCount(3);
+    await expect(page.locator('.team-row h3 a').first()).toHaveAttribute('href', 'https://clinic.test/dr-sarah-assaya/');
+    await expect(page.locator('.team img')).toHaveCount(0);
+    await expect(page.locator('.team')).not.toContainText(/condent|Certi ed|Rosemaroe|o ering/);
     await expect(page.locator('#book .form')).toBeVisible();
   });
 
   test('doctor page: hero with breadcrumb, profile section and booking form', async ({ page }) => {
     await page.goto('/dr-sherief-mohamed.html');
     await expect(page.locator('h1')).toHaveText('Dr. Sherief Mohamed');
-    await expect(page.locator('.crumbs')).toContainText('Doctors');
-    await expect(page.locator('.doctor')).toContainText('sees patients at The Dental Hauz in Markham, Ontario.');
+    await expect(page.locator('.crumbs')).toContainText('Our Team');
+    await expect(page.locator('.doctor')).toContainText('internationally trained general dentist');
+    await expect(page.locator('.doctor img')).toHaveCount(0);
     await expect(page.locator('#book .form')).toBeVisible();
   });
 
@@ -529,8 +534,8 @@ test.describe('doctors', () => {
 
   test('doctors are in the menu and the footer', async ({ page }) => {
     await page.goto('/index.html');
-    await expect(page.locator('#site-nav > ul > li > a', { hasText: 'Doctors' })).toHaveAttribute('href', 'https://clinic.test/doctors/');
-    await expect(page.locator('.footer a', { hasText: 'Doctors' })).toHaveCount(1);
+    await expect(page.locator('#site-nav > ul > li > a', { hasText: 'Our Team' })).toHaveAttribute('href', 'https://clinic.test/doctors/');
+    await expect(page.locator('.footer a', { hasText: 'Our Team' })).toHaveCount(1);
   });
 });
 
@@ -695,7 +700,7 @@ test('phone menu: Services sits in its own row between Doctors and Testimonial, 
   await page.click('#menu-toggle');
   const rows = await page.$$eval('#site-nav > ul > li', (lis) => lis.map((li) => ({ text: li.firstElementChild.textContent.trim(), top: li.getBoundingClientRect().top, pos: getComputedStyle(li).position })));
   const names = rows.map((r) => r.text);
-  expect(names.slice(2, 5)).toEqual(['Doctors', 'Services', 'Testimonial']);
+  expect(names.slice(2, 5)).toEqual(['Our Team', 'Services', 'Testimonial']);
   for (let i = 1; i < rows.length; i++) expect(rows[i].top).toBeGreaterThan(rows[i - 1].top);
   expect(rows.every((r) => r.pos === 'static')).toBe(true);
   expect(await page.$eval('.site-header', (h) => getComputedStyle(h).backdropFilter)).toBe('none');

@@ -23,17 +23,19 @@ get_template_part(
 	null,
 	array(
 		'title'  => $dh_doc['name'],
-		'crumbs' => array( array( __( 'Doctors', 'the-dental-hauz' ), dh_page_url( 'doctors' ) ) ),
+		'crumbs' => array( array( __( 'Our Team', 'the-dental-hauz' ), dh_page_url( 'doctors' ) ) ),
 		'lead'   => $dh_doc['role'] ? array( $dh_doc['role'] ) : array(),
 	)
 );
 $dh_has_more = $dh_doc['bio'] || $dh_doc['credentials'];
 ?>
-<section class="section doctor">
-  <div class="wrap split">
-    <div class="split__media doctor__photo"><?php echo dh_doctor_photo( $dh_doc, 'large' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></div>
+<section class="section doctor<?php echo $dh_doc['photo'] ? '' : ' doctor--text'; ?>">
+  <div class="wrap<?php echo $dh_doc['photo'] ? ' split' : ''; ?>">
+    <?php if ( $dh_doc['photo'] ) : ?>
+      <div class="split__media doctor__photo"><?php echo dh_doctor_photo( $dh_doc, 'large' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></div>
+    <?php endif; ?>
     <div class="split__copy">
-      <p class="eyebrow"><?php esc_html_e( 'Meet your dentist', 'the-dental-hauz' ); ?></p>
+      <p class="eyebrow"><?php echo esc_html( $dh_doc['role'] ? $dh_doc['role'] : __( 'Meet your dentist', 'the-dental-hauz' ) ); ?></p>
       <h2><?php echo esc_html( $dh_doc['name'] ); ?></h2>
       <?php if ( $dh_doc['bio'] ) : ?>
         <?php foreach ( $dh_doc['bio'] as $dh_p ) : ?>

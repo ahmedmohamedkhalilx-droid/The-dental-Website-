@@ -481,6 +481,30 @@ body .elementor-location-header, body .elementor-location-footer { display: none
 @media (max-width: 960px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 520px) { .footer-grid { grid-template-columns: 1fr; } }
 
+/* Our Team: editorial list (no photos) */
+.team__grid { display: grid; grid-template-columns: minmax(0, 20rem) minmax(0, 1fr); gap: clamp(2rem, 6vw, 5rem); align-items: start; }
+.team__intro { display: grid; gap: 1.1rem; position: sticky; top: 7rem; }
+.team__intro h2 { font-size: var(--step-3); }
+.team__intro p:not(.eyebrow) { color: var(--umber-soft); }
+.team-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.team-row { display: grid; grid-template-columns: 3.5rem minmax(0, 15rem) minmax(0, 1fr); gap: 1.6rem; padding: 1.8rem 0; border-bottom: 1px solid var(--line); }
+.team-row__num { font-family: var(--font-display); font-style: italic; font-size: 1.8rem; line-height: 1.1; color: var(--blush); }
+.team-row__who { display: grid; gap: .4rem; align-content: start; }
+.team-row__who h3 { font-size: 1.75rem; line-height: 1.1; }
+.team-row__who h3 a { text-decoration: none; }
+.team-row__who h3 a:hover { text-decoration: underline; text-underline-offset: .2em; }
+.team-row__role { font-size: .74rem; letter-spacing: .2em; text-transform: uppercase; color: var(--sage-deep); }
+.team-row__bio p { color: var(--umber-soft); line-height: 1.7; }
+@media (max-width: 960px) { .team__grid { grid-template-columns: 1fr; } .team__intro { position: static; } }
+@media (max-width: 640px) {
+  .team-row { grid-template-columns: 2.4rem minmax(0, 1fr); gap: .4rem 1rem; padding: 1.4rem 0; }
+  .team-row__bio { grid-column: 2; }
+  .team-row__num { font-size: 1.4rem; }
+  .team-row__who h3 { font-size: 1.45rem; }
+  .team-row__bio p { font-size: .9rem; line-height: 1.65; }
+}
+.doctor--text .split__copy { max-width: 46rem; }
+
 /* Thank-you pop-up after a form is sent */
 .dh-modal { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 20px; background: rgba(81, 74, 67, .55); backdrop-filter: blur(3px); }
 .dh-modal[hidden] { display: none; }

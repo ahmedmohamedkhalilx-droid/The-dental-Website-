@@ -14,7 +14,7 @@ $dh_tel   = dh_tel_href();
 $dh_addr  = dh_address_lines();
 $dh_hours = dh_hours();
 $dh_map   = dh_map_src();
-get_template_part( 'template-parts/hero', null, array( 'title' => get_the_title(), 'image' => 305, 'alt' => '' ) );
+get_template_part( 'template-parts/hero', null, array( 'title' => get_the_title(), 'image' => 'clinic-storefront.jpg', 'alt' => '' ) );
 ?>
 <section class="section contact-cards">
   <div class="wrap">

@@ -30,9 +30,15 @@ test.describe('every page of the old site exists in the theme', () => {
       expect(w[0], 'horizontal scroll').toBeLessThanOrEqual(w[1]);
 
       // Scroll through like a visitor so lazy-loaded photos further down actually load, then check them.
-      await page.evaluate(async () => { for (let y = 0; y < document.body.scrollHeight; y += 400) { window.scrollTo(0, y); await new Promise((r) => setTimeout(r, 30)); } window.scrollTo(0, 0); });
+      await page.evaluate(async () => {
+        for (const img of [...document.images]) {
+          if (img.complete) continue;
+          img.scrollIntoView({ block: 'center' });
+          await new Promise((r) => { img.addEventListener('load', r, { once: true }); img.addEventListener('error', r, { once: true }); setTimeout(r, 5000); });
+        }
+        window.scrollTo(0, 0);
+      });
       await page.waitForLoadState('networkidle');
-      await page.waitForFunction(() => [...document.images].every((i) => i.complete));
       const imgs = await page.$$eval('img', (list) => list.map((i) => {
         const r = i.getBoundingClientRect();
         return { src: i.getAttribute('src'), ok: i.complete && i.naturalWidth > 0, fit: getComputedStyle(i).objectFit, ratio: r.height / r.width, natural: i.naturalHeight / i.naturalWidth, shown: r.width > 0 };
@@ -710,5 +716,26 @@ test('phones: checklist in two columns, extra paragraphs fold behind Read more',
   await expect(box.locator('.read-more')).toHaveText('Read less');
   const fs = await page.$eval('.intro__copy p:not(.eyebrow)', (p) => parseFloat(getComputedStyle(p).fontSize));
   expect(fs).toBeLessThanOrEqual(15);
+});
+
+test('real clinic photos are in place, each with a description', async ({ page }) => {
+  await page.goto('/index.html');
+  await expect(page.locator('.intro__media img')).toHaveAttribute('src', /clinic-storefront\.jpg$/);
+  await expect(page.locator('.intro__media img')).toHaveAttribute('alt', /storefront/);
+  const grid = await page.$$eval('.photo-grid img', (imgs) => imgs.map((i) => [i.getAttribute('src').split('/').pop(), i.getAttribute('alt')]));
+  expect(grid.map((g) => g[0])).toEqual(['clinic-treatment-room.jpg', 'clinic-xray.jpg', 'clinic-reception.jpg', 'clinic-waiting-room.jpg']);
+  expect(grid.every((g) => g[1] && g[1].length > 10)).toBe(true);
+  await page.goto('/contact-us.html');
+  await expect(page.locator('.page-hero__media img')).toHaveAttribute('src', /clinic-storefront\.jpg$/);
+  await page.goto('/about-us.html');
+  await expect(page.locator('.duo img').first()).toHaveAttribute('src', /clinic-reception\.jpg$/);
+});
+
+test('every page tells Google and social sites which photo to show', async ({ page }) => {
+  for (const slug of ['index', 'about-us', 'dental-implants', 'contact-us']) {
+    await page.goto(`/${slug}.html`);
+    await expect(page.locator('meta[property="og:image"]'), slug).toHaveAttribute('content', /\.jpg$/);
+    await expect(page.locator('meta[name="twitter:image"]'), slug).toHaveCount(1);
+  }
 });
 

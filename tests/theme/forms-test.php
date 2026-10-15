@@ -198,5 +198,18 @@ check( 'stylesheet version follows the file (not a fixed number)', $css_v === DH
 check( 'script version follows the file', dh_asset_version( 'assets/main.js' ) === DH_VERSION . '.' . filemtime( getenv( 'DH_THEME_DIR' ) . '/assets/main.js' ) );
 check( 'theme version was bumped so old copies are replaced', preg_match( '/^Version: ' . preg_quote( DH_VERSION, '/' ) . '$/m', file_get_contents( getenv( 'DH_THEME_DIR' ) . '/style.css' ) ) === 1 );
 
+echo "\n[search and sharing image]\n";
+$GLOBALS['dh_page'] = array( 'slug' => 'home', 'title' => 'Home' );
+check( 'home page shares the clinic storefront photo', 'clinic-storefront.jpg' === basename( dh_share_image()['url'] ) && dh_share_image()['width'] > 0 );
+$GLOBALS['dh_page'] = array( 'slug' => 'dental-implants', 'title' => 'Dental Implants' );
+check( 'a treatment page shares its own cover photo', 'svc-dental-implants.jpg' === basename( dh_share_image()['url'] ) );
+$GLOBALS['dh_page'] = array( 'slug' => 'about-us', 'title' => 'About Us' );
+check( 'About Us shares its cover photo', 'about-hero.jpg' === basename( dh_share_image()['url'] ) );
+$dh_rm = new class { public $got = array(); public function add_image( $a ) { $this->got[] = $a; } };
+dh_rank_math_images( $dh_rm );
+check( 'Rank Math is handed the photo with size and description', 1 === count( $dh_rm->got ) && $dh_rm->got[0]['height'] > 0 && '' !== $dh_rm->got[0]['alt'] );
+check( 'hooked into Rank Math for Facebook and X/Twitter previews', isset( $GLOBALS['dh_hooks']['rank_math/opengraph/facebook/add_images'], $GLOBALS['dh_hooks']['rank_math/opengraph/twitter/add_images'] ) );
+$GLOBALS['dh_page'] = null;
+
 echo $fails ? "\n$fails FAILED\n" : "\nall form and routing checks passed\n";
 exit( $fails ? 1 : 0 );

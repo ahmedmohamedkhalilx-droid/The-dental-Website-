@@ -59,7 +59,7 @@ return array(
 			'paragraphs' => array( 'At The Dental Hauz in Kennedy Road, Markham, we provide trusted dental care for healthy, confident smiles. From cosmetic dentistry and restorative treatments to preventive care, every treatment plan is tailored to your unique dental needs. Our focus is your oral health, comfort, and long-term smile wellness at every stage of life.', 'Utilizing advanced dental technology and gentle techniques, we ensure your visits are as efficient as they are comfortable. Whether you are visiting us for a routine checkup, clear aligners, or a complete smile makeover, our dedicated team is here to guide you toward optimal oral wellness.' ),
 			'button' => 'Contact Us',
 			'button_link' => 'contact-us',
-			'images' => array( 235, 236, 237, 238 ),
+			'images' => array( 'clinic-treatment-room.jpg', 'clinic-xray.jpg', 'clinic-reception.jpg', 'clinic-waiting-room.jpg' ),
 		),
 		'devices' => array(
 			'eyebrow' => 'The Right Device For You!',
@@ -173,7 +173,7 @@ return array(
 		'title' => 'Creating Better Dental Experiences Through Personalized Care',
 		'lead' => 'At The Dental Hauz, we provide trusted, patient-centered dental care focused on comfort, communication, and informed oral health decisions.',
 		'intro' => 'Located on Kennedy Road in Markham, ON, The Dental Hauz provides personalized dental experiences for individuals and families in the community.',
-		'images' => array( 304, 305 ),
+		'images' => array( 'clinic-reception.jpg', 'clinic-waiting-room.jpg' ),
 		'boxes' => array(
 			array( 'More Than 15+ Years Of Experience', 'Our experienced dental team provides customized care through clinical expertise, thoughtful assessments, and modern dental practices, helping patients make informed decisions for their long-term oral health.' ),
 			array( 'Market Excellence', 'The Dental Hauz builds lasting patient relationships through trusted, individualized dental care, proudly serving individuals and families in Markham, ON.' ),

@@ -215,6 +215,85 @@ function dh_page_url( $slug ) {
 }
 
 /**
+ * Descriptions for the photos shipped in the theme (screen readers and Google Images).
+ *
+ * @return array<string, string>
+ */
+function dh_photo_alts() {
+	return array(
+		'clinic-storefront.jpg'     => __( 'The Dental Hauz storefront on Kennedy Road in Markham', 'the-dental-hauz' ),
+		'clinic-waiting-room.jpg'   => __( 'Bright waiting area at The Dental Hauz', 'the-dental-hauz' ),
+		'clinic-reception.jpg'      => __( 'Reception desk and seating at The Dental Hauz', 'the-dental-hauz' ),
+		'clinic-xray.jpg'           => __( 'Panoramic dental X-ray unit at The Dental Hauz', 'the-dental-hauz' ),
+		'clinic-treatment-room.jpg' => __( 'Treatment room with dental chair at The Dental Hauz', 'the-dental-hauz' ),
+		'about-hero.jpg'            => __( 'Dental instruments prepared on a tray', 'the-dental-hauz' ),
+		'svc-oral-examination.jpg'  => __( 'Dental examination with a mouth mirror', 'the-dental-hauz' ),
+		'svc-tooth-colored.jpg'     => __( 'Tooth shade guide for natural-looking restorations', 'the-dental-hauz' ),
+		'svc-crowns-bridges.jpg'    => __( 'Dental models used to plan crowns and bridges', 'the-dental-hauz' ),
+		'svc-dental-implants.jpg'   => __( 'Model of a dental implant between natural teeth', 'the-dental-hauz' ),
+	);
+}
+
+/**
+ * The photo that represents the current page when it is shared or shown in search results.
+ *
+ * @return array{url:string,width:int,height:int,alt:string}
+ */
+function dh_share_image() {
+	$file = 'clinic-storefront.jpg';
+	if ( is_page() ) {
+		$slug = get_post_field( 'post_name', get_queried_object_id() );
+		$c    = dh_content();
+		$map  = array( 'about-us' => 'about-hero.jpg' );
+		if ( isset( $map[ $slug ] ) ) {
+			$file = $map[ $slug ];
+		} elseif ( isset( $c['service_pages'][ $slug ]['hero'] ) && is_string( $c['service_pages'][ $slug ]['hero'] ) && ! ctype_digit( $c['service_pages'][ $slug ]['hero'] ) ) {
+			$file = $c['service_pages'][ $slug ]['hero'];
+		}
+	}
+	$path = get_theme_file_path( 'assets/img/' . $file );
+	$size = is_readable( $path ) ? getimagesize( $path ) : false;
+	return array(
+		'url'    => get_theme_file_uri( 'assets/img/' . $file ),
+		'width'  => $size ? (int) $size[0] : 0,
+		'height' => $size ? (int) $size[1] : 0,
+		'alt'    => dh_photo_alts()[ $file ] ?? get_bloginfo( 'name' ),
+	);
+}
+
+/**
+ * Give Rank Math a real photo for every page (its own pick is empty because the pages are drawn by the theme),
+ * so search results and shared links show the clinic.
+ *
+ * @param object $images Rank Math OpenGraph image collector.
+ */
+function dh_rank_math_images( $images ) {
+	if ( is_object( $images ) && method_exists( $images, 'add_image' ) ) {
+		$img = dh_share_image();
+		$images->add_image( $img );
+	}
+}
+add_action( 'rank_math/opengraph/facebook/add_images', 'dh_rank_math_images' );
+add_action( 'rank_math/opengraph/twitter/add_images', 'dh_rank_math_images' );
+
+/**
+ * Without Rank Math, print the basic sharing tags ourselves.
+ */
+function dh_share_meta() {
+	if ( defined( 'RANK_MATH_VERSION' ) || is_admin() ) {
+		return;
+	}
+	$img = dh_share_image();
+	printf( '<meta property="og:image" content="%s">' . "\n", esc_url( $img['url'] ) );
+	if ( $img['width'] ) {
+		printf( '<meta property="og:image:width" content="%d"><meta property="og:image:height" content="%d">' . "\n", (int) $img['width'], (int) $img['height'] );
+	}
+	printf( '<meta property="og:image:alt" content="%s">' . "\n", esc_attr( $img['alt'] ) );
+	printf( '<meta name="twitter:image" content="%s">' . "\n", esc_url( $img['url'] ) );
+}
+add_action( 'wp_head', 'dh_share_meta', 5 );
+
+/**
  * An image from the media library by attachment ID, with an optional brand-photo fallback.
  */
 function dh_img( $id, $size = 'large', $attr = array(), $fallback = '' ) {
@@ -222,6 +301,9 @@ function dh_img( $id, $size = 'large', $attr = array(), $fallback = '' ) {
 	if ( is_string( $id ) && '' !== $id && ! ctype_digit( $id ) ) {
 		$fallback = $id;
 		$id       = 0;
+		if ( empty( $attr['alt'] ) && isset( dh_photo_alts()[ $fallback ] ) ) {
+			$attr['alt'] = dh_photo_alts()[ $fallback ];
+		}
 	}
 	$id = (int) $id;
 	if ( $id && wp_attachment_is_image( $id ) ) {

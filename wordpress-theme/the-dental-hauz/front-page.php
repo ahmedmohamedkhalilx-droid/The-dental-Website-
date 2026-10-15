@@ -57,7 +57,7 @@ if ( $dh_q_mail || $dh_q_addr ) :
 <section class="section intro" id="about">
   <div class="wrap intro__grid">
     <div class="intro__media">
-      <?php echo dh_img( 0, 'large', array( 'alt' => '' ), 'oral-health.jpg' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+      <?php echo dh_img( 'clinic-storefront.jpg', 'large', array( 'alt' => '' ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
     </div>
     <div class="intro__copy">
       <p class="eyebrow"><?php echo esc_html( $dh_h['intro']['eyebrow'] ); ?></p>

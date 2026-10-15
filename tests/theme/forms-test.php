@@ -223,5 +223,21 @@ check( 'the page lists favicon.ico, 48/96/192 px icons and a phone home-screen i
 try { dh_do_favicon(); $dh_r = ''; } catch ( DH_Redirect $e ) { $dh_r = $e->getMessage(); }
 check( '/favicon.ico is answered with the brand icon', 'favicon.ico' === basename( $dh_r ) );
 
+echo "\n[reviews: only 5 stars]\n";
+$dh_w = file_get_contents( __DIR__ . '/fixtures/trustindex-widget.html' ); // the live Testimonial page's Trustindex markup
+check( 'all-5-star widget passes through byte for byte', dh_only_five_star_reviews( $dh_w ) === $dh_w );
+foreach ( array( 1, 4 ) as $dh_keep ) {
+	$dh_i   = 0;
+	$dh_bad = preg_replace_callback( '/(<div\b[^>]*class="[^"]*ti-review-item[^"]*"[^>]*>)(.*?)(?=<div\b[^>]*class="[^"]*ti-review-item|$)/s', function ( $m ) use ( &$dh_i, $dh_keep ) {
+		$dh_i++;
+		if ( 6 !== $dh_i ) { return $m[0]; }
+		$n = 0;
+		return $m[1] . preg_replace_callback( '#/star/f\.svg#', function ( $x ) use ( &$n, $dh_keep ) { $n++; return $n > $dh_keep ? '/star/e.svg' : $x[0]; }, $m[2] );
+	}, $dh_w );
+	$dh_f = dh_only_five_star_reviews( $dh_bad );
+	check( "a {$dh_keep}-star review is removed and the other 8 stay", 8 === substr_count( $dh_f, 'ti-review-item' ) && false === strpos( $dh_f, 'joanne chang' ) && false !== strpos( $dh_f, 'Marlowe Mendoza' ) && substr_count( $dh_f, '<div' ) === substr_count( $dh_f, '</div>' ) );
+}
+check( 'markup without reviews is left alone', '<p>x</p>' === dh_only_five_star_reviews( '<p>x</p>' ) );
+
 echo $fails ? "\n$fails FAILED\n" : "\nall form and routing checks passed\n";
 exit( $fails ? 1 : 0 );

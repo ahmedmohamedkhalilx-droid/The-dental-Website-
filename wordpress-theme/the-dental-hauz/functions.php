@@ -438,13 +438,54 @@ function dh_map_src() {
 }
 
 /**
+ * Keep only 5-star reviews in the Trustindex widget's markup: any review showing fewer than five full stars
+ * is cut out before the page is sent, so a low or old review can never appear even if Trustindex lists it.
+ *
+ * @param string $html Widget markup.
+ * @return string
+ */
+function dh_only_five_star_reviews( $html ) {
+	if ( ! is_string( $html ) || false === strpos( $html, 'ti-review-item' ) ) {
+		return $html;
+	}
+	$out = '';
+	$pos = 0;
+	while ( preg_match( '/<div\b[^>]*class="[^"]*\bti-review-item\b[^"]*"[^>]*>/', $html, $m, PREG_OFFSET_CAPTURE, $pos ) ) {
+		$start = $m[0][1];
+		// Find the matching </div> by counting nested divs.
+		$depth = 0;
+		$end   = false;
+		if ( preg_match_all( '/<div\b[^>]*>|<\/div>/', $html, $tags, PREG_OFFSET_CAPTURE, $start ) ) {
+			foreach ( $tags[0] as $t ) {
+				$depth += ( '</div>' === $t[0] ) ? -1 : 1;
+				if ( 0 === $depth ) {
+					$end = $t[1] + strlen( $t[0] );
+					break;
+				}
+			}
+		}
+		if ( false === $end ) {
+			return $html; // Unexpected markup: leave the widget untouched rather than break it.
+		}
+		$item = substr( $html, $start, $end - $start );
+		$full = preg_match_all( '#/star/f\.svg#', $item );
+		$out .= substr( $html, $pos, $start - $pos );
+		if ( $full >= 5 ) {
+			$out .= $item;
+		}
+		$pos = $end;
+	}
+	return $out . substr( $html, $pos );
+}
+
+/**
  * Google reviews: the Trustindex plugin's widget, or the widget embedded by its ID. $where is "full" or "home".
  */
 function dh_reviews_html( $where = 'full' ) {
 	if ( shortcode_exists( 'trustindex' ) ) {
 		$key  = ( 'home' === $where ) ? 'dh_reviews_shortcode_home' : 'dh_reviews_shortcode';
 		$code = dh_sanitize_reviews_shortcode( get_theme_mod( $key, '[trustindex no-registration=google]' ) );
-		return do_shortcode( $code );
+		return dh_only_five_star_reviews( do_shortcode( $code ) );
 	}
 	// Without the plugin, the widget's own embed code works from its ID.
 	$id = dh_sanitize_trustindex_id( get_theme_mod( 'dh_trustindex_id', '' ) );

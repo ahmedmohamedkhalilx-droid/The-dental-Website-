@@ -44,7 +44,7 @@ test.describe('every page of the old site exists in the theme', () => {
         return { src: i.getAttribute('src'), ok: i.complete && i.naturalWidth > 0, fit: getComputedStyle(i).objectFit, ratio: r.height / r.width, natural: i.naturalHeight / i.naturalWidth, shown: r.width > 0 };
       }));
       for (const i of imgs) {
-        expect(i.ok, `broken: ${i.src}`).toBe(true);
+        expect(i.ok || !i.shown, `broken: ${i.src}`).toBe(true); // hidden photos (e.g. the FAQ photo on phones) are rightly never downloaded
         if (i.shown && i.fit !== 'cover' && i.fit !== 'contain') expect(Math.abs(i.ratio / i.natural - 1), `distorted: ${i.src}`).toBeLessThan(0.02);
         if (i.shown && i.fit === 'cover') expect(i.ratio, `frame too tall: ${i.src}`).toBeLessThanOrEqual(1.6);
       }
@@ -742,5 +742,12 @@ test('every page tells Google and social sites which photo to show', async ({ pa
     await expect(page.locator('meta[property="og:image"]'), slug).toHaveAttribute('content', /\.jpg$/);
     await expect(page.locator('meta[name="twitter:image"]'), slug).toHaveCount(1);
   }
+});
+
+test('the old stock photo (media #248) is gone: FAQ sections use the clinic\'s own photos', async ({ page }) => {
+  await page.goto('/index.html');
+  await expect(page.locator('.faq__media img')).toHaveAttribute('src', /about-hero\.jpg$/);
+  await page.goto('/faqs.html');
+  await expect(page.locator('.faq__media img')).toHaveAttribute('src', /clinic-reception\.jpg$/);
 });
 

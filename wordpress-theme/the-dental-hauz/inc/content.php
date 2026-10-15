@@ -73,7 +73,7 @@ return array(
 		),
 		'faq' => array(
 			'title' => 'Frequently Asked Questions?',
-			'image' => 248,
+			'image' => 'about-hero.jpg',
 			'items' => array(
 				array( 'How often should I visit the dentist?', 'Most patients should schedule a dental exam and professional cleaning every six months, unless advised otherwise.' ),
 				array( 'Do you accept new patients?', 'Yes. The Dental Hauz welcomes new patients of all ages for comprehensive family dental care.' ),
@@ -250,7 +250,7 @@ return array(
 	),
 	'faq' => array(
 		'title' => 'Frequently Asked Questions?',
-		'image' => 248,
+		'image' => 'clinic-reception.jpg',
 		'items' => array(
 			array( 'What are the early signs of gum disease?', 'Early signs of gum disease include red, swollen, or bleeding gums, persistent bad breath, gum tenderness, and gum recession. Scheduling a dental examination early can help prevent the condition from progressing and protect your long-term oral health.' ),
 			array( 'When should wisdom teeth be removed?', 'Wisdom teeth may need removal if they are impacted, cause pain, crowd nearby teeth, or increase the risk of infection. Your dentist can evaluate your wisdom teeth and recommend treatment based on your individual oral health needs.' ),

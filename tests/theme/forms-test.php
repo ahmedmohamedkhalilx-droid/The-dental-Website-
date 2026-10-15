@@ -211,5 +211,17 @@ check( 'Rank Math is handed the photo with size and description', 1 === count( $
 check( 'hooked into Rank Math for Facebook and X/Twitter previews', isset( $GLOBALS['dh_hooks']['rank_math/opengraph/facebook/add_images'], $GLOBALS['dh_hooks']['rank_math/opengraph/twitter/add_images'] ) );
 $GLOBALS['dh_page'] = null;
 
+echo "\n[icon for Google and phones]\n";
+$dh_sq = true;
+foreach ( array( 'icon-48.png', 'icon-96.png', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png' ) as $f ) {
+	$sz = getimagesize( getenv( 'DH_THEME_DIR' ) . '/assets/img/' . $f );
+	if ( ! $sz || $sz[0] !== $sz[1] || $sz[0] % 48 && ! in_array( $f, array( 'apple-touch-icon.png', 'icon-512.png' ), true ) ) { $dh_sq = false; echo "      not square / wrong size: $f\n"; }
+}
+check( 'every icon is square (Google ignores icons that are not)', $dh_sq );
+ob_start(); dh_favicon(); $dh_fav = ob_get_clean();
+check( 'the page lists favicon.ico, 48/96/192 px icons and a phone home-screen icon', false !== strpos( $dh_fav, 'favicon.ico' ) && false !== strpos( $dh_fav, 'sizes="192x192"' ) && false !== strpos( $dh_fav, 'apple-touch-icon' ) );
+try { dh_do_favicon(); $dh_r = ''; } catch ( DH_Redirect $e ) { $dh_r = $e->getMessage(); }
+check( '/favicon.ico is answered with the brand icon', 'favicon.ico' === basename( $dh_r ) );
+
 echo $fails ? "\n$fails FAILED\n" : "\nall form and routing checks passed\n";
 exit( $fails ? 1 : 0 );

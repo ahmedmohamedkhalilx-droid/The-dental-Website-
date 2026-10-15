@@ -309,3 +309,14 @@ test('without JavaScript the form still sends, by a normal page load', async ({ 
   await ctx.close();
 });
 
+test('/favicon.ico and the page icons answer with the square brand icon', async ({ request, page }) => {
+  const r = await request.get('/favicon.ico');
+  expect(r.status()).toBe(200);
+  expect(r.url()).toMatch(/assets\/img\/favicon\.ico$/);
+  await page.goto('/');
+  for (const sel of ['link[rel="icon"][sizes="192x192"]', 'link[rel="apple-touch-icon"]']) {
+    const href = await page.getAttribute(sel, 'href');
+    expect((await request.get(href)).status(), sel).toBe(200);
+  }
+});
+

@@ -70,11 +70,29 @@ add_filter( 'wp_resource_hints', 'dh_resource_hints', 10, 2 );
  * Use the brand mark as the favicon when no Site Icon has been set.
  */
 function dh_favicon() {
-	if ( ! has_site_icon() ) {
-		printf( "<link rel=\"icon\" type=\"image/png\" href=\"%s\">\n", esc_url( get_theme_file_uri( 'assets/img/mark-dark.png' ) ) );
+	if ( has_site_icon() ) {
+		return;
 	}
+	// Square icons in the sizes Google and phones ask for (Google ignores icons that are not square).
+	printf( "<link rel=\"icon\" href=\"%s\" sizes=\"48x48\">\n", esc_url( get_theme_file_uri( 'assets/img/favicon.ico' ) ) );
+	foreach ( array( 48, 96, 192 ) as $dh_s ) {
+		printf( '<link rel="icon" type="image/png" sizes="%1$dx%1$d" href="%2$s">' . "\n", (int) $dh_s, esc_url( get_theme_file_uri( 'assets/img/icon-' . $dh_s . '.png' ) ) );
+	}
+	printf( "<link rel=\"apple-touch-icon\" href=\"%s\">\n", esc_url( get_theme_file_uri( 'assets/img/apple-touch-icon.png' ) ) );
 }
 add_action( 'wp_head', 'dh_favicon' );
+
+/**
+ * /favicon.ico is the first place Google looks. Without a Site Icon, point it at the theme's icon.
+ */
+function dh_do_favicon() {
+	if ( has_site_icon() ) {
+		return;
+	}
+	wp_safe_redirect( get_theme_file_uri( 'assets/img/favicon.ico' ), 301 );
+	exit;
+}
+add_action( 'do_favicon', 'dh_do_favicon', 1 );
 
 /**
  * Page copy carried over from the previous site (see inc/content.php).

@@ -682,6 +682,28 @@ test('phones: treatments are a two-column grid of compact tiles and one tap open
   await nav;
 });
 
+test('phones: hero and call-to-action buttons sit side by side, one line each, same height', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mobile', 'phone only');
+  for (const width of [360, 375, 390, 430]) {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto('/index.html');
+    for (const sel of ['.hero-actions .btn', '.cta-band .btn']) {
+      const b = await page.locator(sel).evaluateAll((els) => els.map((e) => {
+        const r = e.getBoundingClientRect();
+        return { y: r.y, h: r.height, x: r.x, w: r.width, lineH: parseFloat(getComputedStyle(e).fontSize) * 1.6, pad: parseFloat(getComputedStyle(e).paddingTop) * 2, clipped: e.scrollWidth > e.clientWidth };
+      }));
+      expect(b.length, `${sel} @${width}`).toBe(2);
+      expect(Math.abs(b[0].y - b[1].y), `${sel} tops @${width}`).toBeLessThan(1);
+      expect(Math.abs(b[0].h - b[1].h), `${sel} heights @${width}`).toBeLessThan(1);
+      expect(b[1].x, `${sel} side by side @${width}`).toBeGreaterThan(b[0].x + b[0].w);
+      for (const x of b) {
+        expect(x.h - x.pad, `${sel} one line @${width}`).toBeLessThan(x.lineH);
+        expect(x.clipped, `${sel} label fits @${width}`).toBe(false);
+      }
+    }
+  }
+});
+
 test('phones: photos are never taller than they are wide and image pairs line up', async ({ page }, info) => {
   test.skip(info.project.name !== 'mobile', 'phone only');
   for (const url of ['/index.html', '/about-us.html']) {

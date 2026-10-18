@@ -560,8 +560,9 @@ body .elementor-location-header, body .elementor-location-footer { display: none
   .hero-copy { gap: 1.1rem; }
   .hero h1 { font-size: 2.75rem; line-height: 1.05; }
   .hero-lead { font-size: 1rem; line-height: 1.65; }
-  .hero-actions { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
-  .hero-actions .btn { padding: .95em .5em; letter-spacing: .14em; font-size: .72rem; }
+  /* Both buttons on one line, same height: the longer label gets the wider column. */
+  .hero-actions { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: .6rem; align-items: stretch; }
+  .hero-actions .btn { padding: 1.05em .6em; letter-spacing: .08em; font-size: .7rem; white-space: nowrap; }
   .hero-media { max-width: 100%; }
   .hero-media .frame { aspect-ratio: 3 / 2; border-radius: var(--radius-lg); }
 
@@ -605,7 +606,7 @@ body .elementor-location-header, body .elementor-location-footer { display: none
   .checks li { grid-template-columns: 14px 1fr; gap: .5rem; font-size: .9rem; line-height: 1.35; }
   .checks li::before { width: 10px; height: 10px; margin-top: .3em; }
   .cta-band .wrap { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; padding-block: 1.5rem; }
-  .cta-band .btn { padding: .95em .5em; letter-spacing: .14em; font-size: .72rem; }
+  .cta-band .btn { padding: 1.05em .6em; letter-spacing: .1em; font-size: .7rem; white-space: nowrap; }
 
   /* Booking form */
   .form { padding: 1.25rem; gap: 1.1rem; }
@@ -617,6 +618,10 @@ body .elementor-location-header, body .elementor-location-footer { display: none
   .footer-grid { grid-template-columns: 1fr 1fr; gap: 1.8rem 1.25rem; }
   .footer-grid > .footer-brand, .footer-grid > :last-child { grid-column: 1 / -1; }
   .form-card h3 { font-size: 1.35rem; }
+}
+/* Very narrow phones: stack the hero buttons full width so neither label is squeezed. */
+@media (max-width: 340px) {
+  .hero-actions { grid-template-columns: 1fr; }
 }
 
 /* Brand colours win over leftover page-builder styles (Elementor, MetForm, kit colours) */

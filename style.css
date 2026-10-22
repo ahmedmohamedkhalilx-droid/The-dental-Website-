@@ -23,9 +23,11 @@ Text Domain: the-dental-hauz
   --line: rgba(81, 74, 67, .16);
   --umber-soft: rgba(81, 74, 67, .76);
 
-  /* Brand faces are The Seasons (headings) and Garet (body); Cormorant Garamond and Jost stand in until the licensed files are added. */
-  --font-display: "The Seasons", "Cormorant Garamond", "Cormorant", Georgia, "Times New Roman", serif;
-  --font-body: "Garet", "Jost", "Futura", "Century Gothic", "Helvetica Neue", Arial, sans-serif;
+  /* Brand faces are The Seasons (headings) and Garet (body). They are deliberately not named here: a device with the free demo
+     version installed would use it, and the demo swaps hyphens, brackets and some digits for "DEMO" marks. Add the licensed
+     files with @font-face before naming them again. */
+  --font-display: "Cormorant Garamond", "Cormorant", Georgia, "Times New Roman", serif;
+  --font-body: "Jost", "Futura", "Century Gothic", "Helvetica Neue", Arial, sans-serif;
 
   --step--1: .8125rem;
   --step-0: 1.0625rem;
@@ -304,6 +306,7 @@ body .elementor-location-header, body .elementor-location-footer { display: none
 .box p { color: var(--umber-soft); font-size: .95rem; line-height: 1.65; }
 .boxes--1 .box { margin: 0; background: var(--paper); }
 .about-intro .boxes--2, .service-intro .boxes--2 { margin-top: clamp(2rem, 5vw, 4rem); }
+.box .box__tag { justify-self: start; margin: -.2rem 0 .2rem; padding: .35em .9em; border-radius: 999px; background: var(--sage); color: var(--umber); font-size: .68rem; letter-spacing: .2em; text-transform: uppercase; line-height: 1.3; }
 .devices__closing { margin-top: 2rem; max-width: 46rem; color: var(--umber-soft); }
 @media (max-width: 960px) { .boxes--4 { grid-template-columns: repeat(2, 1fr); } .boxes--3 { grid-template-columns: 1fr; } }
 @media (max-width: 640px) { .boxes--2, .boxes--4 { grid-template-columns: 1fr; } }

@@ -65,9 +65,9 @@ return array(
 			'eyebrow' => 'The Right Device For You!',
 			'title' => 'Helping Patients Achieve Healthy Smiles With Confidence',
 			'items' => array(
-				array( 'Traditional Fixed', 'Traditional braces effectively correct crowded teeth, bite problems, and alignment issues, providing reliable orthodontic treatment for healthier, straighter, and more confident smiles.' ),
-				array( 'Self-Connected Appliance', 'Self-ligating braces use specialized brackets designed to improve comfort while supporting efficient tooth movement throughout orthodontic treatment.' ),
-				array( 'Invisible Device', 'Clear aligners offer a discreet and comfortable alternative to traditional braces for straightening teeth. These custom-made, removable aligners gradually improve tooth alignment while allowing you to eat, brush, and floss with ease.' ),
+				array( 'Traditional Braces', 'Traditional braces effectively correct crowded teeth, bite problems, and alignment issues, providing reliable orthodontic treatment for healthier, straighter, and more confident smiles.' ),
+				array( 'Self-Ligating Braces', 'Self-ligating braces use specialized brackets designed to improve comfort while supporting efficient tooth movement throughout orthodontic treatment.' ),
+				array( 'Clear Aligners', 'Clear aligners offer a discreet and comfortable alternative to traditional braces for straightening teeth. These custom-made, removable aligners gradually improve tooth alignment while allowing you to eat, brush, and floss with ease.', 'Silver Plus Provider' ),
 			),
 			'closing' => 'At The Dental Hauz, we create tailored clear aligner treatment plans to help patients achieve healthier, straighter, and more confident smiles.',
 		),

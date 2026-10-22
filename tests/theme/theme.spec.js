@@ -182,6 +182,19 @@ test.describe('home page', () => {
     await expect(page.locator('#book .form')).toBeVisible();
   });
 
+  test('orthodontic devices use the owner\'s names, and clear aligners carry the Silver Plus Provider tag', async ({ page }) => {
+    await page.goto('/index.html');
+    await expect(page.locator('.devices .box h3')).toHaveText(['Traditional Braces', 'Self-Ligating Braces', 'Clear Aligners']);
+    await expect(page.locator('.devices .box__tag')).toHaveText(['Silver Plus Provider']);
+    await expect(page.locator('.devices .box').nth(2).locator('.box__tag')).toBeVisible();
+  });
+
+  test('fonts never fall back to a locally installed demo of the brand faces (they show "DEMO" marks)', async ({ page }) => {
+    await page.goto('/index.html');
+    const stacks = await page.evaluate(() => [getComputedStyle(document.querySelector('h1')).fontFamily, getComputedStyle(document.body).fontFamily]);
+    for (const f of stacks) expect(f).not.toMatch(/Seasons|Garet/i);
+  });
+
   test('the home page has no video; without the reviews plugin the built-in Google reviews are shown', async ({ page }) => {
     await page.goto('/home-novideo.html');
     await expect(page.locator('.video')).toHaveCount(0);

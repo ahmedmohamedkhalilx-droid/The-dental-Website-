@@ -29,6 +29,18 @@
   {
    "string": "Make Appointment",
    "reason": "Hero button renamed to \"Request Appointment\" at the owner's request"
+  },
+  {
+   "string": "Traditional Fixed",
+   "reason": "Renamed by the owner to \"Traditional Braces\""
+  },
+  {
+   "string": "Self-Connected Appliance",
+   "reason": "Renamed by the owner to \"Self-Ligating Braces\""
+  },
+  {
+   "string": "Invisible Device",
+   "reason": "Renamed by the owner to \"Clear Aligners (Silver Plus Provider)\""
   }
  ],
  "contact-us": [

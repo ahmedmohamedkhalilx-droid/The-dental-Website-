@@ -132,7 +132,7 @@ if ( $dh_q_mail || $dh_q_addr ) :
     </div>
     <div class="boxes boxes--3">
       <?php foreach ( $dh_h['devices']['items'] as $dh_b ) : ?>
-        <article class="box"><h3><?php echo esc_html( $dh_b[0] ); ?></h3><p><?php echo esc_html( $dh_b[1] ); ?></p></article>
+        <article class="box"><h3><?php echo esc_html( $dh_b[0] ); ?></h3><?php if ( ! empty( $dh_b[2] ) ) : ?><p class="box__tag"><?php echo esc_html( $dh_b[2] ); ?></p><?php endif; ?><p><?php echo esc_html( $dh_b[1] ); ?></p></article>
       <?php endforeach; ?>
     </div>
     <p class="devices__closing"><?php echo esc_html( $dh_h['devices']['closing'] ); ?></p>
